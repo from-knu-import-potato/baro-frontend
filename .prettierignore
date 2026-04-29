@@ -1,0 +1,24 @@
+# 빌드 결과물
+dist/
+build/
+out/
+
+# 의존성 라이브러리
+node_modules/
+
+# Git 및 설정 폴더
+.husky/
+.git/
+
+# 정적 파일 (이미지, 폰트 등은 포맷팅이 필요 없음)
+public/
+assets/
+*.png
+*.jpg
+*.svg
+*.ico
+
+# 환경 변수 및 로그
+.env*
+*.log
+pnpm-lock.yaml
