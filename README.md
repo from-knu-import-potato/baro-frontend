@@ -5,7 +5,7 @@
   <img alt="Baro Banner" src="./public/assets/baro-banner-white.png">
 </picture>
 
-<br/>
+<br/><br/>
 
 ### 시작하기 (Getting Started)
 
