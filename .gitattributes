@@ -1,0 +1,14 @@
+# 모든 텍스트 파일의 줄바꿈을 LF로 고정
+* text=auto eol=lf
+
+# 이미지, 폰트 등 바이너리 파일은 수정하지 않음
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.woff2 binary
+*.ttf binary
+
+# (선택) 깃허브 언어 통계에서 제외하고 싶은 경우
+# public/* linguist-vendored
