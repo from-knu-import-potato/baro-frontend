@@ -1,6 +1,9 @@
 # baro-frontend
 
-BARO Frontend | AI &amp; OCR 기반 스마트 재고 관리 서비스
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./public/assets/baro-banner-black.png">
+  <img alt="Baro Banner" src="./public/assets/baro-banner-white.png">
+</picture>
 
 <br/>
 
