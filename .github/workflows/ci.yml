@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  pull_request:
+    branches: ['develop', 'main']
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: pnpm 설치
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: 의존성 설치
+        run: pnpm install --frozen-lockfile
+
+      - name: ESLint 검사
+        run: pnpm lint
+
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: pnpm 설치
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: 의존성 설치
+        run: pnpm install --frozen-lockfile
+
+      - name: 타입 체크
+        run: pnpm exec tsc --noEmit
+
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+    needs: [lint, type-check]
+
+    steps:
+      - name: 코드 체크아웃
+        uses: actions/checkout@v4
+
+      - name: pnpm 설치
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Node.js 설정
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: 의존성 설치
+        run: pnpm install --frozen-lockfile
+
+      - name: 빌드 테스트
+        run: pnpm build
