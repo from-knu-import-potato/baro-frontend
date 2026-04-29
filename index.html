@@ -1,10 +1,16 @@
 <!doctype html>
-<html lang="en">
+<html lang="kr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/assets/baro-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>baro-frontend</title>
+    <title>바로 | BARO</title>
+    <script>
+      (function () {
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.toggle('dark', systemDark);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
