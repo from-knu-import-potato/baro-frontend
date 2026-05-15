@@ -8,8 +8,8 @@ import InventoryDepletedPage from '@/pages/InventoryDepletedPage';
 import LandingPage from '@/pages/LandingPage';
 import LoginPage from '@/pages/LoginPage';
 import NotFoundPage from '@/pages/NotFoundPage';
-import PriceAnalysisPage from '@/pages/PriceAnalysisPage';
 import OrderGuidePage from '@/pages/OrderGuidePage';
+import PriceAnalysisPage from '@/pages/PriceAnalysisPage';
 
 export default function Router() {
   return (
