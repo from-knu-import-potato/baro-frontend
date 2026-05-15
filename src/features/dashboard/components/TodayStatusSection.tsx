@@ -1,9 +1,9 @@
 import { Package, Clock, Bot, TrendingDown, TrendingUp, Store } from 'lucide-react';
 
+import StatItem from '@/features/dashboard/components/StatItem';
 import type { DashboardStats } from '@/features/dashboard/types/dashboard.types';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
-import StatItem from '@/features/dashboard/components/StatItem';
 
 interface TodayStatusSectionProps {
   stats: DashboardStats;
