@@ -1,6 +1,9 @@
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+import { routePaths } from '@/app/routes/routePaths';
+import KakaoLoginButton from '@/features/auth/components/KakaoLoginButton';
+import { Button } from '@/shadcn/ui/button';
 import {
   Card,
   CardContent,
@@ -9,11 +12,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/shadcn/ui/card';
-import { Button } from '@/shadcn/ui/button';
-
-import { routePaths } from '@/app/routes/routePaths';
-import KakaoLoginButton from '@/features/auth/components/KakaoLoginButton';
-
 import baroLogo from '@/shared/assets/images/baro-logo.png';
 
 const LoginPage = () => {
