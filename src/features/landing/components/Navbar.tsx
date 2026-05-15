@@ -4,11 +4,14 @@ import { Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
+import ThemeToggle from '@/features/theme/components/ThemeToggle';
+import { useTheme } from '@/features/theme/hooks/useTheme';
 import { Button } from '@/shadcn/ui/button';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { dark, toggleTheme } = useTheme();
 
   const handleLogoClick = () => {
     navigate(routePaths.landing);
@@ -17,11 +20,6 @@ const Navbar = () => {
 
   const handleLoginClick = () => {
     navigate(routePaths.login);
-    setIsMenuOpen(false);
-  };
-
-  const handleSignupClick = () => {
-    navigate(routePaths.signup);
     setIsMenuOpen(false);
   };
 
@@ -35,13 +33,13 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-baro-ivory-dark">
+    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b border-baro-ivory-dark dark:border-baro-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <button onClick={handleLogoClick} className="flex items-center gap-2 outline-none">
-            <img src="/assets/baro-icon.png" alt="BARO" className="h-8 w-8" />
-            <span className="text-xl font-bold text-baro-black tracking-tight">BARO</span>
+            <img src="/assets/baro-logo.png" alt="BARO" className="h-8 w-8" />
+            <span className="text-xl font-bold tracking-tight">BARO</span>
           </button>
 
           {/* Desktop Menu */}
@@ -68,21 +66,19 @@ const Navbar = () => {
               이용가이드
             </a>
             <div className="flex items-center gap-3 ml-4">
-              <Button variant="outline" onClick={handleLoginClick} className="rounded-full text-xs">
-                로그인
-              </Button>
               <Button
-                className="bg-baro-blue hover:bg-baro-blue-dark text-xs rounded-full"
-                onClick={handleSignupClick}
+                className="bg-baro-blue hover:bg-baro-blue-dark text-xs rounded-full text-white"
+                onClick={handleLoginClick}
               >
                 시작하기
               </Button>
+              <ThemeToggle dark={dark} toggleTheme={toggleTheme} />
             </div>
           </div>
 
           {/* Mobile Menu Button */}
           <div className="md:hidden flex items-center">
-            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-baro-black p-2">
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="p-2">
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -91,8 +87,8 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-b border-baro-ivory-dark animate-in slide-in-from-top duration-300">
-          <div className="px-4 pt-2 pb-6 space-y-2">
+        <div className="md:hidden border-b border-baro-ivory-dark dark:border-baro-black animate-in slide-in-from-top duration-300">
+          <div className="px-4 pt-2 pb-6 space-y-2 text-center">
             <a
               href="#features"
               onClick={(e) => handleNavLinkClick(e, 'features')}
@@ -114,17 +110,12 @@ const Navbar = () => {
             >
               이용가이드
             </a>
-            <div className="grid grid-cols-2 gap-4 pt-4">
-              <Button variant="outline" onClick={handleLoginClick} className="w-full">
-                로그인
-              </Button>
-              <Button
-                className="bg-baro-blue hover:bg-baro-blue/90 w-full"
-                onClick={handleSignupClick}
-              >
-                시작하기
-              </Button>
-            </div>
+            <Button
+              className="bg-baro-blue hover:bg-baro-blue/90 w-full h-11 text-white"
+              onClick={handleLoginClick}
+            >
+              시작하기
+            </Button>
           </div>
         </div>
       )}

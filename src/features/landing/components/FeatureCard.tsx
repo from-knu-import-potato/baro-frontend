@@ -30,9 +30,7 @@ const FeatureCard = ({ feature, delay }: FeatureCardProps) => {
         >
           {feature.icon}
         </div>
-        <CardTitle className="text-xl font-bold text-baro-black text-center">
-          {feature.title}
-        </CardTitle>
+        <CardTitle className="text-xl font-bold text-center">{feature.title}</CardTitle>
       </CardHeader>
       <CardContent className="text-center pb-8 px-6">
         <CardDescription className="text-baro-black-muted leading-relaxed">

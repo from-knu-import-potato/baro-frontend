@@ -12,7 +12,7 @@ const HeroSection = () => {
   const { ref, isVisible } = useScrollReveal();
 
   const handleStartClick = () => {
-    navigate(routePaths.signup);
+    navigate(routePaths.login);
   };
 
   const handleFeaturesClick = () => {
@@ -28,14 +28,14 @@ const HeroSection = () => {
   return (
     <section
       ref={ref}
-      className="relative min-h-[90vh] flex items-center justify-center overflow-hidden bg-white pt-20"
+      className="relative min-h-[90vh] flex items-center justify-center overflow-hidden pt-20"
     >
       <div className="max-w-8xl mx-auto px-4 py-10 lg:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-40 items-center text-center lg:text-left">
           {/* Left Content */}
           <div
             className={cn(
-              'flex flex-col items-center lg:items-start transition-all duration-1000 transform delay-100',
+              'flex flex-col items-center lg:items-start transition-[opacity,transform] duration-1000 delay-100',
               isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10',
             )}
           >
@@ -48,7 +48,7 @@ const HeroSection = () => {
                 alt="BARO Logo"
                 className="h-20 lg:h-29 w-auto transition-transform duration-500 group-hover:scale-110"
               />
-              <p className="mb-6 font-extrabold text-3xl leading-tight tracking-tight text-baro-black lg:text-4xl">
+              <p className="mb-6 font-extrabold text-3xl leading-tight tracking-tight lg:text-4xl">
                 찍으면 <span className="text-baro-blue">바로</span>
                 <br />
                 재고 관리도 <span className="text-baro-green">바로</span>
@@ -64,15 +64,15 @@ const HeroSection = () => {
             <div className="mt-4 lg:mt-10 mb-10 w-full flex flex-col items-center gap-4 sm:flex-row justify-center lg:justify-start">
               <Button
                 onClick={handleStartClick}
-                className="h-auto rounded-full bg-baro-blue px-8 py-3 hover:bg-baro-blue/90 w-full sm:w-auto"
+                className="h-auto rounded-full bg-baro-blue px-8 py-3 hover:bg-baro-blue/90 w-full sm:w-auto text-white"
               >
-                무료로 시작하기
+                BARO 시작하기
               </Button>
 
               <Button
                 variant="outline"
                 onClick={handleFeaturesClick}
-                className="h-auto rounded-full border-baro-ivory-dark px-8 py-3 w-full sm:w-auto"
+                className="h-auto rounded-full px-8 py-3 w-full sm:w-auto"
               >
                 기능 둘러보기
               </Button>
@@ -97,36 +97,34 @@ const HeroSection = () => {
           {/* Right Content */}
           <div
             className={cn(
-              'relative flex transition-all duration-1000 transform delay-300 mt-12 lg:mt-0',
+              'relative flex transition-[opacity,transform] duration-1000 delay-300 mt-12 lg:mt-0',
               isVisible
                 ? 'opacity-100 translate-y-0 lg:translate-x-0'
                 : 'opacity-0 translate-y-10 lg:translate-x-10',
             )}
           >
             {/* Main Decorative Card */}
-            <div className="relative w-full z-10 p-7 bg-linear-to-br from-baro-ivory/50 to-white rounded-[3rem] border border-baro-ivory-dark/30 shadow-md backdrop-blur-sm group">
+            <div className="relative w-full z-10 p-7 rounded-[3rem] border border-baro-ivory-dark/30 dark:border-baro-black shadow-md backdrop-blur-sm group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-baro-blue/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
 
               {/* Floating Items Container */}
               <div className="space-y-6 relative z-20">
                 {/* Visual Item 1 */}
-                <div className="bg-white p-5 rounded-2xl shadow-md border border-baro-ivory-dark flex items-center gap-4 transform transition-all hover:-translate-y-2 relative z-10">
+                <div className="p-5 rounded-2xl shadow-md border border-baro-ivory-dark dark:border-baro-black flex items-center gap-4 transform transition-transform hover:-translate-y-2 relative z-10">
                   <div className="w-12 h-12 bg-baro-blue/10 rounded-xl flex items-center justify-center text-baro-blue font-black text-[10px] uppercase">
                     OCR
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-baro-blue tracking-tighter uppercase mb-0.5">
+                    <p className="text-[10px] text-baro-blue tracking-tighter uppercase mb-0.5">
                       Recognition
                     </p>
-                    <p className="text-sm font-bold text-baro-black leading-none">
-                      거래명세서 15개 품목 인식
-                    </p>
+                    <p className="text-sm font-bold leading-none">거래명세서 15개 품목 인식</p>
                   </div>
                 </div>
 
                 {/* Visual Item 2 */}
-                <div className="bg-baro-green p-5 rounded-2xl shadow-md border border-baro-green-dark flex items-center gap-4 transform translate-x-8 lg:translate-x-16 transition-all hover:-translate-y-3 relative z-30">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-white">
+                <div className="bg-baro-green p-5 rounded-2xl shadow-md border border-baro-green-dark dark:bg-baro-green-dark flex items-center gap-4 transform translate-x-8 lg:translate-x-16 transition-transform hover:-translate-y-3 relative z-30">
+                  <div className="w-12 h-12  rounded-full flex items-center justify-center text-white">
                     <CheckCircle2 size={24} strokeWidth={3} />
                   </div>
                   <div className="text-white">
@@ -138,7 +136,7 @@ const HeroSection = () => {
                 </div>
 
                 {/* Visual Item 3 */}
-                <div className="bg-white p-5 rounded-2xl shadow-md border border-baro-ivory-dark flex items-center gap-4 transform transition-all hover:-translate-y-2  relative z-10">
+                <div className="p-5 rounded-2xl shadow-md border border-baro-ivory-dark dark:border-baro-black flex items-center gap-4 transform transition-transform hover:-translate-y-2  relative z-10">
                   <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 font-black text-[10px] uppercase">
                     KRW
                   </div>
@@ -146,9 +144,7 @@ const HeroSection = () => {
                     <p className="text-[10px] font-black text-amber-600 tracking-tighter uppercase mb-0.5">
                       Analysis
                     </p>
-                    <p className="text-sm font-bold text-baro-black leading-none">
-                      시세 대비 12% 저렴해요
-                    </p>
+                    <p className="text-sm font-bold leading-none">시세 대비 12% 저렴해요</p>
                   </div>
                 </div>
               </div>

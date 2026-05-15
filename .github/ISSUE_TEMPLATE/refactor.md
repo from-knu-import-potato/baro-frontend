@@ -1,9 +1,9 @@
 ---
 name: ♻️ Refactor
 about: 코드 개선 작업
-title: "[REFACTOR] "
+title: '♻️ [REFACTOR] '
 labels: ♻️ refactor
-assignees: ""
+assignees: ''
 ---
 
 ## 🎯 대상 코드

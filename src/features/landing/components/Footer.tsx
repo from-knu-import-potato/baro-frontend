@@ -23,7 +23,7 @@ const Footer = () => {
 
           {/* Links */}
           <div>
-            <h4 className="font-bold mb-6">서비스</h4>
+            <h4 className="font-bold mb-6 text-white!">서비스</h4>
             <ul className="space-y-4 text-sm text-baro-black-muted">
               <li>
                 <a href="#features" className="hover:text-white transition-colors">
@@ -52,7 +52,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-bold mb-6">고객 지원</h4>
+            <h4 className="font-bold mb-6 text-white!">고객 지원</h4>
             <ul className="space-y-4 text-sm text-baro-black-muted">
               <li>
                 <a href="#" className="hover:text-white transition-colors">
@@ -78,7 +78,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-bold mb-6">문의</h4>
+            <h4 className="font-bold mb-6 text-white!">문의</h4>
             <ul className="space-y-4 text-sm text-baro-black-muted">
               <li>Email: dd22dd22.yy66yy66@gmail.com</li>
               <li>Phone: -</li>

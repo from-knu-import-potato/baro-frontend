@@ -7,7 +7,7 @@ const FeatureSection = () => {
   const { ref, isVisible } = useScrollReveal();
 
   return (
-    <section id="features" className="py-36 bg-white overflow-hidden">
+    <section id="features" className="py-36 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           ref={ref}

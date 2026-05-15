@@ -1,103 +1,102 @@
-import { BadgeAlert } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
+import KakaoLoginButton from '@/features/auth/components/KakaoLoginButton';
 import { Button } from '@/shadcn/ui/button';
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from '@/shadcn/ui/card';
-import { Input } from '@/shadcn/ui/input';
-import { Label } from '@/shadcn/ui/label';
+import baroLogo from '@/shared/assets/images/baro-logo.png';
 
 const LoginPage = () => {
   const navigate = useNavigate();
 
-  const handleSignupClick = () => {
-    navigate(routePaths.signup);
-  };
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-baro-ivory/30 px-4">
-      <Card className="w-full max-w-md px-3 py-5">
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div>
-              <CardTitle className="text-2xl font-black text-baro-black">로그인</CardTitle>
+    <div className="relative flex min-h-screen items-center justify-center px-4">
+      {/* Back Button */}
+      <Button
+        variant="outline"
+        size="icon"
+        className="absolute top-6 left-6 rounded-full hover:bg-muted p-2"
+        onClick={() => navigate(routePaths.landing)}
+        aria-label="뒤로 가기"
+      >
+        <ArrowLeft className="size-4 text-baro-black" />
+      </Button>
 
-              <CardDescription className="mt-2 text-sm leading-relaxed text-baro-black-muted">
-                BARO에 로그인하고
-                <br />
-                스마트 재고 관리를 시작해보세요.
-              </CardDescription>
+      <div className="w-full max-w-md">
+        {/* Login Card */}
+        <Card className="rounded-3xl border-border/60  py-6">
+          <CardHeader className="text-center">
+            {/* Title with Logo */}
+            <div className="flex items-center justify-center gap-3 pr-4">
+              <img src={baroLogo} alt="BARO Logo" className="h-10 w-auto" />
+              <CardTitle className="text-3xl font-black tracking-tight">BARO 로그인</CardTitle>
             </div>
 
-            <CardAction>
-              <Button
-                variant="link"
-                onClick={handleSignupClick}
-                className="text-sm text-baro-blue font-semibold"
-              >
-                회원가입
-              </Button>
-            </CardAction>
-          </div>
-        </CardHeader>
+            <CardDescription className="mt-5 text-sm leading-relaxed text-muted-foreground">
+              카카오 계정으로 간편하게 로그인하고
+              <br />
+              스마트 재고 관리를 시작해보세요.
+            </CardDescription>
+          </CardHeader>
 
-        <CardContent>
-          <form>
-            <div className="flex flex-col gap-4">
-              <div className="grid gap-1">
-                <Label htmlFor="email" className="text-sm font-semibold text-baro-black">
-                  이메일
-                </Label>
-
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="example@baro.com"
-                  required
-                  className="h-11 border-baro-ivory-dark focus-visible:ring-transparent"
-                />
-              </div>
-
-              <div className="grid gap-1">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password" className="text-sm font-semibold text-baro-black">
-                    비밀번호
-                  </Label>
-
-                  <Button variant="link" className="text-sm text-baro-blue hover:underline">
-                    비밀번호 찾기
-                  </Button>
+          <CardContent className="mt-2 space-y-4 px-4">
+            {/* Feature Preview 1 */}
+            <div className="rounded-2xl border border-border/60 bg-muted/40 p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-baro-blue/10 text-xs font-black text-baro-blue">
+                  OCR
                 </div>
 
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  className="h-11 border-baro-ivory-dark  focus-visible:ring-transparent"
-                />
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-baro-blue">
+                    Smart Recognition
+                  </p>
+
+                  <p className="text-sm font-semibold">거래명세서 촬영만으로 재고 자동 등록</p>
+                </div>
               </div>
             </div>
-          </form>
-        </CardContent>
 
-        <CardFooter className="flex flex-col gap-2 pt-4">
-          <Button className="h-11 w-full bg-baro-blue hover:bg-baro-blue/90">로그인</Button>
-          <Button
-            variant="outline"
-            className="h-11 w-full border-baro-ivory-dark hover:cursor-not-allowed text-gray-600"
-          >
-            <BadgeAlert /> 소셜 로그인 도입 예정
-          </Button>
-        </CardFooter>
-      </Card>
+            {/* Feature Preview 2 */}
+            <div className="rounded-2xl border border-border/60 bg-muted/40 p-4">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-baro-green/10 text-xs font-black text-baro-green">
+                  AI
+                </div>
+
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wide text-baro-green">
+                    Smart Prediction
+                  </p>
+
+                  <p className="text-sm font-semibold">AI 기반 식자재 발주 추천 및 시세 분석</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+
+          <CardFooter className="flex flex-col gap-4 pt-6">
+            <KakaoLoginButton />
+
+            <p className="text-center text-xs leading-relaxed text-muted-foreground">
+              처음 로그인 시 자동으로 회원가입이 진행됩니다.
+            </p>
+          </CardFooter>
+        </Card>
+
+        {/* Bottom Copyright */}
+        <p className="mt-6 pt-3 text-center text-xs text-muted-foreground">
+          © 2026 BARO. All rights reserved.
+        </p>
+      </div>
     </div>
   );
 };

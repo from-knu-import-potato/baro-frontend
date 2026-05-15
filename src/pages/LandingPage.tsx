@@ -5,7 +5,7 @@ import Navbar from '@/features/landing/components/Navbar';
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <Navbar />
       <main>
         <HeroSection />
