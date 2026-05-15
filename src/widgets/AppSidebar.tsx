@@ -173,9 +173,7 @@ const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
           </div>
           <div className="flex flex-col min-w-0">
             <span className="text-[10px] text-muted-foreground truncate">{storeCategory}</span>
-            <span className="text-sm font-semibold text-muted-foreground truncate">
-              {storeName}
-            </span>
+            <span className="text-sm font-semibold text-foreground truncate">{storeName}</span>
           </div>
           <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto shrink-0" />
         </SidebarMenuButton>
