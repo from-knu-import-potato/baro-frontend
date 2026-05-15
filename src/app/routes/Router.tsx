@@ -9,6 +9,7 @@ import LandingPage from '@/pages/LandingPage';
 import LoginPage from '@/pages/LoginPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import PriceAnalysisPage from '@/pages/PriceAnalysisPage';
+import OrderGuidePage from '@/pages/OrderGuidePage';
 
 export default function Router() {
   return (
@@ -23,6 +24,7 @@ export default function Router() {
         <Route path={routePaths.dashboard} element={<DashboardPage />} />
         <Route path={routePaths.inventoryCurrent} element={<InventoryCurrentPage />} />
         <Route path={routePaths.inventoryDepleted} element={<InventoryDepletedPage />} />
+        <Route path={routePaths.orderGuide} element={<OrderGuidePage />} />
         <Route path={routePaths.priceAnalysis} element={<PriceAnalysisPage />} />
       </Route>
     </Routes>
