@@ -29,6 +29,6 @@ export const features: Feature[] = [
     title: '스마트 마감 & 오차 분석',
     description: '판매량 기반 이론 재고와 실제 재고의 오차를 분석하여 로스율을 관리합니다.',
     color: 'text-baro-black',
-    bgColor: 'bg-baro-black/5',
+    bgColor: 'bg-baro-black-muted/5',
   },
 ];
