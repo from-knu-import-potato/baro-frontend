@@ -8,10 +8,13 @@
 <br/>
 
 <div align="center">
-
-[![서비스 바로가기](https://img.shields.io/badge/서비스_바로가기-baro--web.vercel.app-449CD4?style=for-the-badge&logo=vercel&logoColor=white)](https://baro-web.vercel.app/)
-[![테스트 서버](https://img.shields.io/badge/테스트_서버-qa--baro--web.vercel.app-679436?style=for-the-badge&logo=vercel&logoColor=white)](https://qa-baro-web.vercel.app/)
-
+  <a href="https://baro-web.vercel.app/">
+    <img src="https://img.shields.io/badge/🌐 서비스 바로가기-Click-449CD4?style=flat-square" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://qa-baro-web.vercel.app/">
+    <img src="https://img.shields.io/badge/🧪 테스트 서버-Click-679436?style=flat-square" />
+  </a>
 </div>
 
 <br/>
