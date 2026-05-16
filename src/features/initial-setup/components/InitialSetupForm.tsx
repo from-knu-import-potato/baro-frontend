@@ -150,7 +150,7 @@ const InitialSetupForm = () => {
               </div>
               <CardDescription className="mt-0.5">{currentStepConfig.description}</CardDescription>
             </CardHeader>
-            <CardContent className="pt-5">{renderStep()}</CardContent>
+            <CardContent>{renderStep()}</CardContent>
           </Card>
 
           {/* Navigation */}
