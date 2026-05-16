@@ -33,17 +33,7 @@ export const DAY_OF_WEEK_CONFIG: { value: DayOfWeek; label: string }[] = [
   { value: 'sunday', label: '일요일' },
 ];
 
-export const INGREDIENT_UNITS: IngredientUnit[] = [
-  'g',
-  'kg',
-  'ml',
-  'L',
-  '개',
-  '봉',
-  '팩',
-  '병',
-  '캔',
-];
+export const INGREDIENT_UNITS: IngredientUnit[] = ['개', '캔', '봉', '팩', '박스', '묶음'];
 
 export const NOTIFICATION_CHANNELS: { key: ChannelKey; label: string }[] = [
   { key: 'email', label: '이메일' },

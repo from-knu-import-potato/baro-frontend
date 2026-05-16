@@ -19,7 +19,7 @@ export type DayOfWeek =
   | 'saturday'
   | 'sunday';
 
-export type IngredientUnit = 'g' | 'kg' | 'ml' | 'L' | '개' | '봉' | '팩' | '병' | '캔';
+export type IngredientUnit = '개' | '봉' | '팩' | '병' | '캔' | '박스' | '묶음';
 
 export interface StoreBasicInfo {
   storeName: string;
