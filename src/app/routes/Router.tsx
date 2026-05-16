@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import AppLayout from '@/app/layouts/AppLayout';
 import { routePaths } from '@/app/routes/routePaths';
 import DashboardPage from '@/pages/DashboardPage';
+import InitialSetupPage from '@/pages/InitialSetupPage';
 import InventoryCurrentPage from '@/pages/InventoryCurrentPage';
 import InventoryDepletedPage from '@/pages/InventoryDepletedPage';
 import LandingPage from '@/pages/LandingPage';
@@ -17,6 +18,7 @@ export default function Router() {
       {/* 레이아웃 없는 페이지 */}
       <Route path={routePaths.landing} element={<LandingPage />} />
       <Route path={routePaths.login} element={<LoginPage />} />
+      <Route path={routePaths.initialSetup} element={<InitialSetupPage />} />
       <Route path={routePaths.notFound} element={<NotFoundPage />} />
 
       {/* 사이드바 + 상단바 공통 레이아웃 */}
