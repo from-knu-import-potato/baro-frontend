@@ -38,7 +38,7 @@ const StepRecipeInfo = ({ menuItems, recipes, onChange }: StepRecipeInfoProps) =
       id: generateId(),
       ingredientName: '',
       amount: 0,
-      unit: 'g',
+      unit: '개',
     };
     updateRecipe({ ...recipe, ingredients: [...recipe.ingredients, newIngredient] });
   };

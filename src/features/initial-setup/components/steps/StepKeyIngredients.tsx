@@ -16,7 +16,7 @@ const generateId = () => Math.random().toString(36).slice(2, 9);
 
 const StepKeyIngredients = ({ data, onChange }: StepKeyIngredientsProps) => {
   const addIngredient = () => {
-    onChange([...data, { id: generateId(), name: '', minStockAmount: 0, unit: 'g' }]);
+    onChange([...data, { id: generateId(), name: '', minStockAmount: 0, unit: '개' }]);
   };
 
   const removeIngredient = (id: string) => {
