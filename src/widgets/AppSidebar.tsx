@@ -8,6 +8,7 @@ import {
   Bell,
   Settings,
   HelpCircle,
+  Home,
   ChevronRight,
   ChevronDown,
 } from 'lucide-react';
@@ -37,6 +38,7 @@ const BOTTOM_NAV_ITEMS = [
   { label: '알림', icon: Bell, to: routePaths.notifications },
   { label: '설정', icon: Settings, to: routePaths.settings },
   { label: '지원', icon: HelpCircle, to: routePaths.support },
+  { label: '랜딩 페이지', icon: Home, to: routePaths.landing },
 ];
 
 interface AppSidebarProps {
