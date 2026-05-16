@@ -58,7 +58,7 @@ const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
       {/* 로고 + 토글 */}
       <SidebarHeader className="flex flex-row items-center justify-between px-3 py-3 border-b border-sidebar-border">
         <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
-          <img src={BaroLogo} className="w-8 h-8" />
+          <img src={BaroLogo} className="w-6 h-6" />
           <span className="font-bold text-lg tracking-tight">
             BA<span className="text-[#449CD4]">RO</span>
           </span>
