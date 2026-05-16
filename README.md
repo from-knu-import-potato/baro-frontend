@@ -5,7 +5,19 @@
   <img alt="Baro Banner" src="./public/assets/baro-banner-white.png">
 </picture>
 
-<br/><br/>
+<br/>
+
+<div align="center">
+  <a href="https://baro-web.vercel.app/">
+    <img src="https://img.shields.io/badge/🌐 서비스 바로가기-Click-449CD4?style=flat-square" />
+  </a>
+  &nbsp;&nbsp;
+  <a href="https://qa-baro-web.vercel.app/">
+    <img src="https://img.shields.io/badge/🧪 테스트 서버-Click-679436?style=flat-square" />
+  </a>
+</div>
+
+<br/>
 
 ### 시작하기 (Getting Started)
 
