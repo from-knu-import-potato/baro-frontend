@@ -44,7 +44,7 @@ const StepMenuRegistration = ({ data, onChange }: StepMenuRegistrationProps) => 
           {data.map((item) => (
             <div
               key={item.id}
-              className="grid grid-cols-[1fr_110px_36px_36px] items-center gap-2 rounded-lg border border-gray-100 bg-gray-50/50 px-2 py-1.5"
+              className="grid grid-cols-[1fr_110px_36px_36px] items-center gap-2 rounded-lg border px-2 py-1.5"
             >
               <Input
                 placeholder="메뉴 이름"

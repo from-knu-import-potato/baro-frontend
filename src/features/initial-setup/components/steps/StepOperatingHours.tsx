@@ -22,7 +22,7 @@ const TimeInput = ({ value, onChange }: TimeInputProps) => (
       type="time"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      className="h-8 w-36 rounded-lg border border-input bg-white pl-8 pr-3 text-sm outline-none transition-colors focus:border-baro-blue focus:ring-2 focus:ring-(--baro-blue)/20"
+      className="h-8 w-36 rounded-lg border border-input pl-8 pr-3 text-sm outline-none transition-colors focus:border-baro-blue focus:ring-2 focus:ring-baro-blue/20"
     />
   </div>
 );
@@ -45,8 +45,8 @@ const StepOperatingHours = ({ data, onChange }: StepOperatingHoursProps) => {
             className={cn(
               'flex items-center gap-3 rounded-lg border px-3 py-2.5 transition-colors',
               hour.isOpen
-                ? 'border-(--baro-blue)/25 bg-(--baro-blue)/5'
-                : 'border-gray-100 bg-gray-50/80',
+                ? 'border-baro-blue/25 bg-baro-blue/5 dark:border-baro-blue-dark/15 dark:bg-baro-blue-dark/3'
+                : 'border-gray-100 bg-gray-50/80 dark:bg-baro-black/80 dark:border-baro-black',
             )}
           >
             <span

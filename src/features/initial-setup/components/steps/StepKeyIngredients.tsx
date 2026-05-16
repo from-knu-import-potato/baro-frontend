@@ -29,9 +29,9 @@ const StepKeyIngredients = ({ data, onChange }: StepKeyIngredientsProps) => {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start gap-2 rounded-lg bg-(--baro-blue)/8 p-3">
+      <div className="flex items-start gap-2 rounded-lg bg-baro-blue/8 p-3">
         <AlertCircle className="mt-0.5 size-4 shrink-0 text-baro-blue" />
-        <p className="text-xs leading-relaxed text-(--baro-blue)/80">
+        <p className="text-xs leading-relaxed text-baro-blue/80">
           최소 재고 기준을 설정하면 재고가 기준 이하로 떨어질 때 알림을 받을 수 있어요
         </p>
       </div>
@@ -53,7 +53,7 @@ const StepKeyIngredients = ({ data, onChange }: StepKeyIngredientsProps) => {
           {data.map((item) => (
             <div
               key={item.id}
-              className="grid grid-cols-[1fr_100px_88px_32px] items-center gap-2 rounded-lg border border-gray-100 bg-gray-50/50 px-2 py-1.5"
+              className="grid grid-cols-[1fr_100px_88px_32px] items-center gap-2 rounded-lg border px-2 py-1.5"
             >
               <Input
                 placeholder="예: 원두"

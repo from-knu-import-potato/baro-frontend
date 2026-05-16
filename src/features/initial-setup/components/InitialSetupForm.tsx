@@ -117,9 +117,9 @@ const InitialSetupForm = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-(--baro-ivory)/30">
+    <div className="flex min-h-screen flex-col">
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-gray-100 bg-white px-6 py-3.5">
+      <header className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-background px-6 py-3.5">
         <div className="flex items-center gap-2.5">
           <img src={baroLogo} alt="BARO" className="h-7 w-auto" />
           <span className="text-sm font-semibold text-foreground">초기 설정</span>
@@ -141,7 +141,7 @@ const InitialSetupForm = () => {
 
           {/* Step card */}
           <Card className="shadow-sm">
-            <CardHeader className="border-b border-gray-100">
+            <CardHeader className="border-b">
               <div className="flex items-center gap-2">
                 <span className="flex size-6 items-center justify-center rounded-full bg-baro-blue text-xs font-bold text-white">
                   {currentStep}

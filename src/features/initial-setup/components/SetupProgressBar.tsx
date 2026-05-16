@@ -15,7 +15,7 @@ const SetupProgressBar = ({ currentStep }: SetupProgressBarProps) => {
     <div className="w-full px-1">
       <div className="relative flex items-start justify-between">
         {/* Background line */}
-        <div className="absolute left-4 right-4 top-4 h-0.5 -translate-y-1/2 bg-gray-200" />
+        <div className="absolute left-4 right-4 top-4 h-0.5 -translate-y-1/2 bg-gray-200 dark:bg-baro-black-muted" />
         {/* Progress line */}
         <div
           className="absolute left-4 top-4 h-0.5 -translate-y-1/2 bg-baro-blue transition-all duration-500"
@@ -35,8 +35,8 @@ const SetupProgressBar = ({ currentStep }: SetupProgressBarProps) => {
                   isCompleted
                     ? 'border-baro-blue bg-baro-blue text-white'
                     : isActive
-                      ? 'border-baro-blue bg-white text-baro-blue'
-                      : 'border-gray-200 bg-white text-gray-400',
+                      ? 'border-baro-blue bg-background text-baro-blue'
+                      : 'border-gray-200 dark:border-baro-black-muted bg-background text-gray-400 dark:text-baro-black-muted',
                 )}
               >
                 {isCompleted ? <Check className="size-3.5" strokeWidth={3} /> : step.id}
@@ -44,11 +44,7 @@ const SetupProgressBar = ({ currentStep }: SetupProgressBarProps) => {
               <span
                 className={cn(
                   'hidden text-center text-[10px] font-medium leading-tight sm:block',
-                  isActive
-                    ? 'text-baro-blue'
-                    : isCompleted
-                      ? 'text-(--baro-blue)/70'
-                      : 'text-gray-400',
+                  isActive ? 'text-baro-blue' : isCompleted ? 'text-baro-blue/70' : 'text-gray-400',
                 )}
               >
                 {step.title}

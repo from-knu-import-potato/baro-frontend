@@ -40,15 +40,15 @@ const StepNotifications = ({ data, onChange }: StepNotificationsProps) => {
               className={cn(
                 'flex items-start justify-between gap-4 rounded-lg border p-3.5 transition-colors',
                 data[key]
-                  ? 'border-(--baro-blue)/25 bg-(--baro-blue)/5'
-                  : 'border-gray-100 bg-gray-50',
+                  ? 'border-baro-blue/25 bg-baro-blue/5'
+                  : 'border-gray-100 bg-gray-50 dark:bg-baro-black dark:border-baro-black/60',
               )}
             >
               <div className="flex items-start gap-3">
                 <div
                   className={cn(
                     'mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg transition-colors',
-                    data[key] ? 'bg-baro-blue text-white' : 'bg-gray-200 text-gray-400',
+                    data[key] ? 'bg-baro-blue text-white' : 'bg-gray-200  text-gray-400',
                   )}
                 >
                   <Icon className="size-4" />

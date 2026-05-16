@@ -80,8 +80,8 @@ const StepRecipeInfo = ({ menuItems, recipes, onChange }: StepRecipeInfoProps) =
         const recipe = getRecipe(menu.id);
 
         return (
-          <div key={menu.id} className="overflow-hidden rounded-xl border border-gray-200">
-            <div className="flex items-center justify-between bg-gray-50 px-4 py-2.5">
+          <div key={menu.id} className="overflow-hidden rounded-xl border">
+            <div className="flex items-center justify-between px-4 py-2.5">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium">{menu.name || '(이름 없음)'}</span>
                 {menu.isFeatured && (
