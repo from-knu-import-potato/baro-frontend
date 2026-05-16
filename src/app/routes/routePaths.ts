@@ -9,6 +9,9 @@ export const routePaths = {
   priceAnalysis: '/ingredient-price-analysis',
   notifications: '/notifications',
   settings: '/settings',
+  settingsMenus: '/settings/menus',
+  settingsRecipes: '/settings/recipes',
+  settingsIngredients: '/settings/ingredients',
   support: '/support',
   notFound: '*',
 } as const;
