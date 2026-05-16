@@ -11,6 +11,7 @@ import LoginPage from '@/pages/LoginPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import OrderGuidePage from '@/pages/OrderGuidePage';
 import PriceAnalysisPage from '@/pages/PriceAnalysisPage';
+import SettingsPage from '@/pages/SettingsPage';
 
 export default function Router() {
   return (
@@ -28,6 +29,7 @@ export default function Router() {
         <Route path={routePaths.inventoryDepleted} element={<InventoryDepletedPage />} />
         <Route path={routePaths.orderGuide} element={<OrderGuidePage />} />
         <Route path={routePaths.priceAnalysis} element={<PriceAnalysisPage />} />
+        <Route path={routePaths.settings} element={<SettingsPage />} />
       </Route>
     </Routes>
   );
