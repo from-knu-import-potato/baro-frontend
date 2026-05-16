@@ -9,7 +9,7 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 import importPlugin from 'eslint-plugin-import';
 
 export default defineConfig([
-  globalIgnores(['dist', 'node_modules', '.husky']),
+  globalIgnores(['dist', 'node_modules', '.husky', 'src/shadcn']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

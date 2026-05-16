@@ -17,6 +17,14 @@ import baroLogo from '@/shared/assets/images/baro-logo.png';
 const LoginPage = () => {
   const navigate = useNavigate();
 
+  const handleKakaoLoginClick = () => {
+    navigate(routePaths.dashboard);
+  };
+
+  const handleGoBackClick = () => {
+    navigate(routePaths.landing);
+  };
+
   return (
     <div className="relative flex min-h-screen items-center justify-center px-4">
       {/* Back Button */}
@@ -24,7 +32,7 @@ const LoginPage = () => {
         variant="outline"
         size="icon"
         className="absolute top-6 left-6 rounded-full hover:bg-muted p-2"
-        onClick={() => navigate(routePaths.landing)}
+        onClick={handleGoBackClick}
         aria-label="뒤로 가기"
       >
         <ArrowLeft className="size-4 text-baro-black" />
@@ -84,7 +92,7 @@ const LoginPage = () => {
           </CardContent>
 
           <CardFooter className="flex flex-col gap-4 pt-6">
-            <KakaoLoginButton />
+            <KakaoLoginButton onClick={handleKakaoLoginClick} />
 
             <p className="text-center text-xs leading-relaxed text-muted-foreground">
               처음 로그인 시 자동으로 회원가입이 진행됩니다.
