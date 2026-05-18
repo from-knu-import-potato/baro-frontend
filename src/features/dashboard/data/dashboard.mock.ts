@@ -30,32 +30,20 @@ export const MOCK_RECOMMENDATIONS: OrderRecommendationItem[] = [
   {
     id: '1',
     name: '감자',
-    reason: 'expiring',
-    detail: '유통기한 2일 남음 · 현재 재고 5kg',
+    aiReason:
+      '유통기한이 2일밖에 남지 않았고, 이번 주 메뉴에 가장 많이 쓰이는 식자재예요. 지금 남은 재고(5kg)를 소진하기 전에 미리 발주해 두는 걸 권장해요.',
   },
   {
     id: '2',
     name: '버터',
-    reason: 'low_stock',
-    detail: '현재 재고 200g · 주간 평균 소비 1.2kg',
+    aiReason:
+      '현재 재고(200g)가 주간 평균 소비량(1.2kg)의 17% 수준이에요. 이 추세라면 2~3일 내 재고가 바닥날 가능성이 높으니 빠른 발주가 필요해요.',
   },
   {
     id: '3',
     name: '우유',
-    reason: 'expiring',
-    detail: '유통기한 1일 남음 · 현재 재고 2L',
-  },
-  {
-    id: '4',
-    name: '밀가루',
-    reason: 'low_stock',
-    detail: '현재 재고 500g · 주간 평균 소비 3kg',
-  },
-  {
-    id: '5',
-    name: '토마토 소스',
-    reason: 'low_stock',
-    detail: '현재 재고 1병 · 일평균 소비 0.5병',
+    aiReason:
+      '유통기한이 내일까지로 급박해요. 현재 재고(2L)는 오늘 영업 중에 소진될 수 있으니, 신선한 제품을 당일 발주하는 것을 강력 추천해요.',
   },
 ];
 

@@ -11,6 +11,11 @@ import LoginPage from '@/pages/LoginPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import OrderGuidePage from '@/pages/OrderGuidePage';
 import PriceAnalysisPage from '@/pages/PriceAnalysisPage';
+import SettingsIngredientsPage from '@/pages/SettingsIngredientsPage';
+import SettingsMenusPage from '@/pages/SettingsMenusPage';
+import SettingsPage from '@/pages/SettingsPage';
+import SettingsRecipesPage from '@/pages/SettingsRecipesPage';
+import StoreSelectionPage from '@/pages/StoreSelectionPage';
 
 export default function Router() {
   return (
@@ -18,6 +23,7 @@ export default function Router() {
       {/* 레이아웃 없는 페이지 */}
       <Route path={routePaths.landing} element={<LandingPage />} />
       <Route path={routePaths.login} element={<LoginPage />} />
+      <Route path={routePaths.storeSelection} element={<StoreSelectionPage />} />
       <Route path={routePaths.initialSetup} element={<InitialSetupPage />} />
       <Route path={routePaths.notFound} element={<NotFoundPage />} />
 
@@ -28,6 +34,10 @@ export default function Router() {
         <Route path={routePaths.inventoryDepleted} element={<InventoryDepletedPage />} />
         <Route path={routePaths.orderGuide} element={<OrderGuidePage />} />
         <Route path={routePaths.priceAnalysis} element={<PriceAnalysisPage />} />
+        <Route path={routePaths.settings} element={<SettingsPage />} />
+        <Route path={routePaths.settingsMenus} element={<SettingsMenusPage />} />
+        <Route path={routePaths.settingsRecipes} element={<SettingsRecipesPage />} />
+        <Route path={routePaths.settingsIngredients} element={<SettingsIngredientsPage />} />
       </Route>
     </Routes>
   );

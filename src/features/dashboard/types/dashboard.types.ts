@@ -10,8 +10,7 @@ export interface DashboardStats {
 export interface OrderRecommendationItem {
   id: string;
   name: string;
-  reason: 'expiring' | 'low_stock';
-  detail: string;
+  aiReason: string;
 }
 
 export interface MonthlySalesData {

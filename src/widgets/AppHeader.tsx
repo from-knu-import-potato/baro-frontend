@@ -7,7 +7,7 @@ interface AppHeaderProps {
 
 const AppHeader = ({ userName, userRole }: AppHeaderProps) => {
   return (
-    <header className="bg-background h-14 border-b border-gray-200 dark:border-gray-800 flex items-center justify-end px-6 gap-4 sticky top-0 z-10">
+    <header className="bg-background h-13 border-b flex items-center justify-end px-6 gap-4 sticky top-0 z-10">
       {/* 검색 */}
       {/* <div className="flex-1 flex justify-center">
         <div className="relative w-full max-w-sm">
@@ -21,13 +21,13 @@ const AppHeader = ({ userName, userRole }: AppHeaderProps) => {
       </div> */}
 
       {/* 유저 정보 */}
-      <div className="flex items-center gap-5 cursor-pointer rounded-lg py-1.5 transition-colors">
-        <div className="w-8 h-8 rounded-full bg-baro-blue flex items-center justify-center">
+      <div className="flex items-center gap-4 cursor-pointer rounded-lg transition-colors">
+        <div className="w-7 h-7 rounded-full bg-baro-blue flex items-center justify-center">
           <span className="text-xs font-semibold text-white">{userName.charAt(0)}</span>
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-semibold leading-tight">{userName}</span>
-          <span className="text-xs leading-tight">{userRole}</span>
+          <span className="text-xs font-semibold leading-tight">{userName}</span>
+          <span className="text-xs leading-tight text-muted-foreground">{userRole}</span>
         </div>
         <ChevronDown className="w-4 h-4 text-gray-400" />
       </div>

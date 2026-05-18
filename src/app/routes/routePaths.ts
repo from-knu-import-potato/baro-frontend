@@ -1,6 +1,7 @@
 export const routePaths = {
   landing: '/',
   login: '/login',
+  storeSelection: '/store-selection',
   initialSetup: '/initial-setup',
   dashboard: '/dashboard',
   inventoryCurrent: '/inventory/current',
@@ -9,6 +10,9 @@ export const routePaths = {
   priceAnalysis: '/ingredient-price-analysis',
   notifications: '/notifications',
   settings: '/settings',
+  settingsMenus: '/settings/menus',
+  settingsRecipes: '/settings/recipes',
+  settingsIngredients: '/settings/ingredients',
   support: '/support',
   notFound: '*',
 } as const;

@@ -18,7 +18,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleKakaoLoginClick = () => {
-    navigate(routePaths.initialSetup);
+    navigate(routePaths.storeSelection);
   };
 
   const handleGoBackClick = () => {

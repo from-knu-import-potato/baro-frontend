@@ -5,15 +5,16 @@ import {
   Package,
   Truck,
   TrendingUp,
-  Bell,
   Settings,
   HelpCircle,
+  Home,
   ChevronRight,
   ChevronDown,
 } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
+import NotificationDropdown from '@/features/notification/components/NotificationDropdown';
 import { Collapsible, CollapsibleContent } from '@/shadcn/ui/collapsible';
 import {
   Sidebar,
@@ -34,9 +35,9 @@ import {
 import BaroLogo from '@/shared/assets/images/baro-logo.png';
 
 const BOTTOM_NAV_ITEMS = [
-  { label: '알림', icon: Bell, to: routePaths.notifications },
   { label: '설정', icon: Settings, to: routePaths.settings },
   { label: '지원', icon: HelpCircle, to: routePaths.support },
+  { label: '랜딩 페이지', icon: Home, to: routePaths.landing },
 ];
 
 interface AppSidebarProps {
@@ -56,7 +57,7 @@ const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
       {/* 로고 + 토글 */}
       <SidebarHeader className="flex flex-row items-center justify-between px-3 py-3 border-b border-sidebar-border">
         <div className="flex items-center gap-2 group-data-[collapsible=icon]:hidden">
-          <img src={BaroLogo} className="w-8 h-8" />
+          <img src={BaroLogo} className="w-6 h-6" />
           <span className="font-bold text-lg tracking-tight">
             BA<span className="text-[#449CD4]">RO</span>
           </span>
@@ -150,6 +151,7 @@ const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
       <SidebarFooter className="pb-2">
         <SidebarSeparator className="mx-0" />
         <SidebarMenu>
+          <NotificationDropdown />
           {BOTTOM_NAV_ITEMS.map(({ label, icon: Icon, to }) => (
             <SidebarMenuItem key={to}>
               <SidebarMenuButton

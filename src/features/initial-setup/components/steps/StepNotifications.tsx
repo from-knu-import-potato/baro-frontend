@@ -1,15 +1,11 @@
 import { Bell } from 'lucide-react';
 
-import { NOTIFICATION_CHANNELS } from '@/features/initial-setup/constants/initialSetup.constants';
 import { ALERT_TYPE_CONFIG } from '@/features/initial-setup/constants/initialSetup.constants.ui';
 import type {
   AlertKey,
-  ChannelKey,
   NotificationSettings,
 } from '@/features/initial-setup/types/initialSetup.types';
 import { cn } from '@/lib/utils';
-import { Checkbox } from '@/shadcn/ui/checkbox';
-import { Separator } from '@/shadcn/ui/separator';
 import { Switch } from '@/shadcn/ui/switch';
 
 interface StepNotificationsProps {
@@ -22,9 +18,9 @@ const StepNotifications = ({ data, onChange }: StepNotificationsProps) => {
     onChange({ ...data, [key]: value });
   };
 
-  const updateChannel = (key: ChannelKey, value: boolean) => {
-    onChange({ ...data, alertChannels: { ...data.alertChannels, [key]: value } });
-  };
+  // const updateChannel = (key: ChannelKey, value: boolean) => {
+  //   onChange({ ...data, alertChannels: { ...data.alertChannels, [key]: value } });
+  // };
 
   return (
     <div className="space-y-6">
@@ -69,9 +65,9 @@ const StepNotifications = ({ data, onChange }: StepNotificationsProps) => {
         </div>
       </div>
 
-      <Separator />
+      {/* <Separator /> */}
 
-      <div>
+      {/* <div>
         <h3 className="mb-3 text-sm font-medium text-foreground">알림 수단</h3>
         <div className="flex flex-wrap gap-5">
           {NOTIFICATION_CHANNELS.map(({ key, label }) => (
@@ -84,7 +80,7 @@ const StepNotifications = ({ data, onChange }: StepNotificationsProps) => {
             </label>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
