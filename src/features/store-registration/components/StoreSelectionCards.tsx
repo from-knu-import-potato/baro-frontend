@@ -28,7 +28,7 @@ const StoreSelectionCards = () => {
       <div className="flex flex-col items-center gap-2 px-4 pt-8 mt-8 text-center">
         <img src={baroLogo} alt="BARO Logo" className="h-9 w-auto" />
         <div>
-          <p className="text-3xl font-black tracking-tight text-baro-black">어떻게 시작할까요?</p>
+          <p className="text-3xl tracking-tight">어떻게 시작할까요?</p>
           <p className="mt-1 text-xs text-muted-foreground">
             새 가게를 등록하거나, 초대코드로 기존 가게에 합류하세요.
           </p>

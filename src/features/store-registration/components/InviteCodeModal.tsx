@@ -57,7 +57,7 @@ const InviteCodeModal = ({ open, onOpenChange }: InviteCodeModalProps) => {
           />
         </div>
 
-        <DialogFooter className="gap-2 pt-2">
+        <DialogFooter className="gap-2 pt-2 bg-background">
           <Button variant="outline" onClick={() => handleOpenChange(false)} className="flex-1 h-9">
             취소
           </Button>
