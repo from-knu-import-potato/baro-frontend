@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
 
 const OcrUploadCard = () => {
   return (
-    <Card>
+    <Card className="h-full flex flex-col">
       <CardHeader className="border-b pb-4">
         <CardTitle className="text-sm flex items-center gap-2">
           <ScanLine className="w-4 h-4 text-muted-foreground" />
@@ -12,8 +12,8 @@ const OcrUploadCard = () => {
         </CardTitle>
       </CardHeader>
 
-      <CardContent>
-        <div className="border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-3 py-8 bg-blue-50/10 cursor-pointer hover:bg-blue-50 hover:dark:bg-baro-blue/20 transition-colors group">
+      <CardContent className="flex-1 flex flex-col">
+        <div className="border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-3 flex-1 bg-blue-50/10 cursor-pointer hover:bg-blue-50 hover:dark:bg-baro-blue/20 transition-colors group">
           <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
             <Upload className="w-4 h-4 text-baro-blue" />
           </div>
