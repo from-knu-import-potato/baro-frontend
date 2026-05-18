@@ -15,6 +15,7 @@ import SettingsIngredientsPage from '@/pages/SettingsIngredientsPage';
 import SettingsMenusPage from '@/pages/SettingsMenusPage';
 import SettingsPage from '@/pages/SettingsPage';
 import SettingsRecipesPage from '@/pages/SettingsRecipesPage';
+import StoreSelectionPage from '@/pages/StoreSelectionPage';
 
 export default function Router() {
   return (
@@ -22,6 +23,7 @@ export default function Router() {
       {/* 레이아웃 없는 페이지 */}
       <Route path={routePaths.landing} element={<LandingPage />} />
       <Route path={routePaths.login} element={<LoginPage />} />
+      <Route path={routePaths.storeSelection} element={<StoreSelectionPage />} />
       <Route path={routePaths.initialSetup} element={<InitialSetupPage />} />
       <Route path={routePaths.notFound} element={<NotFoundPage />} />
 

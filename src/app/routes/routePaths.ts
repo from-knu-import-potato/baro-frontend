@@ -1,6 +1,7 @@
 export const routePaths = {
   landing: '/',
   login: '/login',
+  storeSelection: '/store-selection',
   initialSetup: '/initial-setup',
   dashboard: '/dashboard',
   inventoryCurrent: '/inventory/current',
