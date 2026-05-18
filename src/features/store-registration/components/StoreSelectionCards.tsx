@@ -3,9 +3,8 @@ import { useState } from 'react';
 import { Store, Users, ArrowRight, ChefHat, ClipboardList } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import InviteCodeModal from '@/features/store-registration/components/InviteCodeModal';
-
 import { routePaths } from '@/app/routes/routePaths';
+import InviteCodeModal from '@/features/store-registration/components/InviteCodeModal';
 import { cn } from '@/lib/utils';
 import baroLogo from '@/shared/assets/images/baro-logo.png';
 
