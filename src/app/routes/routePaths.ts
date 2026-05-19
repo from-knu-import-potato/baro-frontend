@@ -10,8 +10,6 @@ export const routePaths = {
   priceAnalysis: '/ingredient-price-analysis',
   notifications: '/notifications',
   settings: '/settings',
-  settingsMenus: '/settings/menus',
-  settingsRecipes: '/settings/recipes',
   settingsIngredients: '/settings/ingredients',
   account: '/account',
   support: '/support',

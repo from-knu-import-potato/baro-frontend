@@ -13,9 +13,7 @@ import NotFoundPage from '@/pages/NotFoundPage';
 import OrderGuidePage from '@/pages/OrderGuidePage';
 import PriceAnalysisPage from '@/pages/PriceAnalysisPage';
 import SettingsIngredientsPage from '@/pages/SettingsIngredientsPage';
-import SettingsMenusPage from '@/pages/SettingsMenusPage';
 import SettingsPage from '@/pages/SettingsPage';
-import SettingsRecipesPage from '@/pages/SettingsRecipesPage';
 import StoreSelectionPage from '@/pages/StoreSelectionPage';
 
 export default function Router() {
@@ -37,8 +35,6 @@ export default function Router() {
         <Route path={routePaths.priceAnalysis} element={<PriceAnalysisPage />} />
         <Route path={routePaths.settings} element={<SettingsPage />} />
         <Route path={routePaths.account} element={<AccountPage />} />
-        <Route path={routePaths.settingsMenus} element={<SettingsMenusPage />} />
-        <Route path={routePaths.settingsRecipes} element={<SettingsRecipesPage />} />
         <Route path={routePaths.settingsIngredients} element={<SettingsIngredientsPage />} />
       </Route>
     </Routes>
