@@ -1,6 +1,7 @@
+import { useEffect, useRef, useState } from 'react';
+
 import { Plus, Trash2 } from 'lucide-react';
 
-import { INGREDIENT_UNITS } from '@/features/initial-setup/constants/initialSetup.constants';
 import type {
   MenuItem,
   Recipe,
@@ -9,7 +10,6 @@ import type {
 import { Button } from '@/shadcn/ui/button';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/ui/select';
 
 interface StepRecipeInfoProps {
   menuItems: MenuItem[];
@@ -17,7 +17,76 @@ interface StepRecipeInfoProps {
   onChange: (recipes: Recipe[]) => void;
 }
 
+interface IngredientInputProps {
+  value: string;
+  suggestions: string[];
+  onChange: (name: string) => void;
+}
+
 const generateId = () => Math.random().toString(36).slice(2, 9);
+
+const IngredientInput = ({ value, suggestions, onChange }: IngredientInputProps) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const filtered = value.trim()
+    ? suggestions.filter((s) => s.includes(value.trim()) && s !== value.trim())
+    : [];
+
+  const showNew = value.trim() && !suggestions.includes(value.trim());
+
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <Input
+        placeholder="식자재 이름"
+        value={value}
+        onChange={(e) => {
+          onChange(e.target.value);
+          setOpen(true);
+        }}
+        onFocus={() => setOpen(true)}
+        className="h-8"
+        autoComplete="off"
+      />
+      {open && (filtered.length > 0 || showNew) && (
+        <ul className="absolute left-0 top-full z-10 mt-1 w-full overflow-hidden rounded-md border bg-popover shadow-md">
+          {filtered.map((name) => (
+            <li
+              key={name}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                onChange(name);
+                setOpen(false);
+              }}
+              className="cursor-pointer px-3 py-2 text-sm hover:bg-accent"
+            >
+              {name}
+            </li>
+          ))}
+          {showNew && (
+            <li
+              onMouseDown={(e) => {
+                e.preventDefault();
+                setOpen(false);
+              }}
+              className="cursor-pointer px-3 py-2 text-sm text-muted-foreground hover:bg-accent"
+            >
+              <span className="text-foreground">"{value.trim()}"</span> 새로 추가
+            </li>
+          )}
+        </ul>
+      )}
+    </div>
+  );
+};
 
 const StepRecipeInfo = ({ menuItems, recipes, onChange }: StepRecipeInfoProps) => {
   const getRecipe = (menuItemId: string): Recipe =>
@@ -65,6 +134,10 @@ const StepRecipeInfo = ({ menuItems, recipes, onChange }: StepRecipeInfoProps) =
     });
   };
 
+  const allIngredientNames = Array.from(
+    new Set(recipes.flatMap((r) => r.ingredients.map((i) => i.ingredientName).filter(Boolean))),
+  );
+
   if (menuItems.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 rounded-lg border-2 border-dashed border-gray-200 py-10 text-center">
@@ -98,31 +171,29 @@ const StepRecipeInfo = ({ menuItems, recipes, onChange }: StepRecipeInfoProps) =
             <div className="space-y-2 p-3">
               {recipe.ingredients.length > 0 && (
                 <>
-                  <div className="grid grid-cols-[1fr_80px_88px_32px] gap-2 px-1">
+                  <div className="grid grid-cols-[1fr_80px_40px_32px] gap-2 px-1">
                     <Label className="text-xs text-muted-foreground">식자재 이름</Label>
-                    <Label className="text-xs text-muted-foreground">사용량</Label>
+                    <Label className="text-xs text-muted-foreground">수량</Label>
                     <Label className="text-xs text-muted-foreground">단위</Label>
                     <span />
                   </div>
                   {recipe.ingredients.map((ingredient) => (
                     <div
                       key={ingredient.id}
-                      className="grid grid-cols-[1fr_80px_88px_32px] items-center gap-2"
+                      className="grid grid-cols-[1fr_80px_40px_32px] items-center gap-2"
                     >
-                      <Input
-                        placeholder="식자재 이름"
+                      <IngredientInput
                         value={ingredient.ingredientName}
-                        onChange={(e) =>
-                          updateIngredient(menu.id, ingredient.id, {
-                            ingredientName: e.target.value,
-                          })
+                        suggestions={allIngredientNames}
+                        onChange={(name) =>
+                          updateIngredient(menu.id, ingredient.id, { ingredientName: name })
                         }
-                        className="h-8"
                       />
                       <Input
                         type="number"
                         placeholder="0"
                         min={0}
+                        step={0.1}
                         value={ingredient.amount === 0 ? '' : ingredient.amount}
                         onChange={(e) =>
                           updateIngredient(menu.id, ingredient.id, {
@@ -131,26 +202,9 @@ const StepRecipeInfo = ({ menuItems, recipes, onChange }: StepRecipeInfoProps) =
                         }
                         className="h-8"
                       />
-                      <Select
-                        value={ingredient.unit}
-                        onValueChange={(val) =>
-                          val &&
-                          updateIngredient(menu.id, ingredient.id, {
-                            unit: val as RecipeIngredient['unit'],
-                          })
-                        }
-                      >
-                        <SelectTrigger className="h-8 w-full">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {INGREDIENT_UNITS.map((unit) => (
-                            <SelectItem key={unit} value={unit}>
-                              {unit}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <span className="flex h-8 w-10 items-center justify-center rounded-md border border-input bg-muted text-xs text-muted-foreground">
+                        개
+                      </span>
                       <button
                         type="button"
                         onClick={() => removeIngredient(menu.id, ingredient.id)}

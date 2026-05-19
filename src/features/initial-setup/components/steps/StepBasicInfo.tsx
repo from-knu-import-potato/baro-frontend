@@ -32,6 +32,20 @@ const StepBasicInfo = ({ data, onChange, errors }: StepBasicInfoProps) => {
       </div>
 
       <div className="space-y-1.5">
+        <Label htmlFor="ownerName">대표자 이름</Label>
+        <Input
+          id="ownerName"
+          placeholder="예: 홍길동"
+          value={data.ownerName}
+          onChange={(e) => onChange({ ...data, ownerName: e.target.value })}
+          className="h-10"
+        />
+        <p className="text-xs text-muted-foreground">
+          카카오 계정 이름으로 자동 입력되며, 수정이 가능합니다.
+        </p>
+      </div>
+
+      <div className="space-y-1.5">
         <Label>업종 타입</Label>
         <Select
           value={data.businessType}

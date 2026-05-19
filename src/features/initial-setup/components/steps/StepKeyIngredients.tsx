@@ -1,11 +1,9 @@
 import { AlertCircle, Plus, Trash2 } from 'lucide-react';
 
-import { INGREDIENT_UNITS } from '@/features/initial-setup/constants/initialSetup.constants';
 import type { KeyIngredient } from '@/features/initial-setup/types/initialSetup.types';
 import { Button } from '@/shadcn/ui/button';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/ui/select';
 
 interface StepKeyIngredientsProps {
   data: KeyIngredient[];
@@ -71,23 +69,9 @@ const StepKeyIngredients = ({ data, onChange }: StepKeyIngredientsProps) => {
                 }
                 className="h-8 bg-white"
               />
-              <Select
-                value={item.unit}
-                onValueChange={(val) =>
-                  val && updateIngredient(item.id, { unit: val as KeyIngredient['unit'] })
-                }
-              >
-                <SelectTrigger className="h-8 w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {INGREDIENT_UNITS.map((unit) => (
-                    <SelectItem key={unit} value={unit}>
-                      {unit}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <span className="flex h-8 w-10 shrink-0 items-center justify-center rounded-md border border-input bg-muted text-xs text-muted-foreground">
+                개
+              </span>
               <button
                 type="button"
                 onClick={() => removeIngredient(item.id)}

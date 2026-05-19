@@ -6,9 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { routePaths } from '@/app/routes/routePaths';
 import SetupProgressBar from '@/features/initial-setup/components/SetupProgressBar';
 import StepBasicInfo from '@/features/initial-setup/components/steps/StepBasicInfo';
-import StepKeyIngredients from '@/features/initial-setup/components/steps/StepKeyIngredients';
 import StepMenuRegistration from '@/features/initial-setup/components/steps/StepMenuRegistration';
-import StepNotifications from '@/features/initial-setup/components/steps/StepNotifications';
 import StepOperatingHours from '@/features/initial-setup/components/steps/StepOperatingHours';
 import StepRecipeInfo from '@/features/initial-setup/components/steps/StepRecipeInfo';
 import { SETUP_STEPS } from '@/features/initial-setup/constants/initialSetup.constants';
@@ -95,20 +93,6 @@ const InitialSetupForm = () => {
             menuItems={formData.menuItems}
             recipes={formData.recipes}
             onChange={(recipes) => setFormData({ ...formData, recipes })}
-          />
-        );
-      case 5:
-        return (
-          <StepKeyIngredients
-            data={formData.keyIngredients}
-            onChange={(keyIngredients) => setFormData({ ...formData, keyIngredients })}
-          />
-        );
-      case 6:
-        return (
-          <StepNotifications
-            data={formData.notificationSettings}
-            onChange={(notificationSettings) => setFormData({ ...formData, notificationSettings })}
           />
         );
       default:

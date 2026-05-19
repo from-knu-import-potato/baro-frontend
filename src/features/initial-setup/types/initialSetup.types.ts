@@ -19,10 +19,11 @@ export type DayOfWeek =
   | 'saturday'
   | 'sunday';
 
-export type IngredientUnit = '개' | '봉' | '팩' | '병' | '캔' | '박스' | '묶음';
+export type IngredientUnit = '개';
 
 export interface StoreBasicInfo {
   storeName: string;
+  ownerName: string;
   businessType: BusinessType;
   category: StoreCategory;
 }
@@ -80,6 +81,4 @@ export interface InitialSetupData {
   operatingHours: OperatingHour[];
   menuItems: MenuItem[];
   recipes: Recipe[];
-  keyIngredients: KeyIngredient[];
-  notificationSettings: NotificationSettings;
 }

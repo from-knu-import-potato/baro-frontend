@@ -16,21 +16,11 @@ const DEFAULT_OPERATING_HOURS: OperatingHour[] = [
 export const DEFAULT_SETUP_DATA: InitialSetupData = {
   basicInfo: {
     storeName: '',
+    ownerName: '',
     businessType: 'individual',
     category: 'cafe',
   },
   operatingHours: DEFAULT_OPERATING_HOURS,
   menuItems: [],
   recipes: [],
-  keyIngredients: [],
-  notificationSettings: {
-    lowStockAlert: true,
-    expiryAlert: true,
-    orderRecommendationAlert: true,
-    alertChannels: {
-      email: false,
-      kakao: true,
-      push: true,
-    },
-  },
 };
