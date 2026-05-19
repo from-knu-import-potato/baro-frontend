@@ -1,9 +1,9 @@
 import { ChevronRight, Info } from 'lucide-react';
 
-import SettingRow from '@/features/settings/components/SettingRow';
-import SettingsSection from '@/features/settings/components/SettingsSection';
-import { APP_VERSION } from '@/features/settings/data/settings.mock';
+import { APP_VERSION } from '@/features/account/data/account.mock';
 import { Separator } from '@/shadcn/ui/separator';
+import SettingRow from '@/shared/components/SettingRow';
+import SettingsSection from '@/shared/components/SettingsSection';
 
 const LinkRow = ({ label }: { label: string }) => (
   <SettingRow label={label} action={<ChevronRight className="h-4 w-4 text-muted-foreground" />} />
