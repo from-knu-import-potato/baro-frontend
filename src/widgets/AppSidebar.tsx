@@ -6,6 +6,7 @@ import {
   Truck,
   TrendingUp,
   Settings,
+  Store,
   HelpCircle,
   Home,
   ChevronRight,
@@ -14,7 +15,6 @@ import {
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
-import NotificationDropdown from '@/features/notification/components/NotificationDropdown';
 import { Collapsible, CollapsibleContent } from '@/shadcn/ui/collapsible';
 import {
   Sidebar,
@@ -35,7 +35,7 @@ import {
 import BaroLogo from '@/shared/assets/images/baro-logo.png';
 
 const BOTTOM_NAV_ITEMS = [
-  { label: '설정', icon: Settings, to: routePaths.settings },
+  { label: '회원 설정', icon: Settings, to: routePaths.account },
   { label: '지원', icon: HelpCircle, to: routePaths.support },
   { label: '랜딩 페이지', icon: Home, to: routePaths.landing },
 ];
@@ -142,6 +142,18 @@ const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
                   <span>가격 변동 분석</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+
+              {/* 가게 설정 */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={location.pathname === routePaths.settings}
+                  tooltip="가게 설정"
+                  render={<NavLink to={routePaths.settings} />}
+                >
+                  <Store />
+                  <span>가게 설정</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -151,7 +163,7 @@ const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
       <SidebarFooter className="pb-2">
         <SidebarSeparator className="mx-0" />
         <SidebarMenu>
-          <NotificationDropdown />
+          {/* <NotificationDropdown /> */}
           {BOTTOM_NAV_ITEMS.map(({ label, icon: Icon, to }) => (
             <SidebarMenuItem key={to}>
               <SidebarMenuButton
