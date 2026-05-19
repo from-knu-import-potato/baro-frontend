@@ -13,6 +13,7 @@ export const routePaths = {
   settingsMenus: '/settings/menus',
   settingsRecipes: '/settings/recipes',
   settingsIngredients: '/settings/ingredients',
+  account: '/account',
   support: '/support',
   notFound: '*',
 } as const;

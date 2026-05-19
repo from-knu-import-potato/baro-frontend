@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 
 import AppLayout from '@/app/layouts/AppLayout';
 import { routePaths } from '@/app/routes/routePaths';
+import AccountPage from '@/pages/AccountPage';
 import DashboardPage from '@/pages/DashboardPage';
 import InitialSetupPage from '@/pages/InitialSetupPage';
 import InventoryCurrentPage from '@/pages/InventoryCurrentPage';
@@ -35,6 +36,7 @@ export default function Router() {
         <Route path={routePaths.orderGuide} element={<OrderGuidePage />} />
         <Route path={routePaths.priceAnalysis} element={<PriceAnalysisPage />} />
         <Route path={routePaths.settings} element={<SettingsPage />} />
+        <Route path={routePaths.account} element={<AccountPage />} />
         <Route path={routePaths.settingsMenus} element={<SettingsMenusPage />} />
         <Route path={routePaths.settingsRecipes} element={<SettingsRecipesPage />} />
         <Route path={routePaths.settingsIngredients} element={<SettingsIngredientsPage />} />
