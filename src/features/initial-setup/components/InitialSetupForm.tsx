@@ -6,11 +6,9 @@ import { useNavigate } from 'react-router-dom';
 import { routePaths } from '@/app/routes/routePaths';
 import SetupProgressBar from '@/features/initial-setup/components/SetupProgressBar';
 import StepBasicInfo from '@/features/initial-setup/components/steps/StepBasicInfo';
-import StepKeyIngredients from '@/features/initial-setup/components/steps/StepKeyIngredients';
+import StepIngredientsAndRecipes from '@/features/initial-setup/components/steps/StepIngredientsAndRecipes';
 import StepMenuRegistration from '@/features/initial-setup/components/steps/StepMenuRegistration';
-import StepNotifications from '@/features/initial-setup/components/steps/StepNotifications';
 import StepOperatingHours from '@/features/initial-setup/components/steps/StepOperatingHours';
-import StepRecipeInfo from '@/features/initial-setup/components/steps/StepRecipeInfo';
 import { SETUP_STEPS } from '@/features/initial-setup/constants/initialSetup.constants';
 import { DEFAULT_SETUP_DATA } from '@/features/initial-setup/data/initialSetup.mock';
 import type {
@@ -71,7 +69,7 @@ const InitialSetupForm = () => {
         return (
           <StepBasicInfo
             data={formData.basicInfo}
-            onChange={(basicInfo) => setFormData({ ...formData, basicInfo })}
+            onChange={(basicInfo) => setFormData((prev) => ({ ...prev, basicInfo }))}
             errors={basicInfoErrors}
           />
         );
@@ -79,36 +77,24 @@ const InitialSetupForm = () => {
         return (
           <StepOperatingHours
             data={formData.operatingHours}
-            onChange={(operatingHours) => setFormData({ ...formData, operatingHours })}
+            onChange={(operatingHours) => setFormData((prev) => ({ ...prev, operatingHours }))}
           />
         );
       case 3:
         return (
           <StepMenuRegistration
             data={formData.menuItems}
-            onChange={(menuItems) => setFormData({ ...formData, menuItems })}
+            onChange={(menuItems) => setFormData((prev) => ({ ...prev, menuItems }))}
           />
         );
       case 4:
         return (
-          <StepRecipeInfo
+          <StepIngredientsAndRecipes
             menuItems={formData.menuItems}
+            ingredients={formData.ingredients}
             recipes={formData.recipes}
-            onChange={(recipes) => setFormData({ ...formData, recipes })}
-          />
-        );
-      case 5:
-        return (
-          <StepKeyIngredients
-            data={formData.keyIngredients}
-            onChange={(keyIngredients) => setFormData({ ...formData, keyIngredients })}
-          />
-        );
-      case 6:
-        return (
-          <StepNotifications
-            data={formData.notificationSettings}
-            onChange={(notificationSettings) => setFormData({ ...formData, notificationSettings })}
+            onIngredientsChange={(ingredients) => setFormData((prev) => ({ ...prev, ingredients }))}
+            onRecipesChange={(recipes) => setFormData((prev) => ({ ...prev, recipes }))}
           />
         );
       default:
@@ -175,7 +161,7 @@ const InitialSetupForm = () => {
               type="button"
               size="sm"
               onClick={handleNext}
-              className="gap-1  rounded-full bg-baro-blue text-white hover:bg-baro-blue-dark"
+              className="gap-1 rounded-full bg-baro-blue text-white hover:bg-baro-blue-dark"
             >
               {currentStep === totalSteps ? (
                 '설정 완료'

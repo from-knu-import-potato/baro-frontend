@@ -1,24 +1,27 @@
 import { ChevronDown } from 'lucide-react';
 
+import { Button } from '@/shadcn/ui/button';
+
 interface AppHeaderProps {
   userName: string;
   userRole: string;
+  onClosingClick?: () => void;
 }
 
-const AppHeader = ({ userName, userRole }: AppHeaderProps) => {
+const AppHeader = ({ userName, userRole, onClosingClick }: AppHeaderProps) => {
   return (
     <header className="bg-background h-13 border-b flex items-center justify-end px-6 gap-4 sticky top-0 z-10">
-      {/* 검색 */}
-      {/* <div className="flex-1 flex justify-center">
-        <div className="relative w-full max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 dark:border-baro-black-muted/40 rounded-full outline-none transition-colors"
-          />
-        </div>
-      </div> */}
+      {/* 마감하기 */}
+      <Button
+        size="sm"
+        onClick={onClosingClick}
+        className="bg-baro-blue text-xs rounded-full hover:bg-baro-blue/80"
+      >
+        마감하기
+      </Button>
+
+      {/* 구분선 */}
+      <div className="h-5 w-px bg-border" />
 
       {/* 유저 정보 */}
       <div className="flex items-center gap-4 cursor-pointer rounded-lg transition-colors">

@@ -1,7 +1,7 @@
-import SettingsContent from '@/features/settings/components/SettingsContent';
+import AccountSettingsContent from '@/features/account-settings/components/AccountSettingsContent';
 
 const SettingsPage = () => {
-  return <SettingsContent />;
+  return <AccountSettingsContent />;
 };
 
 export default SettingsPage;
