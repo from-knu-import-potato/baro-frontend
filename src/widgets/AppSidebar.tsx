@@ -7,7 +7,6 @@ import {
   TrendingUp,
   Store,
   Settings,
-  HelpCircle,
   Home,
   ChevronRight,
   ChevronDown,

@@ -1,4 +1,4 @@
-import { KeyRound, LogOut, UserCircle } from 'lucide-react';
+import { LogOut, UserCircle } from 'lucide-react';
 
 import { MOCK_ACCOUNT_SETTINGS } from '@/features/account-settings/data/account-settings.mock';
 import { Button } from '@/shadcn/ui/button';
