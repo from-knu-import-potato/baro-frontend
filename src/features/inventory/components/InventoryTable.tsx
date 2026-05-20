@@ -1,0 +1,278 @@
+import { useState } from 'react';
+
+import {
+  AlertTriangle,
+  BookOpen,
+  CheckCircle2,
+  MinusCircle,
+  Package2,
+  Search,
+  X,
+} from 'lucide-react';
+
+import {
+  INVENTORY_CATEGORIES,
+  MOCK_INVENTORY_ITEMS,
+} from '@/features/inventory/data/inventory.mock';
+import type { InventoryItem, InventoryStatus } from '@/features/inventory/types/inventory.types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
+import { Input } from '@/shadcn/ui/input';
+
+/* ── 상태 설정 ── */
+const STATUS_CONFIG: Record<
+  InventoryStatus,
+  { label: string; badgeClass: string; rowClass: string; icon: React.ReactNode }
+> = {
+  critical: {
+    label: '재고 부족',
+    badgeClass: 'bg-red-50 text-red-400 border border-red-200/60',
+    rowClass: 'border-l-4 border-l-red-300',
+    icon: <AlertTriangle className="w-3 h-3" />,
+  },
+  warning: {
+    label: '주의',
+    badgeClass: 'bg-yellow-50 text-yellow-600/80 border border-yellow-200/60',
+    rowClass: 'border-l-4 border-l-yellow-300',
+    icon: <AlertTriangle className="w-3 h-3" />,
+  },
+  normal: {
+    label: '정상',
+    badgeClass: 'bg-slate-100 text-slate-400 border border-slate-200',
+    rowClass: 'border-l-4 border-l-transparent',
+    icon: <CheckCircle2 className="w-3 h-3" />,
+  },
+  depleted: {
+    label: '소진',
+    badgeClass: 'bg-zinc-100 text-zinc-400 border border-zinc-200',
+    rowClass: 'border-l-4 border-l-zinc-300',
+    icon: <MinusCircle className="w-3 h-3" />,
+  },
+};
+
+type FilterTab = InventoryStatus | 'all';
+
+const FILTER_TABS: { key: FilterTab; label: string }[] = [
+  { key: 'all', label: '전체' },
+  { key: 'critical', label: '재고 부족' },
+  { key: 'warning', label: '주의' },
+  { key: 'normal', label: '정상' },
+];
+
+/* ── D-day 계산 ── */
+const getDday = (expiryDate?: string) => {
+  if (!expiryDate) return null;
+  const diff = Math.ceil(
+    (new Date(expiryDate).getTime() - new Date().setHours(0, 0, 0, 0)) / (1000 * 60 * 60 * 24),
+  );
+  if (diff < 0) return { text: '만료됨', chipClass: 'bg-zinc-100 text-zinc-400' };
+  if (diff === 0) return { text: 'D-Day', chipClass: 'bg-red-50 text-red-400 font-bold' };
+  if (diff <= 3) return { text: `D-${diff}`, chipClass: 'bg-red-50 text-red-400 font-semibold' };
+  if (diff <= 7) return { text: `D-${diff}`, chipClass: 'bg-yellow-50 text-yellow-600/80' };
+  return { text: `D-${diff}`, chipClass: 'bg-slate-100 text-slate-400' };
+};
+
+/* ── 행 컴포넌트 ── */
+// 컬럼: 식자재명 | 현재 재고 | 안전 재고 | 유통기한 | 포함 레시피 | 상태
+const GRID = 'grid-cols-[2fr_1.2fr_1.2fr_1.5fr_1.1fr_110px]';
+
+const InventoryRow = ({ item }: { item: InventoryItem }) => {
+  const config = STATUS_CONFIG[item.status];
+  const dday = getDday(item.expiryDate);
+
+  return (
+    <div
+      className={`hidden md:grid ${GRID} gap-4 px-5 py-4 hover:bg-muted/20 transition-colors items-center ${config.rowClass}`}
+    >
+      {/* 식자재명 */}
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <span className="text-sm font-semibold truncate">{item.name}</span>
+        <span className="text-xs text-muted-foreground">{item.category}</span>
+      </div>
+
+      {/* 현재 재고 */}
+      <div className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="text-sm font-semibold tabular-nums">
+          {item.currentStock.toLocaleString()}
+        </span>
+        <span className="text-xs text-muted-foreground">{item.unit}</span>
+      </div>
+
+      {/* 안전 재고 */}
+      <div className="flex items-baseline gap-1 whitespace-nowrap">
+        <span className="text-sm tabular-nums text-muted-foreground">
+          {item.safetyStock.toLocaleString()}
+        </span>
+        <span className="text-xs text-muted-foreground">{item.safetyStockUnit}</span>
+      </div>
+
+      {/* 유통기한 */}
+      <div className="flex items-center gap-2">
+        {item.expiryDate && dday ? (
+          <>
+            <span className="text-sm text-foreground">{item.expiryDate}</span>
+            <span
+              className={`px-2 py-0.5 rounded-full text-[11px] font-medium whitespace-nowrap ${dday.chipClass}`}
+            >
+              {dday.text}
+            </span>
+          </>
+        ) : (
+          <span className="text-sm text-muted-foreground/40">—</span>
+        )}
+      </div>
+
+      {/* 포함 레시피 */}
+      <div>
+        {item.recipeCount > 0 ? (
+          <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+            <BookOpen className="w-3.5 h-3.5 shrink-0" />
+            {item.recipeCount}개 메뉴
+          </span>
+        ) : (
+          <span className="text-sm text-muted-foreground/40">—</span>
+        )}
+      </div>
+
+      {/* 상태 뱃지 */}
+      <div className="flex justify-center">
+        <span
+          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${config.badgeClass}`}
+        >
+          {config.icon}
+          {config.label}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+/* ── 메인 컴포넌트 ── */
+const InventoryTable = () => {
+  const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<FilterTab>('all');
+  const [selectedCategory, setSelectedCategory] = useState('전체');
+
+  const countByStatus = (status: InventoryStatus) =>
+    MOCK_INVENTORY_ITEMS.filter((i) => i.status === status).length;
+
+  const filtered = MOCK_INVENTORY_ITEMS.filter((item) => {
+    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
+    const matchesTab = activeTab === 'all' || item.status === activeTab;
+    const matchesCategory = selectedCategory === '전체' || item.category === selectedCategory;
+    return matchesSearch && matchesTab && matchesCategory;
+  });
+
+  return (
+    <Card>
+      {/* 카드 헤더 — 타이틀 + 검색 + 상태 탭 */}
+      <CardHeader className="border-b pb-0">
+        <div className="flex items-center justify-between mb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Package2 className="w-4 h-4 text-muted-foreground" />
+            전체 재고
+            <span className="text-xs font-normal text-muted-foreground">
+              — 총 {MOCK_INVENTORY_ITEMS.length}개 품목
+            </span>
+          </CardTitle>
+
+          <div className="relative w-52">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <Input
+              placeholder="식자재 검색..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-8 h-8 text-xs"
+            />
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* 상태 탭 */}
+        <div className="flex gap-1">
+          {FILTER_TABS.map((tab) => {
+            const count =
+              tab.key === 'all'
+                ? MOCK_INVENTORY_ITEMS.length
+                : countByStatus(tab.key as InventoryStatus);
+            const isActive = activeTab === tab.key;
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`px-3 py-2 text-xs font-medium rounded-t-md border-b-2 transition-colors ${
+                  isActive
+                    ? 'border-b-baro-blue text-baro-blue-dark bg-blue-50/50 dark:bg-blue-950/20'
+                    : 'border-b-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                }`}
+              >
+                {tab.label}
+                <span
+                  className={`ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold ${
+                    isActive
+                      ? 'bg-baro-blue text-white'
+                      : tab.key === 'critical' && count > 0
+                        ? 'bg-red-50 text-red-400'
+                        : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </CardHeader>
+
+      <CardContent className="p-0">
+        {/* 카테고리 필터 */}
+        <div className="flex gap-1.5 flex-wrap px-5 py-3 border-b bg-muted/20">
+          {INVENTORY_CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                selectedCategory === cat
+                  ? 'bg-baro-blue text-white'
+                  : 'bg-background border text-muted-foreground hover:bg-muted/60'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* 컬럼 헤더 */}
+        <div
+          className={`hidden md:grid ${GRID} gap-4 px-5 py-2.5 bg-muted/40 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide`}
+        >
+          <span>식자재명</span>
+          <span>현재 재고</span>
+          <span>안전 재고</span>
+          <span>유통기한</span>
+          <span>포함 레시피</span>
+          <span className="text-center">상태</span>
+        </div>
+
+        {/* 행 목록 */}
+        {filtered.length > 0 ? (
+          <div className="divide-y">
+            {filtered.map((item) => (
+              <InventoryRow key={item.id} item={item} />
+            ))}
+          </div>
+        ) : (
+          <div className="py-16 text-center text-sm text-muted-foreground">검색 결과가 없어요.</div>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default InventoryTable;
