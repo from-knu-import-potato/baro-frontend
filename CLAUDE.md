@@ -2,14 +2,19 @@
 
 ## 서비스 개요
 
-**BARO(바로)** — OCR·AI 기반 식자재 재고관리 SaaS.
-소규모 카페·식당 사장님이 거래명세서를 촬영하면 입고 데이터를 자동 등록하고 재고를 관리할 수 있도록 설계된 웹 서비스.
+**BARO(바로)** — OCR·AI 기반 통합 가게 운영 SaaS.
+소규모 카페·식당 사장님을 위한 주문부터 재고, 발주, 마감까지 관리하는 올인원 플랫폼.
+
+사용자:
+- **사장님 (Owner)**: 서비스 주 사용자. 주문 수락, 재고 관리, 발주, 마감 수행
+- **손님 (Guest)**: QR 스캔으로 접근하는 비회원. 별도 로그인 없이 주문만 가능
 
 핵심 기능:
-1. OCR 기반 입고 데이터 자동화 (거래명세서 촬영 → 자동 디지털화)
-2. AI 기반 보관·발주 가이드 (소비 패턴 분석 → 적정 발주량 추천)
-3. 식자재 가격 변동 분석 및 시세 정보 제공
-4. 마감하기 — 판매 메뉴 입력 시 레시피 기반 이론 사용량 자동 계산
+1. QR 기반 비대면 주문 시스템 (테이블 QR → 손님 주문 → 사장님 실시간 수신)
+2. OCR 기반 입고 데이터 자동화 (거래명세서 촬영 → 자동 디지털화)
+3. AI 기반 발주 가이드 (재고 데이터 분석 → 적정 발주량 + 서술형 추천 이유)
+4. 마감하기 (판매 메뉴 + 레시피 기반 재고 자동 차감)
+5. 통합 대시보드 (실시간 주문·재고·매출 현황 한 화면)
 
 ## 기술 스택
 
@@ -30,7 +35,7 @@
 ```
 src/
 ├─ app/         # 레이아웃, 라우팅, 전역 스타일, AppInitializer
-├─ features/    # 도메인별 기능 모듈 (auth, dashboard, invoice, inventory, order, analytics, settings)
+├─ features/    # 도메인별 기능 모듈 (auth, dashboard, order, inventory, ocr-inbound, order-guide, closing, settings, account-settings)
 │  └─ [domain]/ # components/, hooks/, api/, store/, types/
 ├─ pages/       # 라우팅 페이지 — UI·로직 없이 features 조합만 담당
 ├─ widgets/     # 2개 이상 페이지에서 쓰는 조합형 UI
@@ -46,23 +51,28 @@ src/
 
 ## 페이지 목록
 
-| 경로 | 페이지 |
-|---|---|
-| `/` | 랜딩 페이지 |
-| `/login`, `/signup` | 로그인·회원가입 |
-| `/initial-setup` | 초기 세팅 (가게 정보 입력) |
-| `/dashboard` | 대시보드 |
-| `/inventory/current`, `/inventory/depleted` | 전체 재고 현황 |
-| `/order-guide` | 발주 가이드·수요 예측 |
-| `/ingredient-price-analysis` | 가격 변동 분석 |
-| `/settings` | 설정 |
+| 경로 | 페이지 | 접근 주체 |
+|---|---|---|
+| `/` | 랜딩 페이지 | 전체 |
+| `/login` | 로그인 (카카오 소셜) | 비회원 |
+| `/initial-setup` | 가게 초기 세팅 | 사장님 (최초 1회) |
+| `/dashboard` | 메인 대시보드 | 사장님 |
+| `/inventory` | 전체 재고 현황 | 사장님 |
+| `/ocr-inbound` | OCR 재고 입고 처리 | 사장님 |
+| `/order-guide` | 발주 가이드 | 사장님 |
+| `/closing` | 마감하기 | 사장님 |
+| `/settings` | 가게 설정 | 사장님 |
+| `/my-account` | 회원 설정 | 사장님 |
+| `/order?table={n}` | 손님 주문 메뉴판 | 손님 (비회원) |
 
 ## API 연동
 
 - Base URL: `https://api.baro.com/v1` (임시)
+- 로그인: 카카오 OAuth 소셜 로그인 → JWT 발급 (이메일/일반 회원가입 없음)
 - 인증: JWT Bearer Token (Authorization 헤더)
 - 토큰 갱신: refresh token → `/auth/refresh`
 - 401 감지 시 Axios interceptor에서 자동 로그아웃
+- 실시간 주문 수신: WebSocket 또는 SSE (Server-Sent Events)
 
 ## 상태 관리 전략
 
@@ -130,11 +140,15 @@ src/
 - `console.log` 프로덕션 코드에 잔류 금지
 - 클래스 컴포넌트 금지
 - OCR 결과 자동 확정 로직 추가 금지 (반드시 수동 검수 단계 유지)
+- 마감하기 이론 사용량 자동 차감 금지 (사용자가 검토·수정 후 최종 확정)
 
 ## 알려진 제약
 
 - 이미지 업로드 최대 10MB
-- 시세 API: 평일 오전 9시 이후만 데이터 갱신 (주말/공휴일 예외 처리 필요)
+- 식자재 단위: `g`, `ml`, `개` 세 가지만 사용
+- OCR 단위 환산: `kg→g` (×1000), `L→ml` (×1000) — 프론트엔드에서 처리 후 서버에 표준 단위로 전송
+- 재고 미등록 시 재고 관련 기능 비활성화(disabled) 처리 + 안내 문구 표시
+- 회원 탈퇴: 가게 데이터(재고·메뉴·레시피 등) 초기화 선행 필수
 
 ## 프롬프트 단축키
 

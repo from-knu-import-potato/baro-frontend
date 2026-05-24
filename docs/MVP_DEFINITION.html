@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BARO MVP 정의서</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <style>
+    :root {
+      --blue: #449CD4;
+      --blue-light: #EBF5FF;
+      --blue-mid: #d0e9f7;
+      --blue-dark: #2d7ab0;
+      --green: #679436;
+      --red: #BD5535;
+      --text: #1a202c;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --bg: #f0f4f8;
+      --card: #ffffff;
+      --sidebar-w: 230px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 10.5pt;
+      line-height: 1.75;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    /* ── Page Header ── */
+    .page-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 40px 48px 32px;
+    }
+    .page-header .logo-tag {
+      display: inline-block;
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 8.5pt;
+      letter-spacing: 1.5px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .page-header h1 {
+      font-size: 24pt;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .page-header .tagline {
+      font-size: 11pt;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+    .page-header .meta-row {
+      display: flex;
+      gap: 20px;
+      font-size: 9pt;
+      color: #94a3b8;
+    }
+    .page-header .meta-row span::before { content: '· '; }
+
+    /* ── Layout ── */
+    .layout {
+      display: flex;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      flex-shrink: 0;
+      position: sticky;
+      top: 24px;
+      max-height: calc(100vh - 56px);
+      overflow-y: auto;
+    }
+    .sidebar::-webkit-scrollbar { width: 3px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .toc-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px 0 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+      border: 1px solid var(--border);
+    }
+    .toc-heading {
+      font-size: 8.5pt;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      padding: 0 18px 10px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 6px;
+    }
+    .toc-list { list-style: none; }
+    .toc-list li { line-height: 1; }
+    .toc-list > li > a {
+      display: block;
+      padding: 7px 18px;
+      font-size: 9.5pt;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .toc-list > li > a:hover {
+      color: var(--blue);
+      background: var(--blue-light);
+      border-left-color: var(--blue-mid);
+    }
+    .toc-list > li > a.active {
+      color: var(--blue);
+      background: var(--blue-light);
+      border-left-color: var(--blue);
+      font-weight: 600;
+    }
+    .toc-sub {
+      list-style: none;
+      background: #f8fafc;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      margin: 2px 0;
+      display: none;
+    }
+    .toc-sub.open { display: block; }
+    .toc-sub li a {
+      display: block;
+      padding: 5px 18px 5px 30px;
+      font-size: 8.5pt;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-left: 2px solid transparent;
+      transition: all 0.15s;
+    }
+    .toc-sub li a:hover { color: var(--blue); background: var(--blue-light); }
+    .toc-sub li a.active { color: var(--blue); font-weight: 600; border-left-color: var(--blue); }
+    .toc-toggle {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .toc-toggle .arrow { font-size: 8pt; transition: transform 0.2s; }
+    .toc-toggle.open .arrow { transform: rotate(90deg); }
+
+    /* ── Main Content ── */
+    .main-content { flex: 1; min-width: 0; }
+
+    /* ── Section Card ── */
+    .section {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 32px 36px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+      border: 1px solid var(--border);
+    }
+
+    /* ── Section Titles ── */
+    .section > h2 {
+      font-size: 15pt;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      font-size: 9pt;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .badge-blue   { background: var(--blue-light); color: var(--blue); }
+    .badge-purple { background: #f3f0ff; color: #7c3aed; }
+    .badge-green  { background: #f0f7e8; color: var(--green); }
+    .badge-amber  { background: #fffbeb; color: #d97706; }
+    .badge-red    { background: #fff1ee; color: var(--red); }
+    .badge-gray   { background: #f1f5f9; color: #475569; }
+
+    .section-desc {
+      font-size: 9.5pt;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── Sub-section (feature cards) ── */
+    .sub-section {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin: 20px 0;
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--blue);
+    }
+    .sub-section > h3 {
+      font-size: 11pt;
+      font-weight: 700;
+      color: var(--text);
+      margin: 0 0 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sub-badge {
+      background: var(--blue);
+      color: white;
+      border-radius: 5px;
+      padding: 2px 8px;
+      font-size: 8pt;
+      font-weight: 700;
+    }
+
+    /* ── Typography ── */
+    h3 {
+      font-size: 11.5pt;
+      font-weight: 700;
+      color: var(--text);
+      margin: 28px 0 10px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    h4 {
+      font-size: 10pt;
+      font-weight: 700;
+      color: var(--blue-dark);
+      margin: 18px 0 8px;
+    }
+    p { margin: 8px 0; color: var(--text); }
+    ul, ol { padding-left: 20px; margin: 8px 0; }
+    li { margin: 5px 0; }
+    strong { color: var(--text); }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; margin: 12px 0; border-radius: 8px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+    thead tr { background: var(--blue); }
+    thead th {
+      padding: 10px 14px;
+      text-align: left;
+      font-weight: 600;
+      color: white;
+      font-size: 9pt;
+    }
+    tbody td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:nth-child(even) { background: #f8fafc; }
+
+    /* ── Blockquote ── */
+    blockquote {
+      border-left: 3px solid var(--blue);
+      background: var(--blue-light);
+      padding: 12px 16px;
+      margin: 12px 0;
+      border-radius: 0 8px 8px 0;
+      color: #1e4d7b;
+      font-size: 9.5pt;
+    }
+
+    /* ── Flow arrow text ── */
+    .flow-text {
+      background: #f0f4f8;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 9.5pt;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin: 10px 0;
+    }
+
+    /* ── Info chip ── */
+    .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+    .chip {
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 9pt;
+      font-weight: 600;
+    }
+
+    /* ── Divider ── */
+    .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+    /* ── Print / Word paste ── */
+    @media print {
+      body { background: white; }
+      .sidebar { display: none; }
+      .layout { display: block; padding: 0; }
+      .section { box-shadow: none; margin-bottom: 12px; page-break-inside: avoid; }
+      .page-header { border-bottom: 1px solid var(--border); }
+    }
+
+    /* ── Mobile TOC overlay & FAB ── */
+    .toc-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 900;
+    }
+    .toc-fab {
+      display: none;
+      position: fixed;
+      bottom: 24px;
+      right: 20px;
+      z-index: 950;
+      background: var(--blue);
+      color: white;
+      border: none;
+      border-radius: 50px;
+      padding: 10px 18px;
+      font-size: 10pt;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(68,156,212,0.45);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Mobile breakpoint ── */
+    @media (max-width: 768px) {
+
+      /* Header */
+      .page-header {
+        padding: 24px 20px 20px;
+      }
+      .page-header h1 {
+        font-size: 18pt;
+      }
+      .page-header .tagline {
+        font-size: 10pt;
+      }
+      .page-header .meta-row {
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      /* Layout */
+      .layout {
+        flex-direction: column;
+        padding: 16px 14px 80px;
+        gap: 16px;
+      }
+
+      /* Sidebar — slide-in drawer on mobile */
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -270px;
+        height: 100dvh;
+        width: 250px;
+        max-height: 100dvh;
+        background: white;
+        z-index: 1000;
+        transition: left 0.28s cubic-bezier(.4,0,.2,1);
+        border-radius: 0 12px 12px 0;
+        box-shadow: 4px 0 24px rgba(0,0,0,0.18);
+        padding-top: 0;
+      }
+      .sidebar.mobile-open {
+        left: 0;
+      }
+
+      /* Main content full width */
+      .main-content {
+        width: 100%;
+      }
+
+      /* Section cards */
+      .section {
+        padding: 20px 16px;
+        border-radius: 10px;
+        margin-bottom: 14px;
+      }
+      .section > h2 {
+        font-size: 13pt;
+        flex-wrap: wrap;
+      }
+
+      /* Sub-section */
+      .sub-section {
+        padding: 16px 14px;
+        margin: 14px 0;
+      }
+      .sub-section > h3 {
+        font-size: 10.5pt;
+        flex-wrap: wrap;
+      }
+
+      /* Typography */
+      h3 { font-size: 10.5pt; }
+      h4 { font-size: 9.5pt; }
+      body { font-size: 10pt; }
+
+      /* Tables: already have overflow-x:auto, just ensure min touch target */
+      tbody td, thead th {
+        padding: 8px 10px;
+        font-size: 9pt;
+      }
+
+      /* Chips wrap nicely already via flex-wrap */
+      .chip { font-size: 8.5pt; }
+
+      /* Flow text */
+      .flow-text { font-size: 9pt; }
+
+      /* Show FAB & overlay */
+      .toc-fab { display: block; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Mobile TOC overlay & FAB ── -->
+<div class="toc-overlay" id="toc-overlay"></div>
+<button class="toc-fab" id="toc-fab" aria-label="목차 열기">☰ 목차</button>
+
+<!-- ── Header ── -->
+<header class="page-header">
+  <div class="logo-tag">BARO · MVP DOCUMENT</div>
+  <h1>MVP 정의서</h1>
+  <p class="tagline">주문부터 재고, 발주, 마감까지 관리하는 올인원 플랫폼</p>
+  <div class="meta-row">
+    <span>최종 확정일: 2026-05-21</span>
+    <span>버전: v1.0</span>
+    <span>대상: 소규모 카페 · 식당</span>
+  </div>
+</header>
+
+<!-- ── Layout ── -->
+<div class="layout">
+
+  <!-- ── Sidebar TOC ── -->
+  <aside class="sidebar">
+    <nav class="toc-card">
+      <div class="toc-heading">목차</div>
+      <ul class="toc-list" id="toc-list">
+        <li><a href="#sec-a">A. 제안 배경 및 목적</a></li>
+        <li><a href="#sec-1">1. 서비스 개요</a></li>
+        <li><a href="#sec-2">2. 핵심 가치 제안</a></li>
+        <li><a href="#sec-3">3. 사용자 정의</a></li>
+        <li><a href="#sec-b">B. 사용자 분석</a></li>
+        <li>
+          <a href="#sec-4" class="toc-toggle" id="toc-4-toggle">
+            4. 기능 정의 <span class="arrow">▶</span>
+          </a>
+          <ul class="toc-sub" id="toc-sub-4">
+            <li><a href="#sec-4-1">4-1. 회원 / 인증</a></li>
+            <li><a href="#sec-4-2">4-2. 초기 세팅</a></li>
+            <li><a href="#sec-4-3">4-3. 대시보드</a></li>
+            <li><a href="#sec-4-4">4-4. 주문 시스템</a></li>
+            <li><a href="#sec-4-5">4-5. 재고 현황</a></li>
+            <li><a href="#sec-4-6">4-6. OCR 입고</a></li>
+            <li><a href="#sec-4-7">4-7. 발주 가이드</a></li>
+            <li><a href="#sec-4-8">4-8. 마감하기</a></li>
+            <li><a href="#sec-4-9">4-9. 가게 설정</a></li>
+          </ul>
+        </li>
+        <li><a href="#sec-c">C. AI 기술 활용</a></li>
+        <li><a href="#sec-d">D. 창의성 및 구현 가능성</a></li>
+        <li><a href="#sec-e">E. 사회/경제적 효과</a></li>
+        <li><a href="#sec-5">5. 공통 제약 사항</a></li>
+        <li><a href="#sec-6">6. MVP 제외 기능</a></li>
+        <li><a href="#sec-7">7. 페이지 목록</a></li>
+      </ul>
+    </nav>
+  </aside>
+
+  <!-- ── Main Content ── -->
+  <main class="main-content">
+
+    <!-- A. 제안 배경 및 목적 -->
+    <section class="section accent" id="sec-a">
+      <h2><span class="section-badge badge-blue">A</span> 제안 배경 및 목적</h2>
+      <p class="section-desc">BARO가 탄생한 이유와 해결하고자 하는 문제, 기획 목적을 정의한다.</p>
+
+      <h3>구상 배경 — 우리가 발견한 문제</h3>
+      <p>국내 소규모 외식업체는 약 60만 개 이상(통계청 기준)에 달하지만, 이 중 대다수는 여전히 재고 관리를 수기 장부나 메모앱으로, 발주는 사장님의 경험과 직감에 의존하여 진행하고 있다. 기존 POS 시스템은 결제 처리 중심으로 설계되어 있어 재고 관리와의 연계가 없거나 매우 제한적이며, 도입 비용도 월 수십만 원에 이르러 소규모 가게에게는 부담이 크다. 배달의민족, 쿠팡이츠 같은 외부 플랫폼은 주문을 연결해주지만 가게의 재고나 운영 데이터와는 단절되어 있다.</p>
+      <p>이러한 환경에서 소규모 가게 사장님들은 매일 같은 수동 작업을 반복하고 있다. 냉장고를 직접 열어 재고를 눈으로 확인하고, 거래명세서를 수기로 옮겨 적고, 홀에서 주문을 받으면서 동시에 음료를 제조한다. 이 과정에서 발주를 너무 일찍 하거나 놓치는 일이 생기고, 유통기한 지난 재료를 뒤늦게 발견해 폐기하는 손실이 반복된다.</p>
+
+      <h3>문제 정의</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>문제</th><th>원인</th><th>BARO의 해결 방식</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>수기 재고관리의 비효율</td><td>디지털 입력 도구 부재, 입력 번거로움</td><td>OCR 자동 파싱으로 촬영 한 번에 입고 처리</td></tr>
+            <tr><td>2</td><td>발주 타이밍 파악의 어려움</td><td>데이터 기반 분석 없이 직감에 의존</td><td>AI 발주 가이드가 소비 데이터 기반으로 적정 발주량·시점 추천</td></tr>
+            <tr><td>3</td><td>주문 접수 인력 필요</td><td>홀 서빙과 주문 접수를 동시에 처리</td><td>테이블 QR 비대면 주문으로 손님이 직접 주문</td></tr>
+            <tr><td>4</td><td>판매와 재고 데이터의 단절</td><td>주문 → 재고 차감이 자동으로 연결되지 않음</td><td>마감하기 기능으로 오늘 판매된 메뉴 기반 재고 자동 차감</td></tr>
+            <tr><td>5</td><td>메뉴판 제작·수정 비용</td><td>메뉴 변경 시 인쇄물 재제작 필요</td><td>디지털 QR 메뉴판으로 실시간 메뉴 수정 및 3가지 뷰 커스텀 제공</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>기획 목적</h3>
+      <ul>
+        <li><strong>운영 자동화</strong>: 반복적이고 시간이 많이 걸리는 재고 입력, 발주 판단, 마감 계산을 자동화하여 사장님이 고객 서비스와 요리에 집중할 수 있도록 한다.</li>
+        <li><strong>데이터 기반 운영</strong>: 경험과 직감에 의존하던 운영 방식을 데이터 기반 의사결정으로 전환하여 식재료 낭비와 손실을 줄인다.</li>
+        <li><strong>올인원 연결</strong>: 주문 → 재고 → 발주 → 마감이 하나의 플랫폼에서 유기적으로 연결되도록 하여 데이터 단절로 인한 업무 중복을 제거한다.</li>
+        <li><strong>진입 장벽 최소화</strong>: 복잡한 ERP나 POS 없이도 스마트폰 수준에서 바로 사용 가능한 낮은 기술 장벽의 서비스를 제공한다.</li>
+      </ul>
+    </section>
+
+    <!-- 1. 서비스 개요 -->
+    <section class="section" id="sec-1">
+      <h2><span class="section-badge badge-gray">1</span> 서비스 개요</h2>
+      <p class="section-desc">BARO가 무엇을 하는 서비스인지 한 단락으로 정의한다.</p>
+      <p><strong>BARO(바로)</strong>는 소규모 카페·식당 사장님을 위한 OCR·AI 기반 통합 가게 운영 SaaS이다.</p>
+      <p>손님의 주문 접수부터 재고 관리, AI 발주 추천, 하루 마감 정산까지 가게 운영에 필요한 핵심 업무를 하나의 플랫폼에서 처리할 수 있도록 한다. 특히 거래명세서 촬영 한 번으로 입고 데이터를 자동 등록하는 OCR 기능과, 테이블 QR을 통한 비대면 주문 시스템이 핵심 차별점이다.</p>
+    </section>
+
+    <!-- 2. 핵심 가치 제안 -->
+    <section class="section" id="sec-2">
+      <h2><span class="section-badge badge-gray">2</span> 핵심 가치 제안</h2>
+      <p class="section-desc">BARO가 사장님에게 제공하는 5가지 핵심 가치.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>가치</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td><strong>주문 자동화</strong></td><td>테이블 QR → 손님 주문 → 사장님 실시간 수신</td></tr>
+            <tr><td>2</td><td><strong>입고 자동화</strong></td><td>거래명세서 촬영 → OCR 파싱 → 재고 자동 등록</td></tr>
+            <tr><td>3</td><td><strong>발주 가이드</strong></td><td>재고 데이터 기반 AI 발주 추천 및 이유 제공</td></tr>
+            <tr><td>4</td><td><strong>마감 자동화</strong></td><td>판매 메뉴 + 레시피 기반 재고 자동 차감</td></tr>
+            <tr><td>5</td><td><strong>통합 대시보드</strong></td><td>주문·재고·매출 현황을 한 화면에서 파악</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 3. 사용자 정의 -->
+    <section class="section" id="sec-3">
+      <h2><span class="section-badge badge-gray">3</span> 사용자 정의</h2>
+      <p class="section-desc">서비스와 상호작용하는 두 가지 사용자 유형.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>구분</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td><strong>사장님 (Owner)</strong></td><td>서비스의 주 사용자. 가게를 운영하며 주문 수락, 재고 관리, 발주, 마감 등을 수행한다.</td></tr>
+            <tr><td><strong>손님 (Guest)</strong></td><td>QR을 통해 주문 페이지에 접근하는 비회원 사용자. 별도 로그인 없이 주문만 가능하다.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- B. 사용자 분석 -->
+    <section class="section accent2" id="sec-b">
+      <h2><span class="section-badge badge-purple">B</span> 사용자(타겟층) 분석 및 정의</h2>
+      <p class="section-desc">BARO의 핵심 타겟 사용자를 페르소나 기반으로 상세 정의한다.</p>
+
+      <h3>주요 타겟 — 사장님 (Owner)</h3>
+      <p>BARO의 핵심 사용자는 <strong>1~5인 규모의 소규모 카페·식당을 운영하는 사장님</strong>이다. 연령대는 30~50대이며, 스마트폰 사용에는 익숙하지만 복잡한 소프트웨어나 ERP 도구에는 진입 장벽을 느끼는 경우가 많다. 매일 10~14시간의 영업을 혼자 혹은 최소 인력으로 운영하면서 주문 접수, 재고 파악, 발주, 정산까지 모든 업무를 도맡아 처리한다.</p>
+
+      <h4>핵심 Pain Point</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>영역</th><th>현재 방식</th><th>문제점</th></tr></thead>
+          <tbody>
+            <tr><td>재고 파악</td><td>냉장고·창고를 직접 열어 눈으로 확인</td><td>파악 누락, 시간 소요, 실시간 확인 불가</td></tr>
+            <tr><td>발주</td><td>경험과 직감으로 판단</td><td>과잉 발주 또는 재고 부족 반복 발생</td></tr>
+            <tr><td>입고 처리</td><td>거래명세서를 수기로 옮겨 적음</td><td>오입력, 시간 낭비, 분실 위험</td></tr>
+            <tr><td>주문 접수</td><td>홀에서 직접 주문 받음</td><td>피크 타임 실수, 인력 추가 필요</td></tr>
+            <tr><td>일 마감</td><td>수기 또는 엑셀로 매출·소비 정리</td><td>30분 이상 소요, 계산 오류 발생</td></tr>
+            <tr><td>메뉴판</td><td>인쇄물 제작</td><td>메뉴 변경 시 재제작 비용 발생</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>페르소나</h3>
+
+      <h4>페르소나 1 — 이민수 (43세, 카페 1인 운영, 3년차)</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>항목</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>운영 형태</td><td>매장형 카페, 직원 없이 혼자 운영</td></tr>
+            <tr><td>주요 메뉴</td><td>에스프레소 음료, 케이크류 (원두·우유·시럽 등 식자재 약 15종)</td></tr>
+            <tr><td>현재 방식</td><td>아침 출근 시 냉장고 점검 후 부족한 재료를 수첩에 메모 → 점심 이후 도매 전화 발주</td></tr>
+            <tr><td>주요 불편</td><td>피크 타임에 음료 만들며 주문 동시에 받다가 빠진 메뉴 발생 / 한 달에 2~3회 유통기한 지난 재료 폐기</td></tr>
+            <tr><td>BARO 기대 효과</td><td>QR 주문으로 피크 대응 개선 + OCR로 입고 자동화 + AI 발주 가이드로 폐기 손실 절감</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>페르소나 2 — 박지영 (35세, 한식 식당 가족 운영, 5년차)</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>항목</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>운영 형태</td><td>점심·저녁 영업, 배달+매장 병행, 2~3인 가족 운영</td></tr>
+            <tr><td>주요 메뉴</td><td>한정식 세트, 단품 메뉴 (식자재 30종 이상)</td></tr>
+            <tr><td>현재 방식</td><td>매주 도매시장 직접 방문 발주 / 하루 마감을 엑셀로 30분 이상 정리</td></tr>
+            <tr><td>주요 불편</td><td>발주 타이밍을 놓쳐 메뉴 품절 발생 / 배달앱 주문과 매장 재고를 따로 관리해 이중 작업 발생</td></tr>
+            <tr><td>BARO 기대 효과</td><td>AI 발주 가이드로 발주 타이밍 최적화 + 마감 자동화로 정산 시간 단축</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>보조 타겟 — 손님 (Guest)</h3>
+      <p>손님은 서비스의 직접적인 구매 고객이 아니라, QR 주문 기능을 통해 서비스와 접점을 갖는 <strong>비회원 간접 사용자</strong>이다. 별도 앱 설치나 로그인 없이 테이블의 QR을 스캔하기만 하면 메뉴판을 보고 주문할 수 있어야 하며, 손님 입장에서는 기존 종이 메뉴판을 보고 주문하는 것과 다름없는 간단한 경험을 제공해야 한다.</p>
+    </section>
+
+    <!-- 4. 기능 정의 -->
+    <section class="section accent" id="sec-4">
+      <h2><span class="section-badge badge-blue">4</span> 기능 정의</h2>
+      <p class="section-desc">BARO를 구성하는 9개 기능 도메인의 상세 정의.</p>
+
+      <h3>기능 개요</h3>
+      <p>BARO는 가게 운영의 처음부터 끝까지를 커버하는 9개의 핵심 기능으로 구성된다.</p>
+      <p><strong>회원/인증</strong>은 카카오 소셜 로그인 하나로 간편하게 가입하고 로그인할 수 있도록 제공한다. 가게 데이터가 남아있는 동안에는 탈퇴가 제한되어 데이터 무결성을 보호한다.</p>
+      <p><strong>가게 초기 세팅</strong>은 사장님이 처음 서비스에 접속했을 때 가게 운영에 필요한 기반 데이터를 구성하는 단계이다. 재고 수량은 입력하지 않으며, 어떤 재료가 있는지 항목 구조만 잡아두는 것이 목적이다.</p>
+      <p><strong>메인 대시보드</strong>는 사장님이 가게를 운영하는 내내 열어두는 중심 화면이다. 실시간 주문 현황, 이번 달 가게 요약, 매출 그래프, OCR 빠른 입고, 메모 등이 한 화면에 배치된다.</p>
+      <p><strong>주문 시스템</strong>은 테이블마다 비치된 QR 코드를 손님이 스캔하면 메뉴판 페이지로 이동하는 방식이다. 주문은 실시간으로 사장님 대시보드에 전달된다.</p>
+      <p><strong>전체 재고 현황</strong>은 가게 보유 재고를 단일 페이지 리스트로 제공한다. 상태 기준 필터, 즐겨찾기, 정렬, 검색 기능을 포함한다.</p>
+      <p><strong>OCR 기반 재고 입고 처리</strong>는 거래명세서 이미지를 업로드하면 OCR이 자동으로 파싱하여 입고 등록 화면을 구성하는 기능이다. 미등록 식자재는 해당 화면에서 즉시 등록 가능하다.</p>
+      <p><strong>발주 가이드</strong>는 재고 데이터 기반으로 AI가 발주 필요 식자재를 분석하여 권장 발주량, 긴급도, 서술형 추천 이유를 제공한다.</p>
+      <p><strong>마감하기</strong>는 당일 판매된 메뉴와 레시피를 기반으로 식자재 이론 소비량을 자동 계산하고, 사용자가 검토·수정 후 재고를 차감하는 기능이다.</p>
+      <p><strong>가게 설정</strong>은 메뉴, 레시피, 식자재, 테이블, 메뉴판 뷰 등 가게 정보를 언제든 수정할 수 있는 관리 페이지이다.</p>
+
+      <hr class="divider" />
+
+      <!-- 4-1 -->
+      <div class="sub-section" id="sec-4-1">
+        <h3><span class="sub-badge">4-1</span> 회원 / 인증</h3>
+        <p>카카오 소셜 로그인을 기반으로 한 간편 인증 시스템을 제공한다.</p>
+        <div class="table-wrap" style="margin-top:12px">
+          <table>
+            <thead><tr><th>항목</th><th>내용</th></tr></thead>
+            <tbody>
+              <tr><td><strong>로그인 방식</strong></td><td>카카오 OAuth 소셜 로그인 단일 제공</td></tr>
+              <tr><td><strong>닉네임</strong></td><td>카카오에서 닉네임을 받아오며, 회원 설정 페이지에서 수정 가능</td></tr>
+              <tr><td><strong>회원 탈퇴</strong></td><td>가게 데이터(재고, 메뉴, 레시피 등)가 남아있는 경우 탈퇴 불가</td></tr>
+              <tr><td><strong>탈퇴 절차</strong></td><td>가게 데이터를 먼저 초기화(삭제) 한 이후에만 탈퇴 가능</td></tr>
+              <tr><td><strong>토큰 관리</strong></td><td>JWT Bearer Token, refresh token 기반 자동 갱신</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 4-2 -->
+      <div class="sub-section" id="sec-4-2">
+        <h3><span class="sub-badge">4-2</span> 가게 초기 세팅</h3>
+        <p>사장님이 처음 서비스에 가입한 후 가게 운영에 필요한 기본 데이터를 등록하는 단계이다. 이 단계에서는 <strong>재고 수량을 등록하지 않으며</strong>, 가게 구조(메뉴, 레시피, 식자재 항목)만 설정한다.</p>
+        <h4>Step 1. 가게 정보 입력</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>필드</th><th>설명</th></tr></thead>
+            <tbody>
+              <tr><td>가게 이름</td><td>사용자가 직접 입력</td></tr>
+              <tr><td>카테고리</td><td>예: 카페, 한식, 양식, 분식 등 선택</td></tr>
+              <tr><td>업종 타입</td><td>예: 매장형, 포장 전문, 배달 전문 등 선택</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>Step 2. 메뉴 등록</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>필드</th><th>설명</th></tr></thead>
+            <tbody>
+              <tr><td>메뉴명</td><td>가게에서 판매하는 메뉴 이름</td></tr>
+              <tr><td>가격</td><td>판매 단가</td></tr>
+              <tr><td>메뉴 이미지</td><td>(선택) 메뉴 사진 업로드</td></tr>
+              <tr><td>설명</td><td>(선택) 메뉴 소개 문구</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>Step 3. 식자재 등록</h4>
+        <blockquote>⚠️ 식자재 항목(마스터 데이터)을 등록하는 단계이며, 재고 수량·유통기한은 이 단계에서 입력하지 않는다.</blockquote>
+        <div class="table-wrap" style="margin-top:8px">
+          <table>
+            <thead><tr><th>필드</th><th>설명</th></tr></thead>
+            <tbody>
+              <tr><td>식자재 이름</td><td>예: 감자, 우유, 에스프레소 원두</td></tr>
+              <tr><td>단위</td><td>g, ml, 개 중 선택</td></tr>
+              <tr><td>최소 재고 기준 (안전 재고)</td><td>발주 가이드 및 재고 부족 알림의 기준이 되는 최솟값</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>Step 4. 레시피 등록</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>필드</th><th>설명</th></tr></thead>
+            <tbody>
+              <tr><td>연결 메뉴</td><td>어느 메뉴의 레시피인지 선택</td></tr>
+              <tr><td>사용 식자재</td><td>등록된 식자재 중 선택</td></tr>
+              <tr><td>사용량</td><td>해당 메뉴 1인분 기준 사용량 (단위 포함)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>핵심 원칙</h4>
+        <ul>
+          <li>초기 세팅에서는 <strong>재고 수량을 등록하지 않는다</strong>. (항목 구조만 등록)</li>
+          <li>실제 보유 재고 수량·유통기한의 최초 등록은 <strong>대시보드 최초 진입 시 모달</strong>을 통해 진행한다.</li>
+        </ul>
+      </div>
+
+      <!-- 4-3 -->
+      <div class="sub-section" id="sec-4-3">
+        <h3><span class="sub-badge">4-3</span> 메인 대시보드</h3>
+        <p>사장님이 가게를 운영하는 동안 항상 열어두는 운영 컨트롤 타워 화면이다.</p>
+        <h4>레이아웃 구성</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>섹션</th><th>위치</th><th>내용</th></tr></thead>
+            <tbody>
+              <tr><td>오늘의 주문 현황</td><td>왼쪽 전체</td><td>실시간 주문 리스트</td></tr>
+              <tr><td>이번 달 가게 요약 현황</td><td>오른쪽 상단</td><td>전체 재고 수 / 유통기한 임박 / 오늘 매출</td></tr>
+              <tr><td>매출·소비 그래프</td><td>오른쪽 하단 왼쪽</td><td>이번 달 매출 및 소비 현황 그래프</td></tr>
+              <tr><td>OCR 빠른 입고 처리</td><td>오른쪽 하단 왼쪽 (그래프 하단)</td><td>OCR 빠른 접근 버튼</td></tr>
+              <tr><td>간편 메모</td><td>오른쪽 하단 오른쪽</td><td>자유 메모장</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>주문 상태</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>상태</th><th>설명</th></tr></thead>
+            <tbody>
+              <tr><td><strong>신규</strong></td><td>손님이 주문을 전송한 상태. 사장님이 수락 전 상태</td></tr>
+              <tr><td><strong>준비 중</strong></td><td>사장님이 수락하여 조리·준비 중인 상태</td></tr>
+              <tr><td><strong>완료</strong></td><td>메뉴가 손님에게 제공 완료된 상태</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>이번 달 가게 요약 현황 카드</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>카드</th><th>표시 내용</th></tr></thead>
+            <tbody>
+              <tr><td>전체 재고</td><td>현재 등록된 재고 항목 수. 하단에 '발주 추천이 n개 있어요' 안내 문구 표시 (추천 발주 있을 경우)</td></tr>
+              <tr><td>유통기한 임박</td><td>유통기한 임박 상품 개수</td></tr>
+              <tr><td>오늘 매출</td><td>오늘 완료된 주문의 총 매출액</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>초기 진입 시 재고 등록 모달</h4>
+        <ul>
+          <li>초기 세팅 완료 후 대시보드에 <strong>처음 진입하는 시점</strong>에 모달이 표시된다.</li>
+          <li>모달 내용: 「등록된 식자재에 대해 현재 보유 재고를 등록하시겠어요?」</li>
+          <li><strong>수락 시:</strong> 각 식자재에 대해 현재 수량, 유통기한, 입고일 입력 후 등록한다.</li>
+          <li><strong>거절 시:</strong> 재고가 없는 상태로 대시보드를 사용하며, 재고 관련 기능은 비활성화(disabled) 처리된다.</li>
+        </ul>
+        <blockquote>재고가 등록되지 않아 해당 기능을 사용할 수 없어요. 재고 등록을 진행해주세요.</blockquote>
+      </div>
+
+      <!-- 4-4 -->
+      <div class="sub-section" id="sec-4-4">
+        <h3><span class="sub-badge">4-4</span> 주문 시스템</h3>
+        <p>테이블마다 QR 코드를 비치하고, 손님은 QR을 찍어 메뉴판 페이지에서 비회원으로 주문한다.</p>
+        <h4>손님 주문 흐름</h4>
+        <div class="flow-text">QR 코드 스캔 → 메뉴판 페이지 접속 (테이블 번호 포함) → 메뉴 선택 → 주문 요청 → 사장님 대시보드 실시간 신규 주문 표시 → 사장님 수락 → 준비 중 → 완료</div>
+        <h4>QR 코드</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>항목</th><th>내용</th></tr></thead>
+            <tbody>
+              <tr><td>QR 연동 정보</td><td>테이블 번호 포함 URL (예: /order?table=1)</td></tr>
+              <tr><td>발급 단위</td><td>테이블별 개별 QR 코드 발급</td></tr>
+              <tr><td>관리 위치</td><td>가게 설정에서 테이블 수 설정 및 QR 다운로드</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>메뉴판 뷰 타입 (3종)</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>뷰</th><th>특징</th></tr></thead>
+            <tbody>
+              <tr><td>카드형</td><td>이미지 중심, 그리드 레이아웃</td></tr>
+              <tr><td>리스트형</td><td>텍스트 중심, 세로 나열</td></tr>
+              <tr><td>심플형</td><td>이미지 없이 이름·가격만 표시</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 4-5 -->
+      <div class="sub-section" id="sec-4-5">
+        <h3><span class="sub-badge">4-5</span> 전체 재고 현황</h3>
+        <p>가게가 보유한 전체 재고를 한 페이지에서 테이블(리스트) 형태로 보여주는 페이지이다.</p>
+        <h4>재고 테이블 컬럼</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>컬럼</th><th>설명</th></tr></thead>
+            <tbody>
+              <tr><td>식자재명</td><td>등록된 식자재 이름</td></tr>
+              <tr><td>현재 재고</td><td>현재 보유 수량 + 단위</td></tr>
+              <tr><td>유통기한</td><td>해당 재고 배치의 유통기한</td></tr>
+              <tr><td>입고날짜</td><td>최신 입고 처리 날짜</td></tr>
+              <tr><td>포함 레시피</td><td>해당 식자재가 들어가는 메뉴 레시피 목록</td></tr>
+              <tr><td>상태</td><td>재고 부족 / 주의 / 정상</td></tr>
+              <tr><td>즐겨찾기</td><td>즐겨찾기 여부 (별 아이콘 토글)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>재고 상태 기준</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>상태</th><th>정의</th></tr></thead>
+            <tbody>
+              <tr><td><strong>재고 부족</strong></td><td>현재 재고 &lt; 안전 재고 기준</td></tr>
+              <tr><td><strong>주의</strong></td><td>안전 재고 기준의 일정 비율 이하 (예: 150% 이하)</td></tr>
+              <tr><td><strong>정상</strong></td><td>안전 재고 기준 충분히 상회</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>제공 기능</h4>
+        <div class="chip-row">
+          <span class="chip">검색 — 식자재명</span>
+          <span class="chip">필터 — 전체 / 부족 / 주의 / 정상 / 즐겨찾기</span>
+          <span class="chip">정렬 — 유통기한순 / 입고날짜순</span>
+          <span class="chip">즐겨찾기 토글</span>
+        </div>
+        <blockquote>원두/커피, 유제품 등 카테고리(태그) 기반 분류는 MVP에서 제외한다.</blockquote>
+      </div>
+
+      <!-- 4-6 -->
+      <div class="sub-section" id="sec-4-6">
+        <h3><span class="sub-badge">4-6</span> OCR 기반 재고 입고 처리</h3>
+        <p>거래명세서를 촬영하거나 이미지 업로드하면 OCR이 재고 데이터를 파싱하여 입고 처리를 자동화한다.</p>
+        <h4>입고 처리 흐름</h4>
+        <div class="flow-text">이미지 업로드 또는 촬영 → OCR 파싱 (서버 처리) → 파싱 결과 UI 표시 → 사용자 검토 및 수정 → 미등록 식자재 즉시 등록 (필요 시) → 입고 확정 → 재고 현황 반영</div>
+        <h4>단위 환산 규칙</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>OCR 인식 단위</th><th>변환 처리</th></tr></thead>
+            <tbody>
+              <tr><td>kg</td><td>g으로 환산 (× 1,000) 후 서버 전송</td></tr>
+              <tr><td>L</td><td>ml으로 환산 (× 1,000) 후 서버 전송</td></tr>
+              <tr><td>g, ml, 개</td><td>그대로 전송</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <blockquote>단위 환산은 <strong>프론트엔드에서 처리</strong> 후 서버에 표준 단위(g, ml, 개)로 전송한다.<br>OCR 결과는 자동으로 확정되지 않으며, <strong>반드시 사용자의 검토 및 수동 확정 단계를 거친다</strong>.</blockquote>
+      </div>
+
+      <!-- 4-7 -->
+      <div class="sub-section" id="sec-4-7">
+        <h3><span class="sub-badge">4-7</span> 발주 가이드</h3>
+        <p>보유 재고 데이터를 기반으로 AI가 발주가 필요한 식자재를 분석하여 발주 추천 가이드를 제공한다.</p>
+        <h4>제공 정보</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>항목</th><th>설명</th></tr></thead>
+            <tbody>
+              <tr><td>재료명</td><td>발주 추천 대상 식자재 이름</td></tr>
+              <tr><td>현재 재고</td><td>현재 보유 수량 + 단위</td></tr>
+              <tr><td>안전 재고 기준</td><td>초기 세팅에서 설정한 최소 재고 기준</td></tr>
+              <tr><td>권장 발주량</td><td>AI가 분석하여 추천하는 발주 수량</td></tr>
+              <tr><td>AI 발주 추천 이유</td><td>서술형 코멘트 + 분석 근거 (명확하고 간결하게 제공)</td></tr>
+              <tr><td>긴급도</td><td>높음 / 중간 / 낮음 단계별 표시</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h4>AI 추천 이유 예시</h4>
+        <blockquote>"에스프레소 원두의 현재 재고(200g)가 안전 재고 기준(500g)의 40% 수준입니다. 최근 7일간 일 평균 소비량이 80g이므로 약 2.5일 내 소진이 예상됩니다. 최소 300g 이상 즉시 발주를 권장합니다."</blockquote>
+      </div>
+
+      <!-- 4-8 -->
+      <div class="sub-section" id="sec-4-8">
+        <h3><span class="sub-badge">4-8</span> 마감하기</h3>
+        <p>당일 주문 시스템을 통해 판매된 메뉴 데이터와 등록된 레시피를 기반으로 사용된 재고를 자동 계산하여 차감하는 기능이다.</p>
+        <h4>마감 처리 흐름</h4>
+        <div class="flow-text">마감하기 실행 → 오늘 완료된 주문 데이터 + 레시피 기반 이론 사용량 계산 → 식자재별 예상 차감량 표시 → 사용자 검토 및 수정 → 마감 확정 → 재고 현황 업데이트</div>
+        <h4>마감 화면 제공 정보</h4>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>항목</th><th>설명</th></tr></thead>
+            <tbody>
+              <tr><td>식자재명</td><td>오늘 사용된 식자재 목록</td></tr>
+              <tr><td>이론 사용량</td><td>주문 수량 × 레시피 기준 사용량으로 자동 계산된 값</td></tr>
+              <tr><td>실제 사용량</td><td>사용자가 직접 수정 가능한 입력 필드</td></tr>
+              <tr><td>차감 후 예상 재고</td><td>마감 확정 시 반영될 재고 수량 미리보기</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <blockquote>이론 사용량은 자동 계산되지만, <strong>최종 차감 전 사용자가 반드시 확인하고 수정할 수 있어야 한다</strong>.</blockquote>
+      </div>
+
+      <!-- 4-9 -->
+      <div class="sub-section" id="sec-4-9">
+        <h3><span class="sub-badge">4-9</span> 가게 설정</h3>
+        <p>사장님이 가게의 식자재, 메뉴, 레시피 정보를 수정·관리하는 설정 페이지이다. 회원 설정과는 독립된 별도 페이지로 제공한다.</p>
+        <div class="table-wrap" style="margin-top:12px">
+          <table>
+            <thead><tr><th>항목</th><th>내용</th></tr></thead>
+            <tbody>
+              <tr><td>식자재 관리</td><td>식자재 추가 / 수정 / 삭제 (이름, 단위, 안전 재고 기준)</td></tr>
+              <tr><td>메뉴 관리</td><td>메뉴 추가 / 수정 / 삭제 (이름, 가격, 이미지, 설명)</td></tr>
+              <tr><td>레시피 관리</td><td>레시피 추가 / 수정 / 삭제 (메뉴별 사용 식자재 및 수량)</td></tr>
+              <tr><td>테이블 설정</td><td>테이블 수 설정 및 테이블별 QR 코드 다운로드</td></tr>
+              <tr><td>메뉴판 뷰 설정</td><td>손님에게 보여줄 메뉴판 레이아웃 선택 (카드형 / 리스트형 / 심플형)</td></tr>
+              <tr><td>가게 기본 정보</td><td>가게 이름, 카테고리, 업종 타입 수정</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- C. AI 기술 활용 -->
+    <section class="section accent3" id="sec-c">
+      <h2><span class="section-badge badge-green">C</span> AI 기술 활용</h2>
+      <p class="section-desc">서비스 내 AI 적용 기술과, 아이디어 발굴부터 발표 준비까지 전과정 AI 도구 전략을 정의한다.</p>
+
+      <h3>카테고리 1 — 서비스 내 AI 분석 기술</h3>
+      <p>BARO는 사용자의 반복적인 수작업을 줄이기 위해 두 가지 핵심 AI 기술을 서비스 내에 직접 적용한다.</p>
+
+      <h4>① OCR (광학 문자 인식) — 재고 입고 자동화</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>항목</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>적용 위치</td><td>OCR 기반 재고 입고 처리</td></tr>
+            <tr><td>입력</td><td>거래명세서 이미지 (카메라 촬영 또는 파일 업로드)</td></tr>
+            <tr><td>처리</td><td>이미지에서 품목명, 수량, 단위, 금액 등 텍스트 자동 추출 및 구조화</td></tr>
+            <tr><td>출력</td><td>식자재별 입고 정보가 채워진 편집 가능한 UI 화면</td></tr>
+            <tr><td>사용 기술</td><td>Google Vision API, Naver Clova OCR 등 외부 OCR API 활용</td></tr>
+            <tr><td>사용자 역할</td><td>파싱 결과를 검토하고 수정한 뒤 최종 확정 (자동 확정 불가)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>② AI 발주 추천 (LLM 기반) — 발주 가이드</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>항목</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>적용 위치</td><td>발주 가이드 페이지</td></tr>
+            <tr><td>입력 데이터</td><td>현재 재고 수량, 안전 재고 기준, 과거 소비 이력, 입고 이력</td></tr>
+            <tr><td>처리</td><td>LLM이 데이터를 분석하여 발주 필요 식자재, 권장 발주량, 긴급도 판단</td></tr>
+            <tr><td>출력</td><td>재료명 / 현재 재고 / 안전 재고 기준 / 권장 발주량 / 서술형 추천 이유 / 긴급도</td></tr>
+            <tr><td>사용 기술</td><td>Claude API 또는 OpenAI API를 통한 프롬프트 기반 분석 텍스트 생성</td></tr>
+            <tr><td>핵심 차별점</td><td>단순 수량 추천이 아닌 "왜 지금 발주해야 하는가"의 근거를 자연어로 제공</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>카테고리 2 — 전과정 AI 도구 전략</h3>
+      <p>BARO는 아이디어 발굴 단계부터 기획, 개발, 발표 준비까지 전 과정에서 목적에 맞는 AI 도구를 단계별로 배치하여 활용한다.</p>
+
+      <h4>Step 1. 아이디어 발굴 — 문제 정의 단계</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>AI 도구</th><th>활용 목적</th><th>구체적 작업</th><th>산출물</th></tr></thead>
+          <tbody>
+            <tr><td><strong>ChatGPT</strong></td><td>브레인스토밍, 문제 탐색</td><td>소규모 외식업 사장님이 겪는 Pain Point 목록 생성, 초기 서비스 아이디어 후보군 도출, "어떤 기능이 있으면 좋겠는가" 사용자 관점 시뮬레이션</td><td>Pain Point 목록, 서비스 아이디어 초안 10~20개</td></tr>
+            <tr><td><strong>Perplexity</strong></td><td>시장 조사, 데이터 수집</td><td>국내 소규모 외식업체 수 및 폐업률 데이터 조사, 기존 경쟁 서비스(캐시노트, 식당넷, 포스피아 등) 기능 비교 분석, 소상공인 디지털 전환 현황 리서치</td><td>시장 규모 데이터, 경쟁사 비교표, 레퍼런스 URL</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Step 2. 사용자 분석 및 기획 — 페르소나·시나리오 단계</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>AI 도구</th><th>활용 목적</th><th>구체적 작업</th><th>산출물</th></tr></thead>
+          <tbody>
+            <tr><td><strong>ChatGPT</strong></td><td>페르소나 생성, 시나리오 작성</td><td>실제 사장님 유형 기반 페르소나 2~3개 생성 (이름, 연령, 운영 방식, 불편함), 사용자가 BARO를 처음 가입하고 첫 주문을 받기까지의 상세 시나리오 작성</td><td>페르소나 카드, 사용자 시나리오 문서</td></tr>
+            <tr><td><strong>Claude</strong></td><td>기획 논리 검증, MVP 범위 설정</td><td>도출된 기능 목록의 우선순위 논리 검증, MVP에 포함할 기능과 제외할 기능의 기준 설정, 기능 간 충돌 또는 의존성 점검</td><td>MVP 기능 범위 확정, 제외 기능 목록과 이유</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Step 3. 문서화 및 기획서 작성 — 현재 단계</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>AI 도구</th><th>활용 목적</th><th>구체적 작업</th><th>산출물</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Claude</strong></td><td>기획서 작성, 구조 설계</td><td>MVP 정의서 전체 구조 설계 및 섹션 작성, 기능 정의 상세화, 기획 내용의 논리적 일관성 검토 및 보완</td><td>MVP 정의서 (본 문서), 기능 정의서</td></tr>
+            <tr><td><strong>ChatGPT</strong></td><td>문구 작성, 흐름 정리</td><td>서비스 소개 문구 초안 작성, 사용자 흐름(User Flow) 정리, 섹션별 설명 문구 다듬기</td><td>서비스 소개 카피, User Flow 다이어그램 초안</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Step 4. 디자인 및 프로토타이핑</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>AI 도구</th><th>활용 목적</th><th>구체적 작업</th><th>산출물</th></tr></thead>
+          <tbody>
+            <tr><td><strong>v0 by Vercel / Galileo AI</strong></td><td>UI 초안 생성</td><td>대시보드 레이아웃, 재고 현황 테이블, 주문 카드 UI 초안 자동 생성, 생성된 UI 기반으로 실제 컴포넌트 구조 설계</td><td>UI 초안 화면, 컴포넌트 후보</td></tr>
+            <tr><td><strong>ChatGPT</strong></td><td>UX 개선 아이디어</td><td>사용자 관점에서 불편할 수 있는 UI 요소 점검, 아이콘·색상·텍스트 레이블 개선 제안</td><td>UX 피드백 목록, 개선 아이디어</td></tr>
+            <tr><td><strong>Claude</strong></td><td>디자인 시스템 설계</td><td>Tailwind CSS 디자인 토큰 체계 설계, 컴포넌트 네이밍 컨벤션 정의, Shadcn/UI 기반 컴포넌트 활용 가이드 작성</td><td>디자인 토큰 정의서, 컴포넌트 가이드</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Step 5. 개발</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>AI 도구</th><th>활용 목적</th><th>구체적 작업</th><th>산출물</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Claude</strong></td><td>아키텍처 설계, 코드 생성, 디버깅</td><td>React 컴포넌트 구조 및 폴더 구조 설계, Zustand 스토어·React Query 훅 코드 생성, 복잡한 로직 디버깅</td><td>컴포넌트 코드, 훅 코드, 타입 정의</td></tr>
+            <tr><td><strong>ChatGPT</strong></td><td>알고리즘 구현, API 연동</td><td>재고 상태 판단 알고리즘 구현, 이론 사용량 계산 공식 작성, OCR API·AI API 연동 코드 초안, 단위 환산 로직</td><td>유틸리티 함수, API 연동 코드</td></tr>
+            <tr><td><strong>GitHub Copilot</strong></td><td>코드 자동완성, 반복 코드 생성</td><td>반복되는 CRUD 패턴 코드 자동완성, 타입 추론 지원, 테스트 코드 초안 생성</td><td>자동완성된 코드, 테스트 초안</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>Step 6. 검토 및 발표 준비</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>AI 도구</th><th>활용 목적</th><th>구체적 작업</th><th>산출물</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Gemini</strong></td><td>트렌드 검토, 발표 피드백</td><td>최신 소상공인 디지털 전환 트렌드 데이터 수집, 발표 자료 전체 흐름 및 완성도 피드백, 경쟁사 최신 동향 업데이트</td><td>최신 트렌드 보고서, 발표 피드백</td></tr>
+            <tr><td><strong>Claude</strong></td><td>논리 검증, Q&A 준비</td><td>발표 스크립트 논리적 흐름 검증, 심사위원이 물어볼 수 있는 예상 Q&A 생성 및 답변 정리</td><td>발표 스크립트, 예상 Q&A 문서</td></tr>
+            <tr><td><strong>Perplexity</strong></td><td>팩트체크, 데이터 검증</td><td>인용한 시장 규모·통계 데이터의 최신성 및 정확성 확인, 경쟁사 서비스 기능 현황 최신 정보 확인</td><td>팩트체크 결과, 수정된 데이터 인용</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- D. 창의성 및 구현 가능성 -->
+    <section class="section accent4" id="sec-d">
+      <h2><span class="section-badge badge-amber">D</span> 아이디어의 창의성 및 구현 가능성 분석</h2>
+      <p class="section-desc">BARO의 차별화 포인트와 기술적 실현 가능성을 분석한다.</p>
+
+      <h3>창의성</h3>
+
+      <h4>① 주문 → 재고 → 마감을 잇는 데이터 사이클 완성</h4>
+      <p>기존 소규모 외식업 솔루션은 POS(주문/결제)와 재고 관리가 서로 분리되어 있다. 사장님은 주문을 POS로 받고, 재고는 별도로 수기 관리하며, 마감은 다시 수동으로 계산하는 3중 구조다. BARO는 손님 주문이 들어오면 메뉴 레시피를 통해 자동으로 식자재 소비를 추적하고, 마감하기 기능으로 하루 사용량을 재고에서 차감함으로써 이 세 가지를 하나의 흐름으로 연결한다.</p>
+
+      <h4>② 비대면 QR 주문 + 디지털 메뉴판 일체화</h4>
+      <p>QR 주문 시스템은 별도의 앱 설치 없이 테이블 번호가 연동된 URL로 동작한다. 사장님은 메뉴판을 별도로 제작하지 않아도 되고, 3가지 뷰 타입(카드형/리스트형/심플형)으로 메뉴판 스타일을 직접 커스텀할 수 있다. 메뉴를 바꾸면 즉시 손님 화면에도 반영되어 인쇄 비용이 발생하지 않는다.</p>
+
+      <h4>③ OCR 미등록 식자재 즉시 등록 흐름</h4>
+      <p>기존 OCR 솔루션은 미등록 항목을 오류로 처리하거나 별도 화면으로 이탈시킨다. BARO는 OCR 결과 화면 안에서 미등록 식자재를 즉시 등록하고 바로 입고 처리를 이어갈 수 있도록 설계했다. 업무 흐름이 끊기지 않고 한 화면에서 완결된다.</p>
+
+      <h4>④ 서술형 AI 발주 이유 제공</h4>
+      <p>대부분의 발주 추천 기능은 "이만큼 발주하세요"라는 수량만 제시한다. BARO의 AI 발주 가이드는 "왜 지금 이 재료를 발주해야 하는가"의 분석 근거를 자연어로 함께 제공한다. 사장님이 AI 추천을 납득한 뒤 발주 결정을 내릴 수 있도록 한다.</p>
+
+      <h3>구현 가능성</h3>
+
+      <h4>기술 스택 안정성</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>기술</th><th>용도</th><th>안정성 근거</th></tr></thead>
+          <tbody>
+            <tr><td>React 19 + TypeScript</td><td>프론트엔드 UI</td><td>업계 표준 기술, 방대한 생태계와 커뮤니티</td></tr>
+            <tr><td>Tailwind CSS + Shadcn/UI</td><td>스타일링, 컴포넌트</td><td>빠른 개발 속도, 일관된 디자인 시스템</td></tr>
+            <tr><td>Zustand + React Query</td><td>상태 관리</td><td>경량 구조, 서버 상태와 클라이언트 상태 명확히 분리</td></tr>
+            <tr><td>Vite</td><td>빌드 도구</td><td>빠른 HMR, 소규모 프로젝트에 최적</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h4>핵심 기능별 구현 방식</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>기능</th><th>구현 방식</th><th>난이도</th></tr></thead>
+          <tbody>
+            <tr><td>OCR 파싱</td><td>Google Vision API 또는 Naver Clova OCR 외부 API 활용. 자체 모델 개발 불필요.</td><td>중</td></tr>
+            <tr><td>실시간 주문 수신</td><td>WebSocket 또는 Server-Sent Events(SSE)로 실시간 푸시 구현.</td><td>중</td></tr>
+            <tr><td>AI 발주 추천</td><td>Claude API 또는 OpenAI API에 재고 데이터를 전달하고 분석 텍스트 생성. 프롬프트 엔지니어링 수준에서 구현 가능.</td><td>하</td></tr>
+            <tr><td>QR 코드 생성</td><td>qrcode.js 오픈소스 라이브러리로 클라이언트에서 직접 생성.</td><td>하</td></tr>
+            <tr><td>재고 상태 계산</td><td>현재 재고 / 안전 재고 기준 비율 계산. 순수 자바스크립트 로직으로 구현.</td><td>하</td></tr>
+            <tr><td>단위 환산</td><td>kg→g, L→ml 프론트엔드 수식 처리. 1000 곱하기 연산.</td><td>하</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- E. 사회/경제적 효과 -->
+    <section class="section accent5" id="sec-e">
+      <h2><span class="section-badge badge-red">E</span> 서비스를 통한 사회/경제적 가치창출 효과</h2>
+      <p class="section-desc">BARO가 사회와 경제에 미치는 기대 효과 및 파급력을 분석한다.</p>
+
+      <h3>사회적 파급효과</h3>
+
+      <h4>① 소상공인 디지털 전환 지원</h4>
+      <p>국내 소규모 외식업체 약 60만 개 중 디지털 솔루션을 도입한 곳은 극히 일부에 불과하다. BARO는 복잡한 ERP나 고가의 POS 없이도 스마트폰으로 바로 접근 가능한 낮은 진입 장벽의 디지털 운영 도구를 제공한다. 이는 소규모 가게의 디지털 전환을 실질적으로 지원하며, 기술 소외 계층인 소상공인의 디지털 격차를 좁히는 데 기여한다.</p>
+
+      <h4>② 식품 폐기 감소 및 환경 기여</h4>
+      <p>정확한 재고 관리와 AI 발주 가이드를 통해 과잉 구매로 인한 식재료 낭비를 줄인다. 유통기한 임박 알림 기능은 사장님이 폐기 직전 재료를 먼저 소진하도록 유도하여 식품 낭비를 능동적으로 방지한다. 이는 UN SDG(지속가능발전목표) 12번 '책임감 있는 소비와 생산'과도 연결된다.</p>
+
+      <h4>③ 소규모 가게의 1인 운영 가능성 확대</h4>
+      <p>QR 비대면 주문 시스템 도입으로 홀 서빙 중 주문을 받는 인력이 없어도 주문 접수가 가능해진다. 이는 최소 인력으로 운영해야 하는 소규모 가게의 인력 부담을 줄이고, 1인 창업·운영의 실현 가능성을 높인다.</p>
+
+      <h4>④ 지역 소상공인 경쟁력 강화</h4>
+      <p>대형 프랜차이즈가 독점하던 디지털 운영 효율성을 소규모 독립 가게도 갖출 수 있게 함으로써 지역 경제의 다양성을 보호하고 소상공인의 생존율을 높이는 데 간접적으로 기여한다.</p>
+
+      <h3>경제적 파급효과</h3>
+
+      <h4>① 과잉 발주 비용 절감</h4>
+      <p>AI 발주 가이드를 통해 필요한 양만큼만 적시에 발주할 수 있게 되면, 과잉 재고로 인한 폐기 손실이 줄어든다. 소규모 카페 기준 월 평균 식재료 비용이 100~300만 원이라고 할 때, 과잉 발주 및 폐기를 10~20% 줄이면 월 10~60만 원의 비용 절감 효과가 발생한다.</p>
+
+      <h4>② 운영 시간 단축에 따른 기회비용 절감</h4>
+      <ul>
+        <li><strong>OCR 자동 입고</strong>: 거래명세서 수기 입력 시간 → 촬영 한 번으로 대체 (하루 약 10~20분 절약)</li>
+        <li><strong>QR 주문</strong>: 홀 주문 접수 이탈 시간 제거 (피크 타임 실수 감소)</li>
+        <li><strong>마감 자동화</strong>: 수기·엑셀 정산 30분 → 마감하기 기능으로 5분 이내 처리</li>
+        <li>하루 약 1~2시간 절약 시 월 30~60시간의 운영 시간을 서비스 품질 향상에 재투자 가능</li>
+      </ul>
+
+      <h4>③ 매출 데이터 기반 메뉴 전략 최적화</h4>
+      <p>대시보드의 매출·소비 그래프를 통해 잘 팔리는 메뉴와 식재료 소비 패턴을 데이터로 파악할 수 있다. 이를 바탕으로 저마진 메뉴를 줄이거나 고회전 식재료에 집중 투자하는 등 데이터 기반 메뉴 전략이 가능해진다.</p>
+
+      <h4>④ 시장 잠재 규모</h4>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>항목</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td>국내 소규모 외식업체 수</td><td>약 60만 개 이상 (통계청 기준)</td></tr>
+            <tr><td>타겟 전환율 (보수적 추정 1%)</td><td>6,000개 가입 가게</td></tr>
+            <tr><td>타겟 전환율 (성장 목표 5%)</td><td>30,000개 가입 가게</td></tr>
+            <tr><td>기대 효과</td><td>가입 가게 1개당 월 평균 10~60만 원의 운영 비용 절감</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 5. 공통 제약 -->
+    <section class="section" id="sec-5">
+      <h2><span class="section-badge badge-gray">5</span> 공통 제약 사항</h2>
+      <p class="section-desc">서비스 전반에 적용되는 기술·운영 제약 조건.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>항목</th><th>내용</th></tr></thead>
+          <tbody>
+            <tr><td><strong>식자재 단위</strong></td><td>g, ml, 개 세 가지만 사용</td></tr>
+            <tr><td><strong>단위 환산</strong></td><td>OCR 처리 시 kg → g, L → ml 프론트엔드에서 환산 후 서버 전송</td></tr>
+            <tr><td><strong>이미지 업로드</strong></td><td>최대 10MB</td></tr>
+            <tr><td><strong>OCR 자동 확정 금지</strong></td><td>OCR 결과는 반드시 수동 검수 단계 유지</td></tr>
+            <tr><td><strong>재고 등록 필수성</strong></td><td>재고 미등록 시 관련 기능 비활성화 처리 및 안내 문구 표시</td></tr>
+            <tr><td><strong>회원 탈퇴</strong></td><td>가게 데이터 초기화 선행 필수</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 6. MVP 제외 기능 -->
+    <section class="section" id="sec-6">
+      <h2><span class="section-badge badge-gray">6</span> MVP 제외 기능</h2>
+      <p class="section-desc">기획 논의 과정에서 MVP 범위에서 명시적으로 제외된 항목.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>제외 항목</th><th>이유</th></tr></thead>
+          <tbody>
+            <tr><td>카테고리(태그) 기반 재고 필터 (원두, 유제품 등)</td><td>MVP 단순화</td></tr>
+            <tr><td>재고 현황 → 현재/소진 분리 페이지</td><td>단일 페이지로 통합</td></tr>
+            <tr><td>날씨·요일 기반 수요 예측</td><td>AI 발주 가이드로 대체</td></tr>
+            <tr><td>식자재 등록 단계의 재고 수량 입력</td><td>대시보드 최초 진입 시 별도 등록</td></tr>
+            <tr><td>이메일/일반 회원가입</td><td>카카오 단일 로그인</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 7. 페이지 목록 -->
+    <section class="section" id="sec-7">
+      <h2><span class="section-badge badge-gray">7</span> 페이지 목록</h2>
+      <p class="section-desc">MVP에서 제공하는 전체 페이지 경로와 접근 주체 정의.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>경로</th><th>페이지명</th><th>접근 주체</th></tr></thead>
+          <tbody>
+            <tr><td>/</td><td>랜딩 페이지</td><td>전체</td></tr>
+            <tr><td>/login</td><td>로그인</td><td>비회원</td></tr>
+            <tr><td>/initial-setup</td><td>가게 초기 세팅</td><td>사장님 (최초 1회)</td></tr>
+            <tr><td>/dashboard</td><td>메인 대시보드</td><td>사장님</td></tr>
+            <tr><td>/inventory</td><td>전체 재고 현황</td><td>사장님</td></tr>
+            <tr><td>/ocr-inbound</td><td>OCR 재고 입고 처리</td><td>사장님</td></tr>
+            <tr><td>/order-guide</td><td>발주 가이드</td><td>사장님</td></tr>
+            <tr><td>/closing</td><td>마감하기</td><td>사장님</td></tr>
+            <tr><td>/settings</td><td>가게 설정</td><td>사장님</td></tr>
+            <tr><td>/my-account</td><td>회원 설정</td><td>사장님</td></tr>
+            <tr><td>/order?table={n}</td><td>손님 주문 메뉴판</td><td>손님 (비회원)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  // ── Sticky TOC: IntersectionObserver ──
+  const allSections = document.querySelectorAll('section[id], div.sub-section[id]');
+  const allTocLinks = document.querySelectorAll('.toc-list a, .toc-sub a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        allTocLinks.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector(`a[href="#${entry.target.id}"]`);
+        if (link) {
+          link.classList.add('active');
+          // Auto-open sub-menu if sub-section is active
+          if (entry.target.id.startsWith('sec-4-')) {
+            document.getElementById('toc-sub-4').classList.add('open');
+            document.getElementById('toc-4-toggle').classList.add('open');
+          }
+        }
+      }
+    });
+  }, { rootMargin: '-8% 0px -80% 0px', threshold: 0 });
+
+  allSections.forEach(s => observer.observe(s));
+
+  // ── Toggle sub-menu ──
+  const toggle = document.getElementById('toc-4-toggle');
+  const subMenu = document.getElementById('toc-sub-4');
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    const isOpen = subMenu.classList.toggle('open');
+    toggle.classList.toggle('open', isOpen);
+    // Still scroll to section
+    document.getElementById('sec-4').scrollIntoView({ behavior: 'smooth' });
+  });
+
+  // ── Smooth scroll for all TOC links ──
+  allTocLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+        const target = document.getElementById(href.slice(1));
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Close mobile sidebar on link click
+        closeMobileSidebar();
+      }
+    });
+  });
+
+  // ── Mobile sidebar toggle ──
+  const sidebar   = document.querySelector('.sidebar');
+  const overlay   = document.getElementById('toc-overlay');
+  const fab       = document.getElementById('toc-fab');
+
+  function openMobileSidebar() {
+    sidebar.classList.add('mobile-open');
+    overlay.style.display = 'block';
+    fab.textContent = '✕ 닫기';
+  }
+  function closeMobileSidebar() {
+    sidebar.classList.remove('mobile-open');
+    overlay.style.display = 'none';
+    fab.textContent = '☰ 목차';
+  }
+
+  fab.addEventListener('click', () => {
+    sidebar.classList.contains('mobile-open') ? closeMobileSidebar() : openMobileSidebar();
+  });
+  overlay.addEventListener('click', closeMobileSidebar);
+</script>
+
+</body>
+</html>

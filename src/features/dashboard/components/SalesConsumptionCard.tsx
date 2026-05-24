@@ -1,4 +1,4 @@
-import { BarChart2 } from 'lucide-react';
+import { PieChart } from 'lucide-react';
 
 import type { MonthlySalesData } from '@/features/dashboard/types/dashboard.types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
@@ -7,76 +7,107 @@ interface SalesConsumptionCardProps {
   data: MonthlySalesData[];
 }
 
-const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
-  const allValues = data.flatMap((d) => [d.consumption, d.sales]);
-  const maxValue = Math.max(...allValues);
-  const avgValue = allValues.reduce((a, b) => a + b, 0) / allValues.length;
+/* ── SVG 도넛 차트 ── */
+interface DonutChartProps {
+  consumptionRatio: number; // 0 ~ 1
+}
 
-  const toPercent = (value: number) => Math.round((value / maxValue) * 100);
-  const avgPercent = toPercent(avgValue);
+const DonutChart = ({ consumptionRatio }: DonutChartProps) => {
+  const r = 52;
+  const cx = 70;
+  const cy = 70;
+  const sw = 18;
+  const C = 2 * Math.PI * r;
+  const GAP = C * 0.015;
+
+  const consumptionArc = C * consumptionRatio - GAP;
+  const profitArc = C * (1 - consumptionRatio) - GAP;
 
   return (
-    <Card>
-      <CardHeader className="border-b pb-4">
+    <svg viewBox="0 0 140 140" className="w-full h-full">
+      <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f3f4f6" strokeWidth={sw} />
+
+      <g transform={`rotate(-90 ${cx} ${cy})`}>
+        <circle
+          cx={cx}
+          cy={cy}
+          r={r}
+          fill="none"
+          stroke="#679436"
+          strokeWidth={sw}
+          strokeLinecap="butt"
+          strokeDasharray={`${consumptionArc} ${C}`}
+          strokeDashoffset={0}
+        />
+        {profitArc > 0 && (
+          <circle
+            cx={cx}
+            cy={cy}
+            r={r}
+            fill="none"
+            stroke="#449CD4"
+            strokeWidth={sw}
+            strokeLinecap="butt"
+            strokeDasharray={`${profitArc} ${C}`}
+            strokeDashoffset={-(C * consumptionRatio)}
+          />
+        )}
+      </g>
+    </svg>
+  );
+};
+
+/* ── 메인 카드 ── */
+const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
+  const latest = data[data.length - 1];
+  const profit = Math.max(0, latest.sales - latest.consumption);
+  const consumptionRatio = latest.consumption / latest.sales;
+  const profitRatio = profit / latest.sales;
+
+  return (
+    <Card size="sm" className="h-full">
+      <CardHeader className="border-b px-4 ">
         <CardTitle className="text-sm flex items-center gap-2">
-          <BarChart2 className="w-4 h-4 text-muted-foreground" />
-          가게 소비 및 매출 현황
+          <PieChart className="w-4 h-4 text-muted-foreground" />
+          이번 달 현황
         </CardTitle>
-        <div className="flex items-center gap-4 text-xs text-muted-foreground ml-auto">
-          <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-baro-blue inline-block" />
-            매출
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-sm bg-[#F2A65A] inline-block" />
-            소비
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-5 border-t-2 border-dashed border-gray-400 inline-block" />
-            평균
-          </span>
-        </div>
       </CardHeader>
 
-      <CardContent>
-        {/* 차트 영역 */}
-        <div className="flex flex-col gap-2">
-          <div className="relative h-40">
-            {/* 평균선 */}
-            <div
-              className="absolute inset-x-0 z-10 pointer-events-none flex items-center gap-1"
-              style={{ bottom: `${avgPercent}%` }}
-            >
-              <div className="flex-1 border-t-2 border-dashed border-gray-400/70" />
-              <span className="text-[10px] text-gray-400 bg-white px-1 shrink-0">
-                평균 {Math.round(avgValue / 10000)}만
-              </span>
-            </div>
+      {/* 가로 배치: 도넛 차트 (좌) + 범례 (우) — 세로 중앙 정렬 */}
+      <CardContent className="flex-1 flex items-center gap-4 px-4 py-3">
+        {/* 도넛 차트 */}
+        <div className="relative w-28 h-28 shrink-0">
+          <DonutChart consumptionRatio={consumptionRatio} />
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
+            <p className="text-[10px] text-muted-foreground">{latest.month} 매출</p>
+            <p className="text-sm font-bold leading-none">{(latest.sales / 10000).toFixed(0)}만</p>
+          </div>
+        </div>
 
-            {/* 막대 그래프 */}
-            <div className="flex items-end gap-2.5 h-full">
-              {data.map((d) => (
-                <div key={d.month} className="flex-1 flex items-end gap-0.5 h-full">
-                  <div
-                    className="flex-1 rounded-t bg-[#449CD4]/80 transition-all"
-                    style={{ height: `${toPercent(d.sales)}%` }}
-                  />
-                  <div
-                    className="flex-1 rounded-t bg-[#F2A65A]/80 transition-all"
-                    style={{ height: `${toPercent(d.consumption)}%` }}
-                  />
-                </div>
-              ))}
+        {/* 범례 — 가로 배치 */}
+        <div className="flex-1 flex gap-2">
+          <div className="flex-1 rounded-lg bg-muted/40 px-3 py-2.5">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="size-2 rounded-full bg-baro-green shrink-0" />
+              <span className="text-xs text-muted-foreground">소비</span>
             </div>
+            <p className="text-sm font-bold text-gray-900">
+              {(latest.consumption / 10000).toFixed(0)}만원
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {(consumptionRatio * 100).toFixed(1)}%
+            </p>
           </div>
 
-          {/* 월 라벨 */}
-          <div className="flex gap-2.5">
-            {data.map((d) => (
-              <div key={d.month} className="flex-1 text-center">
-                <span className="text-[10px] text-muted-foreground">{d.month}</span>
-              </div>
-            ))}
+          <div className="flex-1 rounded-lg bg-muted/40 px-3 py-2.5">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="size-2 rounded-full bg-baro-blue shrink-0" />
+              <span className="text-xs text-muted-foreground">순이익</span>
+            </div>
+            <p className="text-sm font-bold text-gray-900">{(profit / 10000).toFixed(0)}만원</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {(profitRatio * 100).toFixed(1)}%
+            </p>
           </div>
         </div>
       </CardContent>

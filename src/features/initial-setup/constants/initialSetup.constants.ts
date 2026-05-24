@@ -1,8 +1,6 @@
 import type {
   BusinessType,
-  ChannelKey,
   DayOfWeek,
-  IngredientUnit,
   StoreCategory,
 } from '@/features/initial-setup/types/initialSetup.types';
 
@@ -33,19 +31,16 @@ export const DAY_OF_WEEK_CONFIG: { value: DayOfWeek; label: string }[] = [
   { value: 'sunday', label: '일요일' },
 ];
 
-export const INGREDIENT_UNITS: IngredientUnit[] = ['개', '캔', '봉', '팩', '박스', '묶음'];
-
-export const NOTIFICATION_CHANNELS: { key: ChannelKey; label: string }[] = [
-  { key: 'email', label: '이메일' },
-  { key: 'kakao', label: '카카오톡' },
-  { key: 'push', label: '앱 푸시' },
+/** 식자재 단위 선택 옵션 (g / ml / 개 고정) */
+export const INGREDIENT_UNIT_OPTIONS: { value: string; label: string }[] = [
+  { value: 'g', label: 'g' },
+  { value: 'ml', label: 'ml' },
+  { value: '개', label: '개' },
 ];
 
 export const SETUP_STEPS = [
   { id: 1, title: '가게 기본 정보', description: '가게 이름과 업종을 입력해주세요' },
   { id: 2, title: '영업 시간', description: '영업 요일과 시간을 설정해주세요' },
-  { id: 3, title: '메뉴 등록', description: '대표 메뉴와 가격을 입력해주세요' },
-  { id: 4, title: '레시피 정보', description: '메뉴별 재료와 사용량을 입력해주세요' },
-  { id: 5, title: '주요 식자재', description: '주요 식자재와 최소 재고 기준을 설정해주세요' },
-  { id: 6, title: '알림 설정', description: '재고 및 발주 알림을 설정해주세요' },
+  { id: 3, title: '메뉴 등록', description: '판매 메뉴를 등록해주세요' },
+  { id: 4, title: '식자재 & 레시피', description: '사용 식자재와 메뉴별 레시피를 등록해주세요' },
 ] as const;

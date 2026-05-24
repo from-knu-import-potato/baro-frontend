@@ -5,8 +5,8 @@ import type {
 } from '@/features/dashboard/types/dashboard.types';
 
 export const MOCK_STORE = {
-  name: '임포트 감자 식당',
-  category: '춘천 | 한식 | 개인',
+  name: '임포트 감자 카페',
+  category: '춘천 | 카페 | 개인',
 };
 
 export const MOCK_USER = {
@@ -15,35 +15,35 @@ export const MOCK_USER = {
 };
 
 export const MOCK_STATS: DashboardStats = {
-  totalInventory: 81,
-  expiringItems: 8,
+  totalInventory: 64,
+  expiringItems: 3,
   aiOrderRecommendations: 3,
   monthlyConsumption: 1132171,
   monthlyConsumptionChange: -4.3,
-  lastUpdated: '2026-05-03 18:38:12',
+  lastUpdated: '2026-05-20 09:15:00',
 };
 
 export const MOCK_DEMAND_PREDICTION =
-  '지난 매출과 오늘 날씨 정보를 파악해보니 따뜻한 음료가 많이 나갈 것 같아요. (지난 주 대비 기온 4°C 하락, 동일 조건 주간 핫 음료 매출 +28% 근거)';
+  '지난 매출과 오늘 날씨 정보를 파악해보니 따뜻한 음료가 많이 나갈 것 같아요. (전 주 대비 기온 4°C 하락, 동일 조건 주간 핫 음료 매출 +28% 근거)';
 
 export const MOCK_RECOMMENDATIONS: OrderRecommendationItem[] = [
   {
     id: '1',
-    name: '감자',
-    aiReason:
-      '유통기한이 2일밖에 남지 않았고, 이번 주 메뉴에 가장 많이 쓰이는 식자재예요. 지금 남은 재고(5kg)를 소진하기 전에 미리 발주해 두는 걸 권장해요.',
-  },
-  {
-    id: '2',
-    name: '버터',
+    name: '에티오피아 원두',
     aiReason:
       '현재 재고(200g)가 주간 평균 소비량(1.2kg)의 17% 수준이에요. 이 추세라면 2~3일 내 재고가 바닥날 가능성이 높으니 빠른 발주가 필요해요.',
   },
   {
-    id: '3',
+    id: '2',
     name: '우유',
     aiReason:
       '유통기한이 내일까지로 급박해요. 현재 재고(2L)는 오늘 영업 중에 소진될 수 있으니, 신선한 제품을 당일 발주하는 것을 강력 추천해요.',
+  },
+  {
+    id: '3',
+    name: '바닐라 시럽',
+    aiReason:
+      '유통기한이 3일밖에 남지 않았고, 바닐라 라떼·바닐라 크림 음료에 가장 많이 쓰이는 시럽이에요. 지금 남은 재고(300ml)를 소진하기 전에 미리 발주해 두는 걸 권장해요.',
   },
 ];
 
