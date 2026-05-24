@@ -1,21 +1,7 @@
-import { useState } from 'react';
-
-import {
-  LayoutDashboard,
-  Package,
-  Truck,
-  TrendingUp,
-  Settings,
-  HelpCircle,
-  Home,
-  ChevronRight,
-  ChevronDown,
-} from 'lucide-react';
+import { LayoutDashboard, Package, Truck, Store, Settings, Home } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
-import NotificationDropdown from '@/features/notification/components/NotificationDropdown';
-import { Collapsible, CollapsibleContent } from '@/shadcn/ui/collapsible';
 import {
   Sidebar,
   SidebarContent,
@@ -26,17 +12,14 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
-  SidebarMenuSubItem,
   SidebarSeparator,
   SidebarTrigger,
 } from '@/shadcn/ui/sidebar';
 import BaroLogo from '@/shared/assets/images/baro-logo.png';
 
 const BOTTOM_NAV_ITEMS = [
-  { label: '설정', icon: Settings, to: routePaths.settings },
-  { label: '지원', icon: HelpCircle, to: routePaths.support },
+  { label: '회원 설정', icon: Settings, to: routePaths.settings },
+  // { label: '지원', icon: HelpCircle, to: routePaths.support },
   { label: '랜딩 페이지', icon: Home, to: routePaths.landing },
 ];
 
@@ -47,10 +30,6 @@ interface AppSidebarProps {
 
 const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
   const location = useLocation();
-  const isInventoryActive =
-    location.pathname === routePaths.inventoryCurrent ||
-    location.pathname === routePaths.inventoryDepleted;
-  const [inventoryOpen, setInventoryOpen] = useState(isInventoryActive);
 
   return (
     <Sidebar collapsible="icon">
@@ -83,41 +62,16 @@ const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
               </SidebarMenuItem>
 
               {/* 전체 재고 현황 */}
-              <Collapsible open={inventoryOpen} onOpenChange={setInventoryOpen}>
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                    isActive={isInventoryActive}
-                    tooltip="전체 재고 현황"
-                    onClick={() => setInventoryOpen((prev) => !prev)}
-                  >
-                    <Package />
-                    <span className="flex-1 truncate">전체 재고 현황</span>
-                    <ChevronDown
-                      className={`ml-auto w-4 h-4 transition-transform duration-200 group-data-[collapsible=icon]:hidden ${inventoryOpen ? 'rotate-180' : ''}`}
-                    />
-                  </SidebarMenuButton>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          isActive={location.pathname === routePaths.inventoryCurrent}
-                          render={<NavLink to={routePaths.inventoryCurrent} />}
-                        >
-                          <span>현재 재고 현황</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                      <SidebarMenuSubItem>
-                        <SidebarMenuSubButton
-                          isActive={location.pathname === routePaths.inventoryDepleted}
-                          render={<NavLink to={routePaths.inventoryDepleted} />}
-                        >
-                          <span>소진 재고 현황</span>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={location.pathname === routePaths.inventory}
+                  tooltip="전체 재고 현황"
+                  render={<NavLink to={routePaths.inventory} />}
+                >
+                  <Package />
+                  <span>전체 재고 현황</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
 
               {/* 발주 가이드 */}
               <SidebarMenuItem>
@@ -131,15 +85,15 @@ const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
                 </SidebarMenuButton>
               </SidebarMenuItem>
 
-              {/* 가격 변동 분석 */}
+              {/* 가게 설정 */}
               <SidebarMenuItem>
                 <SidebarMenuButton
-                  isActive={location.pathname === routePaths.priceAnalysis}
-                  tooltip="가격 변동 분석"
-                  render={<NavLink to={routePaths.priceAnalysis} />}
+                  isActive={location.pathname.startsWith(routePaths.storeSettings)}
+                  tooltip="가게 설정"
+                  render={<NavLink to={routePaths.storeSettings} />}
                 >
-                  <TrendingUp />
-                  <span>가격 변동 분석</span>
+                  <Store />
+                  <span>가게 설정</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
@@ -151,7 +105,6 @@ const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
       <SidebarFooter className="pb-2">
         <SidebarSeparator className="mx-0" />
         <SidebarMenu>
-          <NotificationDropdown />
           {BOTTOM_NAV_ITEMS.map(({ label, icon: Icon, to }) => (
             <SidebarMenuItem key={to}>
               <SidebarMenuButton
@@ -177,7 +130,6 @@ const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
             <span className="text-[10px] text-muted-foreground truncate">{storeCategory}</span>
             <span className="text-sm font-semibold text-foreground truncate">{storeName}</span>
           </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground ml-auto shrink-0" />
         </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>
