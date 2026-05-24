@@ -1,0 +1,211 @@
+import { useState } from 'react';
+
+import { AlertTriangle, CalendarDays, Clock, Package, ShoppingCart, Siren } from 'lucide-react';
+
+import type { OrderGuideItem, UrgencyLevel } from '@/features/order-guide/types/orderGuide.types';
+import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
+
+interface OrderGuideListProps {
+  items: OrderGuideItem[];
+}
+
+type FilterTab = 'all' | UrgencyLevel;
+
+const FILTER_TABS: { key: FilterTab; label: string; count?: number }[] = [
+  { key: 'all', label: '전체' },
+  { key: 'critical', label: '긴급' },
+  { key: 'warning', label: '주의' },
+  { key: 'recommended', label: '권장' },
+];
+
+const URGENCY_CONFIG: Record<
+  UrgencyLevel,
+  { label: string; badgeClass: string; rowClass: string; icon: React.ReactNode }
+> = {
+  critical: {
+    label: '긴급',
+    badgeClass:
+      'bg-red-100 text-baro-red border border-red-200 dark:bg-red-950/40 dark:text-red-400',
+    rowClass: 'border-l-4 border-l-baro-red',
+    icon: <Siren className="w-3.5 h-3.5" />,
+  },
+  warning: {
+    label: '주의',
+    badgeClass:
+      'bg-orange-100 text-orange-600 border border-orange-200 dark:bg-orange-950/40 dark:text-orange-400',
+    rowClass: 'border-l-4 border-l-orange-400',
+    icon: <AlertTriangle className="w-3.5 h-3.5" />,
+  },
+  recommended: {
+    label: '권장',
+    badgeClass:
+      'bg-blue-100 text-baro-blue-dark border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400',
+    rowClass: 'border-l-4 border-l-baro-blue',
+    icon: <ShoppingCart className="w-3.5 h-3.5" />,
+  },
+};
+
+const formatStock = (qty: number, unit: string) => `${qty.toLocaleString()} ${unit}`;
+
+const OrderGuideList = ({ items }: OrderGuideListProps) => {
+  const [activeTab, setActiveTab] = useState<FilterTab>('all');
+
+  const filteredItems =
+    activeTab === 'all' ? items : items.filter((item) => item.urgency === activeTab);
+
+  const countByUrgency = (urgency: UrgencyLevel) =>
+    items.filter((item) => item.urgency === urgency).length;
+
+  return (
+    <Card>
+      <CardHeader className="border-b pb-0">
+        <div className="flex items-center justify-between mb-3">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Package className="w-4 h-4 text-muted-foreground" />
+            발주 가이드
+            <span className="text-xs font-normal text-muted-foreground">
+              — 총 {items.length}개 품목
+            </span>
+          </CardTitle>
+        </div>
+
+        {/* 필터 탭 */}
+        <div className="flex gap-1">
+          {FILTER_TABS.map((tab) => {
+            const count =
+              tab.key === 'all' ? items.length : countByUrgency(tab.key as UrgencyLevel);
+            const isActive = activeTab === tab.key;
+
+            return (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`
+                  px-3 py-2 text-xs font-medium rounded-t-md border-b-2 transition-colors
+                  ${
+                    isActive
+                      ? 'border-b-baro-blue text-baro-blue-dark bg-blue-50/50 dark:bg-blue-950/20'
+                      : 'border-b-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  }
+                `}
+              >
+                {tab.label}
+                <span
+                  className={`ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold
+                  ${
+                    isActive
+                      ? 'bg-baro-blue text-white'
+                      : tab.key === 'critical' && count > 0
+                        ? 'bg-red-100 text-baro-red'
+                        : 'bg-muted text-muted-foreground'
+                  }
+                `}
+                >
+                  {count}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </CardHeader>
+
+      <CardContent className="p-0">
+        {filteredItems.length === 0 ? (
+          <div className="py-16 text-center text-sm text-muted-foreground">
+            해당 조건의 발주 항목이 없어요.
+          </div>
+        ) : (
+          <>
+            {/* 테이블 헤더 */}
+            <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_3fr_80px] gap-4 px-5 py-2.5 bg-muted/40 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+              <span>재료명</span>
+              <span>현재 재고</span>
+              <span>안전 재고 기준</span>
+              <span>권장 발주량</span>
+              <span>발주 이유</span>
+              <span className="text-center">긴급도</span>
+            </div>
+
+            {/* 테이블 바디 */}
+            <div className="divide-y">
+              {filteredItems.map((item) => {
+                const config = URGENCY_CONFIG[item.urgency];
+
+                return (
+                  <div
+                    key={item.id}
+                    className={`grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1fr_3fr_80px] gap-3 md:gap-4 px-5 py-4 hover:bg-muted/20 transition-colors ${config.rowClass}`}
+                  >
+                    {/* 재료명 */}
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-sm font-semibold text-foreground">{item.name}</span>
+                      <span className="text-xs text-muted-foreground">{item.category}</span>
+                      {item.expiryDate && (
+                        <span className="inline-flex items-center gap-1 text-[11px] text-baro-red mt-0.5">
+                          <Clock className="w-3 h-3" />
+                          유통기한 {item.expiryDate}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* 현재 재고 */}
+                    <div className="flex flex-col justify-center">
+                      <span className="md:hidden text-xs text-muted-foreground mb-0.5">
+                        현재 재고
+                      </span>
+                      <span className="text-sm font-medium text-foreground">
+                        {formatStock(item.currentStock, item.currentStockUnit)}
+                      </span>
+                    </div>
+
+                    {/* 안전 재고 기준 */}
+                    <div className="flex flex-col justify-center">
+                      <span className="md:hidden text-xs text-muted-foreground mb-0.5">
+                        안전 재고
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {formatStock(item.safetyStock, item.safetyStockUnit)}
+                      </span>
+                    </div>
+
+                    {/* 권장 발주량 */}
+                    <div className="flex flex-col justify-center">
+                      <span className="md:hidden text-xs text-muted-foreground mb-0.5">
+                        권장 발주량
+                      </span>
+                      <span className="text-sm font-semibold text-baro-blue-dark">
+                        {formatStock(item.recommendedOrderQty, item.recommendedOrderUnit)}
+                      </span>
+                    </div>
+
+                    {/* 발주 이유 */}
+                    <div className="flex flex-col justify-center gap-1">
+                      <span className="md:hidden text-xs text-muted-foreground">발주 이유</span>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{item.reason}</p>
+                      <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/70">
+                        <CalendarDays className="w-3 h-3" />
+                        마지막 발주 {item.lastOrderDate}
+                      </span>
+                    </div>
+
+                    {/* 긴급도 배지 */}
+                    <div className="flex items-start justify-start md:justify-center pt-0.5">
+                      <span
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${config.badgeClass}`}
+                      >
+                        {config.icon}
+                        {config.label}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+};
+
+export default OrderGuideList;
