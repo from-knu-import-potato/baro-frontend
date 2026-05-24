@@ -1,7 +1,10 @@
+import OrderGuideList from '@/features/order-guide/components/OrderGuideList';
+import { MOCK_ORDER_GUIDE_ITEMS } from '@/features/order-guide/data/orderGuide.mock';
+
 const OrderGuidePage = () => {
   return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold text-baro-black">발주 가이드 페이지 (임시) </h1>
+    <div className="flex flex-col gap-6 p-6">
+      <OrderGuideList items={MOCK_ORDER_GUIDE_ITEMS} />
     </div>
   );
 };
