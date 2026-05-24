@@ -3,10 +3,10 @@ import { useState } from 'react';
 import { CheckCircle, Minus, Plus, ShoppingCart } from 'lucide-react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import type { MenuItem } from '@/features/initial-setup/types/initialSetup.types';
 import { MOCK_SHOP_MENU } from '@/features/customer-order/data/customerOrder.mock';
 import { useOrderStore } from '@/features/customer-order/store/customerOrderStore';
 import type { CartItem } from '@/features/customer-order/types/customerOrder.types';
+import type { MenuItem } from '@/features/initial-setup/types/initialSetup.types';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent } from '@/shadcn/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';

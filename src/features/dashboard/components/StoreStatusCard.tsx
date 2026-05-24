@@ -1,7 +1,7 @@
 import { Store } from 'lucide-react';
 
+import { useOrderStore } from '@/features/customer-order/store/customerOrderStore';
 import type { DashboardStats } from '@/features/dashboard/types/dashboard.types';
-import { useOrderStore } from '@/features/orders/store/orderStore';
 
 interface StoreStatusCardProps {
   stats: DashboardStats;

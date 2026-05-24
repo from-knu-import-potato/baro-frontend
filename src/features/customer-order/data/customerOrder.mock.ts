@@ -1,5 +1,5 @@
-import type { MenuItem } from '@/features/initial-setup/types/initialSetup.types';
 import type { Order } from '@/features/customer-order/types/customerOrder.types';
+import type { MenuItem } from '@/features/initial-setup/types/initialSetup.types';
 
 /** 고객용 주문 페이지에 표시할 메뉴 (초기 세팅 데이터가 연동되기 전 목업) */
 export const MOCK_SHOP_MENU: MenuItem[] = [

@@ -14,9 +14,9 @@ import {
 
 import { MOCK_INVENTORY_ITEMS } from '@/features/inventory/data/inventory.mock';
 import type { InventoryItem, InventoryStatus } from '@/features/inventory/types/inventory.types';
+import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
 import { Input } from '@/shadcn/ui/input';
-import { cn } from '@/lib/utils';
 
 /* ── 상태 설정 ── */
 const STATUS_CONFIG: Record<
@@ -89,7 +89,13 @@ const InventoryRow = ({ item, isFavorite, onToggleFavorite }: InventoryRowProps)
   const dday = getDday(item.expiryDate);
 
   return (
-    <div className={cn('hidden md:grid gap-4 px-5 py-4 hover:bg-muted/20 transition-colors items-center', GRID, config.rowClass)}>
+    <div
+      className={cn(
+        'hidden md:grid gap-4 px-5 py-4 hover:bg-muted/20 transition-colors items-center',
+        GRID,
+        config.rowClass,
+      )}
+    >
       {/* 즐겨찾기 버튼 */}
       <button
         onClick={() => onToggleFavorite(item.id)}
@@ -216,10 +222,8 @@ const InventoryTable = () => {
   const sorted = [...filtered].sort((a, b) => {
     if (sortKey === 'default') return 0;
 
-    const aVal =
-      sortKey === 'expiryDate' ? (a.expiryDate ?? '9999-99-99') : a.inboundDate;
-    const bVal =
-      sortKey === 'expiryDate' ? (b.expiryDate ?? '9999-99-99') : b.inboundDate;
+    const aVal = sortKey === 'expiryDate' ? (a.expiryDate ?? '9999-99-99') : a.inboundDate;
+    const bVal = sortKey === 'expiryDate' ? (b.expiryDate ?? '9999-99-99') : b.inboundDate;
 
     const cmp = aVal.localeCompare(bVal);
     return sortDir === 'asc' ? cmp : -cmp;
@@ -279,13 +283,13 @@ const InventoryTable = () => {
                     onClick={() => handleSortClick(key)}
                     className={cn(
                       'px-2 py-1 rounded text-xs font-medium transition-colors',
-                      isActive ? 'bg-baro-blue text-white' : 'text-muted-foreground hover:bg-muted/60',
+                      isActive
+                        ? 'bg-baro-blue text-white'
+                        : 'text-muted-foreground hover:bg-muted/60',
                     )}
                   >
                     {label}
-                    {isActive && (
-                      <span className="ml-0.5">{sortDir === 'asc' ? '↑' : '↓'}</span>
-                    )}
+                    {isActive && <span className="ml-0.5">{sortDir === 'asc' ? '↑' : '↓'}</span>}
                   </button>
                 );
               })}

@@ -1,9 +1,9 @@
+import OrderStatusCard from '@/features/customer-order/components/CustomerOrderStatusCard';
 import MemoCard from '@/features/dashboard/components/MemoCard';
 import OcrUploadCard from '@/features/dashboard/components/OcrUploadCard';
 import SalesConsumptionCard from '@/features/dashboard/components/SalesConsumptionCard';
 import StoreStatusCard from '@/features/dashboard/components/StoreStatusCard';
 import { MOCK_SALES_DATA, MOCK_STATS } from '@/features/dashboard/data/dashboard.mock';
-import OrderStatusCard from '@/features/orders/components/OrderStatusCard';
 
 const DashboardPage = () => {
   return (
