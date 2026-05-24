@@ -2,13 +2,13 @@ import { useState } from 'react';
 
 import { Store } from 'lucide-react';
 
-import SettingsSection from '@/features/settings/components/SettingsSection';
-import { MOCK_STORE_SETTINGS } from '@/features/settings/data/settings.mock';
-import type { StoreSettings } from '@/features/settings/types/settings.types';
+import { MOCK_STORE_SETTINGS } from '@/features/store-settings/data/store-settings.mock';
+import type { StoreSettings } from '@/features/store-settings/types/store-settings.types';
 import { Button } from '@/shadcn/ui/button';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/ui/select';
+import SettingsSection from '@/shared/components/SettingsSection';
 
 const BUSINESS_TYPE_OPTIONS = [
   { value: 'individual', label: '개인' },
@@ -100,7 +100,11 @@ const StoreInfoSection = () => {
                 }
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue />
+                  <SelectValue>
+                    {(value: string) =>
+                      BUSINESS_TYPE_OPTIONS.find((o) => o.value === value)?.label ?? value
+                    }
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {BUSINESS_TYPE_OPTIONS.map((o) => (
@@ -118,7 +122,11 @@ const StoreInfoSection = () => {
                 onValueChange={(val) => setForm((f) => ({ ...f, category: val as string }))}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue />
+                  <SelectValue>
+                    {(value: string) =>
+                      CATEGORY_OPTIONS.find((o) => o.value === value)?.label ?? value
+                    }
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {CATEGORY_OPTIONS.map((o) => (

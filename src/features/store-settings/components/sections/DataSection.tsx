@@ -1,9 +1,9 @@
 import { Database, Download, Trash2 } from 'lucide-react';
 
-import SettingRow from '@/features/settings/components/SettingRow';
-import SettingsSection from '@/features/settings/components/SettingsSection';
 import { Button } from '@/shadcn/ui/button';
 import { Separator } from '@/shadcn/ui/separator';
+import SettingRow from '@/shared/components/SettingRow';
+import SettingsSection from '@/shared/components/SettingsSection';
 
 const DataSection = () => {
   return (

@@ -2,7 +2,7 @@ import { ChevronRight, ClipboardList, Layers, Salad, UtensilsCrossed } from 'luc
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
-import SettingsSection from '@/features/settings/components/SettingsSection';
+import SettingsSection from '@/shared/components/SettingsSection';
 
 interface NavRowProps {
   icon: React.ReactNode;
@@ -41,19 +41,19 @@ const StoreOperationSection = () => {
           icon={<ClipboardList className="h-4 w-4" />}
           label="메뉴 관리"
           description="판매 중인 메뉴 목록을 추가·수정·삭제합니다."
-          onClick={() => navigate(routePaths.settingsMenus)}
+          onClick={() => navigate(routePaths.storeSettingsMenus)}
         />
         <NavRow
           icon={<UtensilsCrossed className="h-4 w-4" />}
           label="레시피 관리"
           description="각 메뉴의 재료 구성과 사용량을 관리합니다."
-          onClick={() => navigate(routePaths.settingsRecipes)}
+          onClick={() => navigate(routePaths.storeSettingsRecipes)}
         />
         <NavRow
           icon={<Salad className="h-4 w-4" />}
           label="주요 식자재 관리"
           description="재고 알림 기준이 되는 주요 식자재를 설정합니다."
-          onClick={() => navigate(routePaths.settingsIngredients)}
+          onClick={() => navigate(routePaths.storeSettingsIngredients)}
         />
       </div>
     </SettingsSection>

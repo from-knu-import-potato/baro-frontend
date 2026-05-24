@@ -1,9 +1,9 @@
 import { Monitor } from 'lucide-react';
 
-import SettingRow from '@/features/settings/components/SettingRow';
-import SettingsSection from '@/features/settings/components/SettingsSection';
 import ThemeToggle from '@/features/theme/components/ThemeToggle';
 import { useTheme } from '@/features/theme/hooks/useTheme';
+import SettingRow from '@/shared/components/SettingRow';
+import SettingsSection from '@/shared/components/SettingsSection';
 
 const ThemeSection = () => {
   const { dark, toggleTheme } = useTheme();
