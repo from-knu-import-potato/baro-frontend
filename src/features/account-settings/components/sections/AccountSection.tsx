@@ -1,5 +1,6 @@
-import { Check, LogOut, Pencil, Trash2, UserCircle, X } from 'lucide-react';
 import { useRef, useState } from 'react';
+
+import { Check, LogOut, Pencil, Trash2, UserCircle, X } from 'lucide-react';
 
 import { MOCK_ACCOUNT_SETTINGS } from '@/features/account-settings/data/account-settings.mock';
 import { Button } from '@/shadcn/ui/button';
