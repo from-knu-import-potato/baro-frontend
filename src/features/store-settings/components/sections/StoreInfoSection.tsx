@@ -2,10 +2,13 @@ import { useState } from 'react';
 
 import { Store } from 'lucide-react';
 
-import { MOCK_STORE_SETTINGS } from '@/features/store-settings/data/store-settings.mock';
+import {
+  MOCK_STORE_SETTINGS,
+  MOCK_STORE_STAFF,
+} from '@/features/store-settings/data/store-settings.mock';
 import type { StoreSettings } from '@/features/store-settings/types/store-settings.types';
 import { Button } from '@/shadcn/ui/button';
-import { Input } from '@/shadcn/ui/input';
+import { Input } from '@/shadcn/ui/input'; // 가게명 수정에 사용
 import { Label } from '@/shadcn/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/ui/select';
 import SettingsSection from '@/shared/components/SettingsSection';
@@ -86,10 +89,21 @@ const StoreInfoSection = () => {
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">대표자명</Label>
-              <Input
+              <Select
                 value={form.ownerName}
-                onChange={(e) => setForm((f) => ({ ...f, ownerName: e.target.value }))}
-              />
+                onValueChange={(val) => setForm((f) => ({ ...f, ownerName: val ?? f.ownerName }))}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="직원을 선택하세요" />
+                </SelectTrigger>
+                <SelectContent>
+                  {MOCK_STORE_STAFF.map((staff) => (
+                    <SelectItem key={staff.id} value={staff.name}>
+                      {staff.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label className="text-xs text-muted-foreground">사업 유형</Label>

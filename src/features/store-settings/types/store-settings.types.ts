@@ -4,3 +4,8 @@ export interface StoreSettings {
   businessType: 'franchise' | 'directly-operated' | 'individual';
   category: string;
 }
+
+export interface StoreStaff {
+  id: string;
+  name: string;
+}
