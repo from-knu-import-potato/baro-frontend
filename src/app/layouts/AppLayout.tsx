@@ -7,7 +7,7 @@ import AppSidebar from '@/widgets/AppSidebar';
 
 const AppLayout = () => {
   return (
-    <SidebarProvider className="h-svh overflow-hidden">
+    <SidebarProvider defaultOpen={false} className="h-svh overflow-hidden">
       <AppSidebar storeName={MOCK_STORE.name} storeCategory={MOCK_STORE.category} />
       <SidebarInset className="overflow-hidden">
         <AppHeader userName={MOCK_USER.name} userRole={MOCK_USER.role} />
