@@ -6,10 +6,12 @@
 소규모 카페·식당 사장님을 위한 주문부터 재고, 발주, 마감까지 관리하는 올인원 플랫폼.
 
 사용자:
+
 - **사장님 (Owner)**: 서비스 주 사용자. 주문 수락, 재고 관리, 발주, 마감 수행
 - **손님 (Guest)**: QR 스캔으로 접근하는 비회원. 별도 로그인 없이 주문만 가능
 
 핵심 기능:
+
 1. QR 기반 비대면 주문 시스템 (테이블 QR → 손님 주문 → 사장님 실시간 수신)
 2. OCR 기반 입고 데이터 자동화 (거래명세서 촬영 → 자동 디지털화)
 3. AI 기반 발주 가이드 (재고 데이터 분석 → 적정 발주량 + 서술형 추천 이유)
@@ -18,17 +20,17 @@
 
 ## 기술 스택
 
-| 분류 | 기술 |
-|---|---|
-| 프레임워크 | React 19 |
-| 언어 | TypeScript |
-| 스타일링 | Tailwind CSS, Shadcn/UI |
-| 상태 관리 | Zustand (클라이언트), React Query (서버) |
-| API 통신 | Axios |
-| 폼 관리 | React Hook Form + Zod |
-| 빌드 | Vite |
-| 패키지 매니저 | pnpm (`pnpm dev` / `pnpm build`) |
-| 테스트 | Vitest |
+| 분류          | 기술                                     |
+| ------------- | ---------------------------------------- |
+| 프레임워크    | React 19                                 |
+| 언어          | TypeScript                               |
+| 스타일링      | Tailwind CSS, Shadcn/UI                  |
+| 상태 관리     | Zustand (클라이언트), React Query (서버) |
+| API 통신      | Axios                                    |
+| 폼 관리       | React Hook Form + Zod                    |
+| 빌드          | Vite                                     |
+| 패키지 매니저 | pnpm (`pnpm dev` / `pnpm build`)         |
+| 테스트        | Vitest                                   |
 
 ## 프로젝트 구조
 
@@ -51,19 +53,19 @@ src/
 
 ## 페이지 목록
 
-| 경로 | 페이지 | 접근 주체 |
-|---|---|---|
-| `/` | 랜딩 페이지 | 전체 |
-| `/login` | 로그인 (카카오 소셜) | 비회원 |
-| `/initial-setup` | 가게 초기 세팅 | 사장님 (최초 1회) |
-| `/dashboard` | 메인 대시보드 | 사장님 |
-| `/inventory` | 전체 재고 현황 | 사장님 |
-| `/ocr-inbound` | OCR 재고 입고 처리 | 사장님 |
-| `/order-guide` | 발주 가이드 | 사장님 |
-| `/closing` | 마감하기 | 사장님 |
-| `/settings` | 가게 설정 | 사장님 |
-| `/my-account` | 회원 설정 | 사장님 |
-| `/order?table={n}` | 손님 주문 메뉴판 | 손님 (비회원) |
+| 경로               | 페이지               | 접근 주체         |
+| ------------------ | -------------------- | ----------------- |
+| `/`                | 랜딩 페이지          | 전체              |
+| `/login`           | 로그인 (카카오 소셜) | 비회원            |
+| `/initial-setup`   | 가게 초기 세팅       | 사장님 (최초 1회) |
+| `/dashboard`       | 메인 대시보드        | 사장님            |
+| `/inventory`       | 전체 재고 현황       | 사장님            |
+| `/ocr-inbound`     | OCR 재고 입고 처리   | 사장님            |
+| `/order-guide`     | 발주 가이드          | 사장님            |
+| `/closing`         | 마감하기             | 사장님            |
+| `/settings`        | 가게 설정            | 사장님            |
+| `/my-account`      | 회원 설정            | 사장님            |
+| `/order?table={n}` | 손님 주문 메뉴판     | 손님 (비회원)     |
 
 ## API 연동
 
@@ -83,13 +85,13 @@ src/
 
 ## 디자인 토큰
 
-| 토큰 | Primary | 용도 |
-|---|---|---|
-| `baro-blue` | #449CD4 | 주요 액션 버튼, 링크 |
-| `baro-red` | #BD5535 | 삭제, 경고 |
+| 토큰         | Primary | 용도                 |
+| ------------ | ------- | -------------------- |
+| `baro-blue`  | #449CD4 | 주요 액션 버튼, 링크 |
+| `baro-red`   | #BD5535 | 삭제, 경고           |
 | `baro-green` | #679436 | 입고 완료, 정상 상태 |
-| `baro-black` | #111111 | 텍스트 |
-| `baro-ivory` | #F2E9E1 | 배경 포인트 |
+| `baro-black` | #111111 | 텍스트               |
+| `baro-ivory` | #F2E9E1 | 배경 포인트          |
 
 ## UI/UX 지침
 
@@ -101,6 +103,7 @@ src/
 ## 개발 컨벤션
 
 ### 네이밍
+
 - 컴포넌트: PascalCase (`InventoryTable.tsx`)
 - 훅: `use` 접두사 camelCase (`useInventory.ts`)
 - 유틸: camelCase (`formatDate.ts`)
@@ -108,6 +111,7 @@ src/
 - API 함수: 동사 + camelCase (`fetchInventory`, `createOrder`)
 
 ### 컴포넌트 작성 순서
+
 1. import: React → 외부 라이브러리 → 내부 모듈 → 타입
 2. Props 타입/interface 정의
 3. `const 컴포넌트명 = () => {}` 함수형 컴포넌트
@@ -115,9 +119,11 @@ src/
 5. 스타일은 Tailwind CSS 클래스
 
 ### Git 커밋 컨벤션
+
 형식: `[gitmoji] [태그]: [제목]`
 
 주요 gitmoji:
+
 - ✨ `feat`: 새 기능
 - 🐛 `fix`: 버그 수정
 - 💄 `ui`: UI·스타일 수정
@@ -158,3 +164,7 @@ src/
 - **"코드 리뷰"**: 현재 코드를 컨벤션 기준으로 점검 후 개선안 제시
 - **"커밋 준비"**: 변경 파일 분석 후 커밋 컨벤션에 맞는 메시지 초안 작성
 - **"테스트 작성"**: 현재 파일 핵심 로직에 대한 Vitest 테스트 코드 생성
+
+## 기타 요구 사항
+
+- 이슈 및 PR 생성 요청은 항상 .github 폴더 내 적절한 템플릿을 사용할 것
