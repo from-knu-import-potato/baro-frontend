@@ -15,5 +15,6 @@ export const routePaths = {
   settings: '/settings',
   support: '/support',
   customerOrder: '/menu/:shopId',
+  authCallback: '/auth/callback',
   notFound: '*',
 } as const;

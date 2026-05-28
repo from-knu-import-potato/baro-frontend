@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import AppLayout from '@/app/layouts/AppLayout';
 import { routePaths } from '@/app/routes/routePaths';
 import SettingsPage from '@/pages/AccountSettingsPage';
+import AuthCallbackPage from '@/pages/AuthCallbackPage';
 import CustomerOrderPage from '@/pages/CustomerOrderPage';
 import DashboardPage from '@/pages/DashboardPage';
 import InitialSetupPage from '@/pages/InitialSetupPage';
@@ -25,6 +26,7 @@ export default function Router() {
       <Route path={routePaths.landing} element={<LandingPage />} />
       <Route path={routePaths.login} element={<LoginPage />} />
       <Route path={routePaths.storeSelection} element={<StoreSelectionPage />} />
+      <Route path={routePaths.authCallback} element={<AuthCallbackPage />} />
       <Route path={routePaths.initialSetup} element={<InitialSetupPage />} />
       <Route path={routePaths.ocrInbound} element={<OcrInboundPage />} />
       <Route path={routePaths.customerOrder} element={<CustomerOrderPage />} />
