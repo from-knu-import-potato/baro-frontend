@@ -7,12 +7,15 @@ import {
   CheckCircle2,
   MinusCircle,
   Package2,
+  ScanLine,
   Search,
   Star,
   X,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-import { MOCK_INVENTORY_ITEMS } from '@/features/inventory/data/inventory.mock';
+import { routePaths } from '@/app/routes/routePaths';
+import { useInventoryStore } from '@/features/inventory/store/inventoryStore';
 import type { InventoryItem, InventoryStatus } from '@/features/inventory/types/inventory.types';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
@@ -181,6 +184,8 @@ const InventoryRow = ({ item, isFavorite, onToggleFavorite }: InventoryRowProps)
 
 /* ── 메인 컴포넌트 ── */
 const InventoryTable = () => {
+  const navigate = useNavigate();
+  const items = useInventoryStore((s) => s.items);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -210,9 +215,9 @@ const InventoryTable = () => {
   };
 
   const countByStatus = (status: InventoryStatus) =>
-    MOCK_INVENTORY_ITEMS.filter((i) => i.status === status).length;
+    items.filter((i) => i.status === status).length;
 
-  const filtered = MOCK_INVENTORY_ITEMS.filter((item) => {
+  const filtered = items.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
     const matchesTab = activeTab === 'all' || item.status === activeTab;
     const matchesFavorites = !showFavoritesOnly || favorites.has(item.id);
@@ -238,11 +243,18 @@ const InventoryTable = () => {
             <Package2 className="w-4 h-4 text-muted-foreground" />
             전체 재고
             <span className="text-xs font-normal text-muted-foreground">
-              — 총 {MOCK_INVENTORY_ITEMS.length}개 품목
+              — 총 {items.length}개 품목
             </span>
           </CardTitle>
 
           <div className="flex items-center gap-2 ml-auto">
+            <button
+              onClick={() => navigate(routePaths.ocrInbound)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-baro-blue text-white hover:bg-baro-blue/90 transition-colors"
+            >
+              <ScanLine className="w-3.5 h-3.5" />
+              재고 등록하기
+            </button>
             {/* 즐겨찾기 필터 버튼 */}
             <button
               onClick={() => setShowFavoritesOnly((prev) => !prev)}
@@ -320,9 +332,7 @@ const InventoryTable = () => {
         <div className="flex gap-1">
           {FILTER_TABS.map((tab) => {
             const count =
-              tab.key === 'all'
-                ? MOCK_INVENTORY_ITEMS.length
-                : countByStatus(tab.key as InventoryStatus);
+              tab.key === 'all' ? items.length : countByStatus(tab.key as InventoryStatus);
             const isActive = activeTab === tab.key;
             return (
               <button

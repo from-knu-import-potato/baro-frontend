@@ -10,6 +10,7 @@ import InventoryPage from '@/pages/InventoryPage';
 import LandingPage from '@/pages/LandingPage';
 import LoginPage from '@/pages/LoginPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+import OcrInboundPage from '@/pages/OcrInboundPage';
 import OrderGuidePage from '@/pages/OrderGuidePage';
 import SettingsIngredientsPage from '@/pages/SettingsIngredientsPage';
 import SettingsMenusPage from '@/pages/SettingsMenusPage';
@@ -25,6 +26,7 @@ export default function Router() {
       <Route path={routePaths.login} element={<LoginPage />} />
       <Route path={routePaths.storeSelection} element={<StoreSelectionPage />} />
       <Route path={routePaths.initialSetup} element={<InitialSetupPage />} />
+      <Route path={routePaths.ocrInbound} element={<OcrInboundPage />} />
       <Route path={routePaths.customerOrder} element={<CustomerOrderPage />} />
       <Route path={routePaths.notFound} element={<NotFoundPage />} />
 

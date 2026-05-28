@@ -1,0 +1,69 @@
+import type {
+  ExistingIngredient,
+  OcrInboundItem,
+} from '@/features/ocr-inbound/types/ocrInbound.types';
+
+export const MOCK_OCR_RESULT: OcrInboundItem[] = [
+  {
+    id: '1',
+    name: '에티오피아 원두',
+    quantity: 1000,
+    unit: 'g',
+    isMatched: true,
+    matchedInventoryId: 'inv001',
+  },
+  {
+    id: '2',
+    name: '우유',
+    quantity: 10000,
+    unit: 'ml',
+    isMatched: true,
+    matchedInventoryId: 'inv003',
+  },
+  {
+    id: '3',
+    name: '생크림',
+    quantity: 2000,
+    unit: 'ml',
+    isMatched: true,
+    matchedInventoryId: 'inv005',
+  },
+  { id: '4', name: '바닐라 시럽', quantity: 1000, unit: 'ml', isMatched: false },
+  {
+    id: '5',
+    name: '초코 파우더',
+    quantity: 500,
+    unit: 'g',
+    isMatched: true,
+    matchedInventoryId: 'inv009',
+  },
+  {
+    id: '6',
+    name: '종이컵 (12oz)',
+    quantity: 300,
+    unit: '개',
+    isMatched: true,
+    matchedInventoryId: 'inv015',
+  },
+];
+
+export const MOCK_EXISTING_INGREDIENTS: ExistingIngredient[] = [
+  { id: 'inv001', name: '에티오피아 원두', unit: 'g' },
+  { id: 'inv002', name: '콜롬비아 원두', unit: 'g' },
+  { id: 'inv003', name: '우유', unit: 'ml' },
+  { id: 'inv004', name: '두유', unit: 'ml' },
+  { id: 'inv005', name: '생크림', unit: 'ml' },
+  { id: 'inv006', name: '바닐라시럽', unit: 'ml' },
+  { id: 'inv007', name: '카라멜시럽', unit: 'ml' },
+  { id: 'inv008', name: '헤이즐넛시럽', unit: 'ml' },
+  { id: 'inv009', name: '초코 파우더', unit: 'g' },
+  { id: 'inv010', name: '설탕', unit: 'g' },
+  { id: 'inv011', name: '소금', unit: 'g' },
+  { id: 'inv012', name: '아몬드 밀크', unit: 'ml' },
+  { id: 'inv013', name: '오트 밀크', unit: 'ml' },
+  { id: 'inv014', name: '플라스틱 빨대', unit: 'g' },
+  { id: 'inv015', name: '종이컵 (12oz)', unit: '개' },
+  { id: 'inv016', name: '종이컵 (16oz)', unit: '개' },
+  { id: 'inv017', name: '컵 홀더', unit: '개' },
+  { id: 'inv018', name: '냅킨', unit: '개' },
+];

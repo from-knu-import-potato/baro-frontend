@@ -31,7 +31,7 @@ const DashboardPage = () => {
           </div>
 
           {/* 우: 메모 */}
-          <div className="w-52 shrink-0 flex flex-col">
+          <div className="w-60 shrink-0 flex flex-col">
             <MemoCard />
           </div>
         </div>

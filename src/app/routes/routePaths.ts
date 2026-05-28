@@ -5,6 +5,7 @@ export const routePaths = {
   initialSetup: '/initial-setup',
   dashboard: '/dashboard',
   inventory: '/inventory',
+  ocrInbound: '/ocr-inbound',
   orderGuide: '/order-guide',
   notifications: '/notifications',
   storeSettings: '/store-settings',
