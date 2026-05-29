@@ -82,7 +82,7 @@ const IngredientLinkModal = ({
                       'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all select-none cursor-pointer',
                       selected?.id === ingredient.id
                         ? 'border-baro-blue bg-baro-blue/10 text-baro-blue'
-                        : 'border-gray-200 bg-white text-foreground hover:border-baro-blue/60 hover:bg-baro-blue/5',
+                        : 'text-foreground hover:border-baro-blue/60 hover:bg-baro-blue/5',
                     )}
                   >
                     {ingredient.name}
