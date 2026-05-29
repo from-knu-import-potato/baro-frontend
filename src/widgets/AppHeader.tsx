@@ -15,7 +15,7 @@ const AppHeader = ({ userName, userRole, onClosingClick }: AppHeaderProps) => {
       <Button
         size="sm"
         onClick={onClosingClick}
-        className="bg-baro-blue text-xs rounded-full hover:bg-baro-blue/80"
+        className="bg-baro-blue text-xs rounded-full hover:bg-baro-blue/80 text-white"
       >
         마감하기
       </Button>
