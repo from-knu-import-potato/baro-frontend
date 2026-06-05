@@ -91,9 +91,7 @@ const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
               <span className="size-2 rounded-full bg-baro-green shrink-0" />
               <span className="text-xs text-muted-foreground">소비</span>
             </div>
-            <p className="text-sm font-bold text-gray-900">
-              {(latest.consumption / 10000).toFixed(0)}만원
-            </p>
+            <p className="text-sm font-bold ">{(latest.consumption / 10000).toFixed(0)}만원</p>
             <p className="text-xs text-muted-foreground mt-0.5">
               {(consumptionRatio * 100).toFixed(1)}%
             </p>
@@ -104,7 +102,7 @@ const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
               <span className="size-2 rounded-full bg-baro-blue shrink-0" />
               <span className="text-xs text-muted-foreground">순이익</span>
             </div>
-            <p className="text-sm font-bold text-gray-900">{(profit / 10000).toFixed(0)}만원</p>
+            <p className="text-sm font-bold">{(profit / 10000).toFixed(0)}만원</p>
             <p className="text-xs text-muted-foreground mt-0.5">
               {(profitRatio * 100).toFixed(1)}%
             </p>
