@@ -9,8 +9,10 @@ import { persist } from 'zustand/middleware';
 interface AuthState {
   accessToken: string | null;
   refreshToken: string | null;
+  storeId: string | null;
   setAccessToken: (token: string) => void;
   setTokens: (accessToken: string, refreshToken: string) => void;
+  setStoreId: (storeId: string) => void;
   clearAuth: () => void;
 }
 
@@ -19,9 +21,11 @@ const useAuthStore = create<AuthState>()(
     (set) => ({
       accessToken: null,
       refreshToken: null,
+      storeId: null,
       setAccessToken: (token) => set({ accessToken: token }),
       setTokens: (accessToken, refreshToken) => set({ accessToken, refreshToken }),
-      clearAuth: () => set({ accessToken: null, refreshToken: null }),
+      setStoreId: (storeId) => set({ storeId }),
+      clearAuth: () => set({ accessToken: null, refreshToken: null, storeId: null }),
     }),
     { name: 'baro-auth' },
   ),
