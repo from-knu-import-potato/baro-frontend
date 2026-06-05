@@ -18,7 +18,8 @@ axiosInstance.interceptors.request.use((config) => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const isRefreshRequest = error.config?.url?.includes('/auth/refresh');
+    if (error.response?.status === 401 && !isRefreshRequest) {
       useAuthStore.getState().clearAuth();
       window.location.href = '/login';
     }
