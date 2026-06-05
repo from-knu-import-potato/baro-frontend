@@ -175,6 +175,7 @@ src/
 | `style.md`      | 🎨 UI/디자인/CSS 변경                     |
 | `config.md`     | 🔧 설정·빌드·의존성·문서·인프라 작업(Chore) |
 | `deploy.md`     | 🚀 배포 관련 작업                          |
+| `thinking.md`   | 💭 기술 결정 고민·구현 방향 논의           |
 
 ### PR 생성
 
