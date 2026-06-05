@@ -24,6 +24,7 @@ export default function Router() {
     <Routes>
       {/* 레이아웃 없는 페이지 */}
       <Route path={routePaths.landing} element={<LandingPage />} />
+      <Route path={routePaths.authCallback} element={<AuthCallbackPage />} />
       <Route path={routePaths.login} element={<LoginPage />} />
       <Route path={routePaths.storeSelection} element={<StoreSelectionPage />} />
       <Route path={routePaths.authCallback} element={<AuthCallbackPage />} />
