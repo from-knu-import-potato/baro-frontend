@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
+import useAuthStore from '@/features/auth/store/authStore';
+import { fetchMe, submitInitialSetup } from '@/features/initial-setup/api/initialSetup.api';
 import SetupProgressBar from '@/features/initial-setup/components/SetupProgressBar';
 import StepBasicInfo from '@/features/initial-setup/components/steps/StepBasicInfo';
 import StepIngredientsAndRecipes from '@/features/initial-setup/components/steps/StepIngredientsAndRecipes';
@@ -23,9 +25,21 @@ type BasicInfoErrors = Partial<Record<keyof StoreBasicInfo, string>>;
 
 const InitialSetupForm = () => {
   const navigate = useNavigate();
+  const setStoreId = useAuthStore((s) => s.setStoreId);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<InitialSetupData>(DEFAULT_SETUP_DATA);
   const [basicInfoErrors, setBasicInfoErrors] = useState<BasicInfoErrors>({});
+
+  useEffect(() => {
+    fetchMe()
+      .then((user) => {
+        setFormData((prev) => ({
+          ...prev,
+          basicInfo: { ...prev.basicInfo, ownerName: user.name },
+        }));
+      })
+      .catch(() => {});
+  }, []);
 
   const totalSteps = SETUP_STEPS.length;
   const currentStepConfig = SETUP_STEPS[currentStep - 1];
@@ -54,9 +68,14 @@ const InitialSetupForm = () => {
     }
   };
 
-  const handleComplete = () => {
-    // TODO: API 연동 후 실제 저장 로직으로 교체
-    navigate(routePaths.dashboard);
+  const handleComplete = async () => {
+    try {
+      const { storeId } = await submitInitialSetup(formData);
+      setStoreId(storeId);
+      navigate(routePaths.dashboard);
+    } catch {
+      alert('초기 설정 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    }
   };
 
   const handleSkip = () => {
