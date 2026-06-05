@@ -3,14 +3,15 @@ import { useState } from 'react';
 import { Store } from 'lucide-react';
 
 import {
-  MOCK_STORE_SETTINGS,
-  MOCK_STORE_STAFF,
-} from '@/features/store-settings/data/store-settings.mock';
+  useStoreSettings,
+  useUpdateStoreSettings,
+} from '@/features/store-settings/hooks/useStoreSettings';
 import type { StoreSettings } from '@/features/store-settings/types/store-settings.types';
 import { Button } from '@/shadcn/ui/button';
-import { Input } from '@/shadcn/ui/input'; // 가게명 수정에 사용
+import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/ui/select';
+import { Skeleton } from '@/shadcn/ui/skeleton';
 import SettingsSection from '@/shared/components/SettingsSection';
 
 const BUSINESS_TYPE_OPTIONS = [
@@ -37,35 +38,46 @@ const InfoRow = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
+const labelOf = (options: { value: string; label: string }[], val: string) =>
+  options.find((o) => o.value === val)?.label ?? val;
+
 const StoreInfoSection = () => {
+  const { data, isLoading } = useStoreSettings();
+  const { mutate: updateStore, isPending } = useUpdateStoreSettings();
   const [isEditing, setIsEditing] = useState(false);
-  const [form, setForm] = useState<StoreSettings>(MOCK_STORE_SETTINGS);
-  const [saved, setSaved] = useState<StoreSettings>(MOCK_STORE_SETTINGS);
+  const [form, setForm] = useState<StoreSettings | null>(null);
+
+  const handleEdit = () => {
+    if (data) setForm(data);
+    setIsEditing(true);
+  };
 
   const handleSave = () => {
-    setSaved(form);
-    setIsEditing(false);
+    if (!form) return;
+    updateStore(form, { onSuccess: () => setIsEditing(false) });
   };
 
   const handleCancel = () => {
-    setForm(saved);
+    if (data) setForm(data);
     setIsEditing(false);
   };
-
-  const labelOf = (options: { value: string; label: string }[], val: string) =>
-    options.find((o) => o.value === val)?.label ?? val;
 
   const headerAction = isEditing ? (
     <div className="flex gap-2">
       <Button variant="outline" size="sm" onClick={handleCancel}>
         취소
       </Button>
-      <Button size="sm" className="bg-baro-blue hover:bg-baro-blue/80" onClick={handleSave}>
+      <Button
+        size="sm"
+        className="bg-baro-blue hover:bg-baro-blue/80"
+        onClick={handleSave}
+        disabled={isPending}
+      >
         저장
       </Button>
     </div>
   ) : (
-    <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+    <Button variant="outline" size="sm" onClick={handleEdit}>
       수정
     </Button>
   );
@@ -77,88 +89,73 @@ const StoreInfoSection = () => {
       icon={<Store className="h-4 w-4" />}
       headerAction={headerAction}
     >
-      {isEditing ? (
+      {isLoading || !form ? (
         <div className="space-y-2">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">가게명</Label>
-              <Input
-                value={form.storeName}
-                onChange={(e) => setForm((f) => ({ ...f, storeName: e.target.value }))}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">대표자명</Label>
-              <Select
-                value={form.ownerName}
-                onValueChange={(val) => setForm((f) => ({ ...f, ownerName: val ?? f.ownerName }))}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="직원을 선택하세요" />
-                </SelectTrigger>
-                <SelectContent>
-                  {MOCK_STORE_STAFF.map((staff) => (
-                    <SelectItem key={staff.id} value={staff.name}>
-                      {staff.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">사업 유형</Label>
-              <Select
-                value={form.businessType}
-                onValueChange={(val) =>
-                  setForm((f) => ({ ...f, businessType: val as StoreSettings['businessType'] }))
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue>
-                    {(value: string) =>
-                      BUSINESS_TYPE_OPTIONS.find((o) => o.value === value)?.label ?? value
-                    }
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {BUSINESS_TYPE_OPTIONS.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label className="text-xs text-muted-foreground">업종</Label>
-              <Select
-                value={form.category}
-                onValueChange={(val) => setForm((f) => ({ ...f, category: val as string }))}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue>
-                    {(value: string) =>
-                      CATEGORY_OPTIONS.find((o) => o.value === value)?.label ?? value
-                    }
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORY_OPTIONS.map((o) => (
-                    <SelectItem key={o.value} value={o.value}>
-                      {o.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <Skeleton className="h-5 w-48" />
+          <Skeleton className="h-5 w-32" />
+          <Skeleton className="h-5 w-40" />
+        </div>
+      ) : isEditing ? (
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">가게명</Label>
+            <Input
+              value={form.storeName}
+              onChange={(e) => setForm((f) => f && { ...f, storeName: e.target.value })}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">대표자명</Label>
+            <Input
+              value={form.ownerName}
+              onChange={(e) => setForm((f) => f && { ...f, ownerName: e.target.value })}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">사업 유형</Label>
+            <Select
+              value={form.businessType}
+              onValueChange={(val) =>
+                setForm((f) => f && { ...f, businessType: val as StoreSettings['businessType'] })
+              }
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {BUSINESS_TYPE_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs text-muted-foreground">업종</Label>
+            <Select
+              value={form.category}
+              onValueChange={(val) => setForm((f) => f && { ...f, category: val ?? f.category })}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORY_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
       ) : (
         <div className="space-y-1">
-          <InfoRow label="가게명" value={saved.storeName} />
-          <InfoRow label="대표자명" value={saved.ownerName} />
-          <InfoRow label="사업 유형" value={labelOf(BUSINESS_TYPE_OPTIONS, saved.businessType)} />
-          <InfoRow label="업종" value={labelOf(CATEGORY_OPTIONS, saved.category)} />
+          <InfoRow label="가게명" value={form.storeName} />
+          <InfoRow label="대표자명" value={form.ownerName} />
+          <InfoRow label="사업 유형" value={labelOf(BUSINESS_TYPE_OPTIONS, form.businessType)} />
+          <InfoRow label="업종" value={labelOf(CATEGORY_OPTIONS, form.category)} />
         </div>
       )}
     </SettingsSection>
