@@ -89,13 +89,13 @@ const StoreInfoSection = () => {
       icon={<Store className="h-4 w-4" />}
       headerAction={headerAction}
     >
-      {isLoading || !form ? (
+      {isLoading || !data ? (
         <div className="space-y-2">
           <Skeleton className="h-5 w-48" />
           <Skeleton className="h-5 w-32" />
           <Skeleton className="h-5 w-40" />
         </div>
-      ) : isEditing ? (
+      ) : isEditing && form ? (
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <Label className="text-xs text-muted-foreground">가게명</Label>
@@ -152,10 +152,10 @@ const StoreInfoSection = () => {
         </div>
       ) : (
         <div className="space-y-1">
-          <InfoRow label="가게명" value={form.storeName} />
-          <InfoRow label="대표자명" value={form.ownerName} />
-          <InfoRow label="사업 유형" value={labelOf(BUSINESS_TYPE_OPTIONS, form.businessType)} />
-          <InfoRow label="업종" value={labelOf(CATEGORY_OPTIONS, form.category)} />
+          <InfoRow label="가게명" value={data.storeName} />
+          <InfoRow label="대표자명" value={data.ownerName} />
+          <InfoRow label="사업 유형" value={labelOf(BUSINESS_TYPE_OPTIONS, data.businessType)} />
+          <InfoRow label="업종" value={labelOf(CATEGORY_OPTIONS, data.category)} />
         </div>
       )}
     </SettingsSection>
