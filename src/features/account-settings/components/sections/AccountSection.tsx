@@ -172,8 +172,8 @@ const AccountSection = () => {
           <DialogHeader>
             <DialogTitle>정말 탈퇴하시겠어요?</DialogTitle>
             <DialogDescription>
-              탈퇴하면 가게 정보, 재고, 메뉴, 레시피 등 모든 데이터가 영구적으로 삭제됩니다.
-              이 작업은 되돌릴 수 없습니다.
+              탈퇴하면 가게 정보, 재고, 메뉴, 레시피 등 모든 데이터가 영구적으로 삭제됩니다. 이
+              작업은 되돌릴 수 없습니다.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -184,11 +184,7 @@ const AccountSection = () => {
             >
               취소
             </Button>
-            <Button
-              variant="destructive"
-              onClick={handleWithdraw}
-              disabled={isWithdrawing}
-            >
+            <Button variant="destructive" onClick={handleWithdraw} disabled={isWithdrawing}>
               탈퇴하기
             </Button>
           </DialogFooter>
