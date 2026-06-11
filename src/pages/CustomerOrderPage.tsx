@@ -1,23 +1,25 @@
 import { useState } from 'react';
 
-import { CheckCircle, Minus, Plus, ShoppingCart } from 'lucide-react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { AlertCircle, CheckCircle, Loader2, Minus, Plus, ShoppingCart } from 'lucide-react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import { MOCK_SHOP_MENU } from '@/features/customer-order/data/customerOrder.mock';
-import { useOrderStore } from '@/features/customer-order/store/customerOrderStore';
+import { fetchStoreMenus } from '@/features/customer-order/api/menu.api';
+import { createOrder } from '@/features/customer-order/api/order.api';
+import type { ApiMenu } from '@/features/customer-order/types/customerOrder.api.types';
 import type { CartItem } from '@/features/customer-order/types/customerOrder.types';
-import type { MenuItem } from '@/features/initial-setup/types/initialSetup.types';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent } from '@/shadcn/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
+import { Skeleton } from '@/shadcn/ui/skeleton';
 
-type CategoryTab = 'all' | 'featured';
+type CategoryTab = 'all' | 'available';
 
 /* ── 메뉴 아이템 카드 ── */
 interface MenuItemCardProps {
-  item: MenuItem;
+  item: ApiMenu;
   quantity: number;
   onUpdate: (id: string, delta: number) => void;
 }
@@ -25,10 +27,13 @@ interface MenuItemCardProps {
 const MenuItemCard = ({ item, quantity, onUpdate }: MenuItemCardProps) => (
   <div
     className={`flex items-center gap-3 bg-white rounded-xl px-4 py-3 transition-all ${
-      quantity > 0 ? 'ring-2 ring-baro-blue/25' : 'border border-gray-100'
+      !item.isAvailable
+        ? 'opacity-50'
+        : quantity > 0
+          ? 'ring-2 ring-baro-blue/25'
+          : 'border border-gray-100'
     }`}
   >
-    {/* 썸네일 */}
     {item.imageUrl ? (
       <img
         src={item.imageUrl}
@@ -41,23 +46,23 @@ const MenuItemCard = ({ item, quantity, onUpdate }: MenuItemCardProps) => (
       </div>
     )}
 
-    {/* 텍스트 */}
     <div className="flex-1 min-w-0">
       <div className="flex items-center gap-1.5">
         <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
-        {item.isFeatured && (
-          <span className="text-xs text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded font-medium shrink-0">
-            대표
+        {!item.isAvailable && (
+          <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded shrink-0">
+            품절
           </span>
         )}
       </div>
-      <p className="text-xs text-gray-400 mt-0.5 truncate">{item.description}</p>
+      {item.description && (
+        <p className="text-xs text-gray-400 mt-0.5 truncate">{item.description}</p>
+      )}
       <p className="text-sm font-bold text-gray-900 mt-1.5">{item.price.toLocaleString()}원</p>
     </div>
 
-    {/* 수량 */}
     <div className="flex items-center gap-2 shrink-0">
-      {quantity > 0 ? (
+      {!item.isAvailable ? null : quantity > 0 ? (
         <>
           <button
             onClick={() => onUpdate(item.id, -1)}
@@ -113,13 +118,10 @@ const OrderSuccess = ({ orderId, totalAmount, items, onReorder }: OrderSuccessPr
 
       <Card className="w-full max-w-xs">
         <CardContent className="px-5 py-4 space-y-3">
-          {/* 주문번호 */}
           <div className="flex justify-between items-center text-sm">
             <span className="text-gray-400">주문번호</span>
             <span className="font-bold text-gray-900">#{orderId}</span>
           </div>
-
-          {/* 주문 항목 */}
           <div className="border-t pt-3 space-y-2">
             {visibleItems.map((item) => (
               <div key={item.menuItemId} className="flex justify-between items-center text-sm">
@@ -132,8 +134,6 @@ const OrderSuccess = ({ orderId, totalAmount, items, onReorder }: OrderSuccessPr
                 </span>
               </div>
             ))}
-
-            {/* 더보기 / 접기 */}
             {hasMore && (
               <button
                 onClick={() => setExpanded((v) => !v)}
@@ -143,8 +143,6 @@ const OrderSuccess = ({ orderId, totalAmount, items, onReorder }: OrderSuccessPr
               </button>
             )}
           </div>
-
-          {/* 합계 */}
           <div className="border-t pt-3 flex justify-between items-center text-sm">
             <span className="text-gray-500 font-medium">합계</span>
             <span className="font-bold text-baro-blue">{totalAmount.toLocaleString()}원</span>
@@ -164,10 +162,9 @@ const OrderSuccess = ({ orderId, totalAmount, items, onReorder }: OrderSuccessPr
 
 /* ── 메인 페이지 ── */
 const CustomerOrderPage = () => {
-  const { shopId } = useParams<{ shopId: string }>();
+  const { shopId: storeId } = useParams<{ shopId: string }>();
   const [searchParams] = useSearchParams();
   const tableNumber = searchParams.get('table');
-  const addOrder = useOrderStore((s) => s.addOrder);
 
   const [activeTab, setActiveTab] = useState<CategoryTab>('all');
   const [cart, setCart] = useState<Record<string, number>>({});
@@ -179,13 +176,44 @@ const CustomerOrderPage = () => {
     items: CartItem[];
   } | null>(null);
 
+  const {
+    data: menus = [],
+    isLoading: isMenuLoading,
+    isError: isMenuError,
+  } = useQuery({
+    queryKey: ['public-menus', storeId],
+    queryFn: () => fetchStoreMenus(storeId!),
+    enabled: !!storeId,
+  });
+
+  const orderMutation = useMutation({
+    mutationFn: (data: Parameters<typeof createOrder>[1]) => createOrder(storeId!, data),
+    onSuccess: (order) => {
+      const cartItems: CartItem[] = menus
+        .filter((item) => (cart[item.id] ?? 0) > 0)
+        .map((item) => ({
+          menuItemId: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: cart[item.id]!,
+          imageUrl: item.imageUrl ?? undefined,
+        }));
+
+      setIsCheckoutOpen(false);
+      setSuccessInfo({
+        orderId: order.id.slice(-4).toUpperCase(),
+        totalAmount: order.totalPrice,
+        items: cartItems,
+      });
+      setCart({});
+      setCustomerNote('');
+    },
+  });
+
+  const visibleMenu = activeTab === 'available' ? menus.filter((m) => m.isAvailable) : menus;
+
   const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
-  const totalAmount = MOCK_SHOP_MENU.reduce(
-    (sum, item) => sum + (cart[item.id] ?? 0) * item.price,
-    0,
-  );
-  const visibleMenu =
-    activeTab === 'featured' ? MOCK_SHOP_MENU.filter((m) => m.isFeatured) : MOCK_SHOP_MENU;
+  const totalAmount = menus.reduce((sum, item) => sum + (cart[item.id] ?? 0) * item.price, 0);
 
   const updateCart = (itemId: string, delta: number) => {
     setCart((prev) => {
@@ -198,35 +226,12 @@ const CustomerOrderPage = () => {
   };
 
   const handleOrder = () => {
-    const cartItems: CartItem[] = MOCK_SHOP_MENU.filter((item) => (cart[item.id] ?? 0) > 0).map(
-      (item) => ({
-        menuItemId: item.id,
-        name: item.name,
-        price: item.price,
-        quantity: cart[item.id]!,
-        imageUrl: item.imageUrl,
-      }),
-    );
+    if (!tableNumber) return;
+    const items = menus
+      .filter((item) => (cart[item.id] ?? 0) > 0)
+      .map((item) => ({ menuId: item.id, quantity: cart[item.id]! }));
 
-    addOrder({
-      shopId: shopId ?? 'shop1',
-      items: cartItems,
-      totalAmount,
-      status: 'pending',
-      tableNumber: tableNumber ? `${tableNumber}번 테이블` : undefined,
-      customerNote: customerNote.trim() || undefined,
-    });
-
-    setIsCheckoutOpen(false);
-    // eslint-disable-next-line react-hooks/purity
-    const orderId = String(Date.now()).slice(-4);
-    setSuccessInfo({
-      orderId,
-      totalAmount,
-      items: cartItems,
-    });
-    setCart({});
-    setCustomerNote('');
+    orderMutation.mutate({ tableNumber: Number(tableNumber), items });
   };
 
   if (successInfo) {
@@ -249,8 +254,8 @@ const CustomerOrderPage = () => {
             🍽️
           </div>
           <div>
-            <p className="text-sm font-bold text-white leading-none">임포트 감자 식당</p>
-            <p className="text-xs text-white/60 mt-1">한식 · 춘천</p>
+            <p className="text-sm font-bold text-white leading-none">주문하기</p>
+            <p className="text-xs text-white/60 mt-1">메뉴를 선택해 주세요</p>
           </div>
         </div>
         {tableNumber && (
@@ -267,7 +272,7 @@ const CustomerOrderPage = () => {
           {(
             [
               { key: 'all', label: '전체' },
-              { key: 'featured', label: '대표 메뉴' },
+              { key: 'available', label: '주문 가능' },
             ] as { key: CategoryTab; label: string }[]
           ).map((tab) => (
             <button
@@ -287,14 +292,30 @@ const CustomerOrderPage = () => {
 
       {/* 메뉴 목록 */}
       <div className="px-4 pt-3 pb-28 space-y-2">
-        {visibleMenu.map((item) => (
-          <MenuItemCard
-            key={item.id}
-            item={item}
-            quantity={cart[item.id] ?? 0}
-            onUpdate={updateCart}
-          />
-        ))}
+        {isMenuLoading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-xl" />
+          ))
+        ) : isMenuError ? (
+          <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
+            <AlertCircle className="size-10 opacity-40" />
+            <p className="text-sm">메뉴를 불러오지 못했어요.</p>
+            <p className="text-xs">잠시 후 다시 시도해 주세요.</p>
+          </div>
+        ) : visibleMenu.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
+            <p className="text-sm">주문 가능한 메뉴가 없어요.</p>
+          </div>
+        ) : (
+          visibleMenu.map((item) => (
+            <MenuItemCard
+              key={item.id}
+              item={item}
+              quantity={cart[item.id] ?? 0}
+              onUpdate={updateCart}
+            />
+          ))
+        )}
       </div>
 
       {/* 장바구니 바 */}
@@ -324,25 +345,25 @@ const CustomerOrderPage = () => {
           </DialogHeader>
 
           <div className="space-y-4">
-            {/* 주문 내역 */}
             <div className="rounded-xl bg-gray-50 px-4 py-3 space-y-2">
-              {MOCK_SHOP_MENU.filter((item) => (cart[item.id] ?? 0) > 0).map((item) => (
-                <div key={item.id} className="flex justify-between text-sm">
-                  <span className="text-gray-500">
-                    {item.name} <span className="text-gray-400">× {cart[item.id]}</span>
-                  </span>
-                  <span className="font-medium text-gray-900">
-                    {((cart[item.id] ?? 0) * item.price).toLocaleString()}원
-                  </span>
-                </div>
-              ))}
+              {menus
+                .filter((item) => (cart[item.id] ?? 0) > 0)
+                .map((item) => (
+                  <div key={item.id} className="flex justify-between text-sm">
+                    <span className="text-gray-500">
+                      {item.name} <span className="text-gray-400">× {cart[item.id]}</span>
+                    </span>
+                    <span className="font-medium text-gray-900">
+                      {((cart[item.id] ?? 0) * item.price).toLocaleString()}원
+                    </span>
+                  </div>
+                ))}
               <div className="border-t border-gray-200 pt-2 flex justify-between text-sm font-bold">
                 <span className="text-gray-900">합계</span>
                 <span className="text-baro-blue">{totalAmount.toLocaleString()}원</span>
               </div>
             </div>
 
-            {/* 테이블 번호 */}
             {tableNumber && (
               <div className="flex items-center justify-between rounded-xl bg-baro-blue/8 px-4 py-2.5">
                 <span className="text-sm text-gray-500">테이블 번호</span>
@@ -350,7 +371,6 @@ const CustomerOrderPage = () => {
               </div>
             )}
 
-            {/* 요청사항 */}
             <div className="space-y-1.5">
               <Label htmlFor="customer-note" className="text-sm text-gray-700">
                 요청사항 <span className="text-gray-400 font-normal">(선택)</span>
@@ -367,8 +387,13 @@ const CustomerOrderPage = () => {
             <Button
               className="w-full bg-baro-blue text-white hover:bg-baro-blue/90 rounded-xl h-11 text-sm font-semibold"
               onClick={handleOrder}
+              disabled={orderMutation.isPending}
             >
-              주문하기 · {totalAmount.toLocaleString()}원
+              {orderMutation.isPending ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                `주문하기 · ${totalAmount.toLocaleString()}원`
+              )}
             </Button>
           </div>
         </DialogContent>
