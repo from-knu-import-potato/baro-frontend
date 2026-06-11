@@ -17,6 +17,7 @@ import type {
   InitialSetupData,
   StoreBasicInfo,
 } from '@/features/initial-setup/types/initialSetup.types';
+import { fetchMenus, updateMenu, uploadMenuImage } from '@/features/store-settings/api/menus.api';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/ui/card';
 import baroLogo from '@/shared/assets/images/baro-logo.png';
@@ -70,8 +71,33 @@ const InitialSetupForm = () => {
 
   const handleComplete = async () => {
     try {
-      const { storeId } = await submitInitialSetup(formData);
+      // imageFile은 JSON 직렬화 제외, blob URL은 서버에 보내지 않음
+      const { storeId } = await submitInitialSetup({
+        ...formData,
+        menuItems: formData.menuItems.map(({ imageFile: _imageFile, imageUrl, ...rest }) => ({
+          ...rest,
+          imageUrl: imageUrl?.startsWith('blob:') ? undefined : imageUrl,
+        })),
+      });
       setStoreId(storeId);
+
+      const menusWithPendingImages = formData.menuItems.filter((m) => m.imageFile);
+      if (menusWithPendingImages.length > 0) {
+        const backendMenus = await fetchMenus(storeId);
+        await Promise.all(
+          menusWithPendingImages.map(async (localMenu) => {
+            const backendMenu = backendMenus.find((m) => m.name === localMenu.name);
+            if (!backendMenu || !localMenu.imageFile) return;
+            const imageUrl = await uploadMenuImage(storeId, localMenu.imageFile);
+            await updateMenu(storeId, backendMenu.id, { imageUrl });
+          }),
+        );
+      }
+
+      formData.menuItems.forEach((m) => {
+        if (m.imageUrl?.startsWith('blob:')) URL.revokeObjectURL(m.imageUrl);
+      });
+
       navigate(routePaths.dashboard);
     } catch {
       alert('초기 설정 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.');
