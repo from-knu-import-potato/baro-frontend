@@ -41,6 +41,8 @@ export interface MenuItem {
   price: number;
   isFeatured: boolean;
   imageUrl?: string;
+  /** 초기 세팅 중 선택된 이미지 파일 (서버 미전송, setup 완료 후 업로드) */
+  imageFile?: File;
 }
 
 /** 태그 형태로 등록되는 식자재 종류 (재고 수량이 아닌 종류 등록) */

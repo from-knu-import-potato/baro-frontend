@@ -23,6 +23,7 @@ const EMPTY_FORM = {
   price: '',
   isFeatured: false,
   imageUrl: undefined as string | undefined,
+  imageFile: undefined as File | undefined,
 };
 
 type FormState = typeof EMPTY_FORM;
@@ -48,6 +49,7 @@ const MenuRegistrationModal = ({
           price: editingMenu.price === 0 ? '' : String(editingMenu.price),
           isFeatured: editingMenu.isFeatured,
           imageUrl: editingMenu.imageUrl,
+          imageFile: editingMenu.imageFile,
         });
       } else {
         setForm(EMPTY_FORM);
@@ -68,13 +70,14 @@ const MenuRegistrationModal = ({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (form.imageUrl?.startsWith('blob:')) URL.revokeObjectURL(form.imageUrl);
     const objectUrl = URL.createObjectURL(file);
-    setForm((prev) => ({ ...prev, imageUrl: objectUrl }));
+    setForm((prev) => ({ ...prev, imageUrl: objectUrl, imageFile: file }));
   };
 
   const handleRemoveImage = () => {
-    if (form.imageUrl) URL.revokeObjectURL(form.imageUrl);
-    setForm((prev) => ({ ...prev, imageUrl: undefined }));
+    if (form.imageUrl?.startsWith('blob:')) URL.revokeObjectURL(form.imageUrl);
+    setForm((prev) => ({ ...prev, imageUrl: undefined, imageFile: undefined }));
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -87,6 +90,7 @@ const MenuRegistrationModal = ({
       price: Number(form.price),
       isFeatured: form.isFeatured,
       imageUrl: form.imageUrl,
+      imageFile: form.imageFile,
     });
   };
 
