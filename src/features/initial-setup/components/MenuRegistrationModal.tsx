@@ -96,12 +96,12 @@ const MenuRegistrationModal = ({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-w-md gap-0 p-0">
-        <DialogHeader className="border-b px-6 pt-4">
-          <DialogTitle className="text-base">{editingMenu ? '메뉴 수정' : '메뉴 등록'}</DialogTitle>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>{editingMenu ? '메뉴 수정' : '메뉴 등록'}</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-5 px-6 py-5">
+        <div>
           {/* 사진 업로드 */}
           <div className="space-y-1.5">
             <Label>메뉴 사진</Label>
