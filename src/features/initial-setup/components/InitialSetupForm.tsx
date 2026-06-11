@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 import { routePaths } from '@/app/routes/routePaths';
 import useAuthStore from '@/features/auth/store/authStore';
 import { fetchMe, submitInitialSetup } from '@/features/initial-setup/api/initialSetup.api';
-import { fetchMenus, updateMenu, uploadMenuImage } from '@/features/store-settings/api/menus.api';
 import SetupProgressBar from '@/features/initial-setup/components/SetupProgressBar';
 import StepBasicInfo from '@/features/initial-setup/components/steps/StepBasicInfo';
 import StepIngredientsAndRecipes from '@/features/initial-setup/components/steps/StepIngredientsAndRecipes';
@@ -18,6 +17,7 @@ import type {
   InitialSetupData,
   StoreBasicInfo,
 } from '@/features/initial-setup/types/initialSetup.types';
+import { fetchMenus, updateMenu, uploadMenuImage } from '@/features/store-settings/api/menus.api';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/ui/card';
 import baroLogo from '@/shared/assets/images/baro-logo.png';
