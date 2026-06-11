@@ -1,1 +1,2 @@
+export PATH="$(cygpath -u "$APPDATA")/npm:$PATH"
 pnpm eslint . --fix
