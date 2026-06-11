@@ -1,13 +1,13 @@
 import { Store } from 'lucide-react';
 
-import { useOrderStore } from '@/features/customer-order/store/customerOrderStore';
+import { useOrders } from '@/features/dashboard/hooks/useOrders';
 import type { DashboardStats } from '@/features/dashboard/types/dashboard.types';
 
 interface StoreStatusCardProps {
   stats: DashboardStats;
+  storeId: string | null;
 }
 
-/* ── 개별 스탯 타일 ── */
 interface StatTileProps {
   label: string;
   value: string;
@@ -23,20 +23,19 @@ const StatTile = ({ label, value, comment, commentColor }: StatTileProps) => (
   </div>
 );
 
-const StoreStatusCard = ({ stats }: StoreStatusCardProps) => {
-  const orders = useOrderStore((s) => s.orders);
+const StoreStatusCard = ({ stats, storeId }: StoreStatusCardProps) => {
+  const { data: orders = [] } = useOrders(storeId);
 
   const today = new Date().toDateString();
   const todayRevenue = orders
     .filter((o) => o.status === 'completed' && new Date(o.createdAt).toDateString() === today)
-    .reduce((sum, o) => sum + o.totalAmount, 0);
+    .reduce((sum, o) => sum + o.totalPrice, 0);
   const todayOrderCount = orders.filter(
     (o) => new Date(o.createdAt).toDateString() === today,
   ).length;
 
   return (
     <div className="rounded-xl bg-card ring-1 ring-foreground/10 overflow-hidden">
-      {/* 헤더 */}
       <div className="border-b px-4 py-2.5">
         <p className="text-sm font-medium flex items-center gap-2">
           <Store className="w-4 h-4 text-muted-foreground" />
@@ -44,7 +43,6 @@ const StoreStatusCard = ({ stats }: StoreStatusCardProps) => {
         </p>
       </div>
 
-      {/* 스탯 타일 */}
       <div className="flex gap-3 px-4 py-3">
         <StatTile
           label="전체 재고"
