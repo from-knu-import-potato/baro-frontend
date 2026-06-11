@@ -1,14 +1,15 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { ArrowLeft, ScanLine } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { routePaths } from '@/app/routes/routePaths';
+import useAuthStore from '@/features/auth/store/authStore';
 import { useInventoryStore } from '@/features/inventory/store/inventoryStore';
+import { uploadOcrImage } from '@/features/ocr-inbound/api/ocr.api';
 import OcrReviewStep from '@/features/ocr-inbound/components/OcrReviewStep';
 import OcrUploadStep from '@/features/ocr-inbound/components/OcrUploadStep';
-import { MOCK_OCR_RESULT } from '@/features/ocr-inbound/data/ocrInbound.mock';
 import type { OcrInboundItem } from '@/features/ocr-inbound/types/ocrInbound.types';
 
 type Step = 'upload' | 'analyzing' | 'review';
@@ -17,6 +18,7 @@ const OcrInboundPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const applyInbound = useInventoryStore((s) => s.applyInbound);
+  const storeId = useAuthStore((s) => s.storeId);
   const [imageUrl, setImageUrl] = useState<string | null>(
     () => (location.state as { imageUrl?: string } | null)?.imageUrl ?? null,
   );
@@ -26,20 +28,28 @@ const OcrInboundPage = () => {
   });
   const [items, setItems] = useState<OcrInboundItem[]>([]);
 
-  useEffect(() => {
-    if (step !== 'analyzing') return;
-    const timer = setTimeout(() => {
-      setItems([...MOCK_OCR_RESULT]);
-      setStep('review');
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, [step]);
-
-  const handleFileSelect = useCallback((file: File) => {
-    const url = URL.createObjectURL(file);
-    setImageUrl(url);
-    setStep('analyzing');
-  }, []);
+  const handleFileSelect = useCallback(
+    async (file: File) => {
+      if (!storeId) {
+        toast.error('가게 정보를 불러올 수 없습니다.');
+        return;
+      }
+      const url = URL.createObjectURL(file);
+      setImageUrl(url);
+      setStep('analyzing');
+      try {
+        const result = await uploadOcrImage(storeId, file);
+        setItems(result);
+        setStep('review');
+      } catch {
+        toast.error('OCR 처리에 실패했습니다. 다시 시도해주세요.');
+        URL.revokeObjectURL(url);
+        setStep('upload');
+        setImageUrl(null);
+      }
+    },
+    [storeId],
+  );
 
   const handleReset = () => {
     if (imageUrl) URL.revokeObjectURL(imageUrl);
