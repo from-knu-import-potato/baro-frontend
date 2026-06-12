@@ -13,12 +13,12 @@ import {
 
 import IngredientLinkModal from '@/features/ocr-inbound/components/IngredientLinkModal';
 import IngredientRegisterModal from '@/features/ocr-inbound/components/IngredientRegisterModal';
-import { MOCK_EXISTING_INGREDIENTS } from '@/features/ocr-inbound/data/ocrInbound.mock';
 import type {
   ExistingIngredient,
   OcrInboundItem,
   OcrUnit,
 } from '@/features/ocr-inbound/types/ocrInbound.types';
+import { useIngredients } from '@/features/store-settings/hooks/useIngredients';
 import { cn } from '@/lib/utils';
 import { Button } from '@/shadcn/ui/button';
 import { Input } from '@/shadcn/ui/input';
@@ -32,6 +32,7 @@ interface OcrReviewStepProps {
   onItemsChange: (items: OcrInboundItem[]) => void;
   onConfirm: () => void;
   onReset: () => void;
+  isConfirming?: boolean;
 }
 
 const OcrReviewStep = ({
@@ -40,7 +41,14 @@ const OcrReviewStep = ({
   onItemsChange,
   onConfirm,
   onReset,
+  isConfirming = false,
 }: OcrReviewStepProps) => {
+  const { data: ingredientList = [] } = useIngredients();
+  const existingIngredients: ExistingIngredient[] = ingredientList.map((ing) => ({
+    id: ing.id,
+    name: ing.name,
+    unit: ing.unit,
+  }));
   const [scale, setScale] = useState(1);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   const [registerModal, setRegisterModal] = useState<{
@@ -319,10 +327,10 @@ const OcrReviewStep = ({
           </p>
           <Button
             onClick={onConfirm}
-            disabled={items.length === 0}
+            disabled={items.length === 0 || isConfirming}
             className="bg-baro-blue hover:bg-baro-blue/90 text-white"
           >
-            입고 확정
+            {isConfirming ? '처리 중...' : '입고 확정'}
           </Button>
         </div>
       </div>
@@ -333,10 +341,12 @@ const OcrReviewStep = ({
           initialName={registerModal.name}
           initialUnit={registerModal.unit}
           onClose={() => setRegisterModal(null)}
-          onConfirm={() => {
+          onConfirm={(ingredientId) => {
             onItemsChange(
               items.map((item) =>
-                item.id === registerModal.itemId ? { ...item, isMatched: true } : item,
+                item.id === registerModal.itemId
+                  ? { ...item, isMatched: true, newIngredientId: ingredientId }
+                  : item,
               ),
             );
             setRegisterModal(null);
@@ -348,7 +358,7 @@ const OcrReviewStep = ({
         <IngredientLinkModal
           open={linkModal.open}
           ocrName={linkModal.name}
-          ingredients={MOCK_EXISTING_INGREDIENTS}
+          ingredients={existingIngredients}
           onClose={() => setLinkModal(null)}
           onConfirm={(ingredient: ExistingIngredient) => {
             onItemsChange(

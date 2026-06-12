@@ -1,28 +1,31 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ScanLine } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { routePaths } from '@/app/routes/routePaths';
 import useAuthStore from '@/features/auth/store/authStore';
-import { useInventoryStore } from '@/features/inventory/store/inventoryStore';
 import { uploadOcrImage } from '@/features/ocr-inbound/api/ocr.api';
 import OcrReviewStep from '@/features/ocr-inbound/components/OcrReviewStep';
 import OcrUploadStep from '@/features/ocr-inbound/components/OcrUploadStep';
 import type { OcrInboundItem } from '@/features/ocr-inbound/types/ocrInbound.types';
+import { confirmInbound } from '@/features/store-settings/api/ingredients.api';
 
 type Step = 'upload' | 'analyzing' | 'review';
 
 const OcrInboundPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const applyInbound = useInventoryStore((s) => s.applyInbound);
   const storeId = useAuthStore((s) => s.storeId);
+  const qc = useQueryClient();
+
   const locationState = location.state as { file?: File } | null;
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [step, setStep] = useState<Step>('upload');
   const [items, setItems] = useState<OcrInboundItem[]>([]);
+  const [isConfirming, setIsConfirming] = useState(false);
   const handledInitialFile = useRef(false);
 
   const handleFileSelect = useCallback(
@@ -62,7 +65,7 @@ const OcrInboundPage = () => {
     setItems([]);
   };
 
-  const handleConfirm = () => {
+  const handleConfirm = async () => {
     const unmatched = items.filter((item) => !item.isMatched);
     if (unmatched.length > 0) {
       toast.warning(
@@ -70,9 +73,24 @@ const OcrInboundPage = () => {
       );
       return;
     }
-    applyInbound(items);
-    toast.success('재고 등록이 완료되었습니다.');
-    navigate(routePaths.inventory);
+    if (!storeId) return;
+
+    const inboundItems = items.map((item) => ({
+      ingredientId: (item.matchedInventoryId ?? item.newIngredientId)!,
+      amount: item.quantity,
+    }));
+
+    setIsConfirming(true);
+    try {
+      await confirmInbound(storeId, inboundItems);
+      qc.invalidateQueries({ queryKey: ['ingredients', storeId] });
+      toast.success('재고 등록이 완료되었습니다.');
+      navigate(routePaths.storeSettings);
+    } catch {
+      toast.error('입고 확정에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setIsConfirming(false);
+    }
   };
 
   const handleBack = () => {
@@ -89,7 +107,7 @@ const OcrInboundPage = () => {
       <header className="shrink-0 h-14 border-b bg-card px-5 flex items-center gap-3">
         <button
           onClick={handleBack}
-          disabled={step === 'analyzing'}
+          disabled={step === 'analyzing' || isConfirming}
           className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-muted transition-colors text-muted-foreground hover:text-foreground disabled:opacity-40 disabled:cursor-not-allowed"
           aria-label="뒤로 가기"
         >
@@ -126,6 +144,7 @@ const OcrInboundPage = () => {
             onItemsChange={setItems}
             onConfirm={handleConfirm}
             onReset={handleReset}
+            isConfirming={isConfirming}
           />
         )}
       </div>

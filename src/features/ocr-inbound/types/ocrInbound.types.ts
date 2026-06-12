@@ -7,6 +7,7 @@ export interface OcrInboundItem {
   unit: OcrUnit;
   isMatched: boolean;
   matchedInventoryId?: string;
+  newIngredientId?: string;
 }
 
 export interface ExistingIngredient {
