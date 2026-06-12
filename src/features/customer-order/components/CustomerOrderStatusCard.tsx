@@ -3,10 +3,12 @@ import { useState } from 'react';
 import { Clock, ShoppingBag } from 'lucide-react';
 
 import OrderStatusBadge from '@/features/customer-order/components/CustomerOrderStatusBadge';
-import { useOrderStore } from '@/features/customer-order/store/customerOrderStore';
-import type { Order } from '@/features/customer-order/types/customerOrder.types';
+import type { ApiOrder } from '@/features/customer-order/types/customerOrder.api.types';
+import { useOrders, useUpdateOrderStatus } from '@/features/dashboard/hooks/useOrders';
+import { useOrderSSE } from '@/features/dashboard/hooks/useOrderSSE';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
+import { Skeleton } from '@/shadcn/ui/skeleton';
 
 type TabKey = 'pending' | 'preparing' | 'completed';
 
@@ -31,20 +33,20 @@ const formatTimeAgo = (isoString: string): string => {
 
 /* ── 개별 주문 카드 ── */
 interface OrderCardProps {
-  order: Order;
+  order: ApiOrder;
+  storeId: string;
 }
 
-const OrderCard = ({ order }: OrderCardProps) => {
-  const updateOrderStatus = useOrderStore((s) => s.updateOrderStatus);
+const OrderCard = ({ order, storeId }: OrderCardProps) => {
+  const { mutate: changeStatus, isPending } = useUpdateOrderStatus(storeId);
+
+  const itemSummary = order.items?.map((i) => `${i.menu.name} x${i.quantity}`).join(' · ') ?? '';
 
   return (
     <div className="rounded-lg border bg-card p-3 space-y-2">
-      {/* 헤더: 테이블 + 상태 + 시간 */}
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="text-sm font-medium truncate">
-            {order.tableNumber ?? '테이블 미지정'}
-          </span>
+          <span className="text-sm font-medium truncate">{order.tableNumber}번 테이블</span>
           <OrderStatusBadge status={order.status} />
         </div>
         <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
@@ -53,28 +55,18 @@ const OrderCard = ({ order }: OrderCardProps) => {
         </div>
       </div>
 
-      {/* 주문 내역 */}
-      <p className="text-xs text-muted-foreground line-clamp-2">
-        {order.items.map((i) => `${i.name} x${i.quantity}`).join(' · ')}
-      </p>
+      {itemSummary && <p className="text-xs text-muted-foreground line-clamp-2">{itemSummary}</p>}
 
-      {/* 요청사항 */}
-      {order.customerNote && (
-        <p className="text-xs text-amber-500/80 bg-amber-50/60 rounded px-2 py-1">
-          💬 {order.customerNote}
-        </p>
-      )}
-
-      {/* 금액 + 액션 버튼 */}
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold">{order.totalAmount.toLocaleString()}원</span>
+        <span className="text-sm font-semibold">{order.totalPrice.toLocaleString()}원</span>
         <div className="flex gap-1.5">
           {order.status === 'pending' && (
             <>
               <Button
                 size="sm"
                 className="h-7 px-2.5 text-xs bg-baro-blue text-white hover:bg-baro-blue/80"
-                onClick={() => updateOrderStatus(order.id, 'preparing')}
+                disabled={isPending}
+                onClick={() => changeStatus({ orderId: order.id, status: 'preparing' })}
               >
                 수락
               </Button>
@@ -82,7 +74,8 @@ const OrderCard = ({ order }: OrderCardProps) => {
                 size="sm"
                 variant="outline"
                 className="h-7 px-2.5 text-xs"
-                onClick={() => updateOrderStatus(order.id, 'cancelled')}
+                disabled={isPending}
+                onClick={() => changeStatus({ orderId: order.id, status: 'cancelled' })}
               >
                 취소
               </Button>
@@ -92,7 +85,8 @@ const OrderCard = ({ order }: OrderCardProps) => {
             <Button
               size="sm"
               className="h-7 px-2.5 text-xs bg-slate-600 text-white hover:bg-slate-700"
-              onClick={() => updateOrderStatus(order.id, 'completed')}
+              disabled={isPending}
+              onClick={() => changeStatus({ orderId: order.id, status: 'completed' })}
             >
               완료처리
             </Button>
@@ -104,9 +98,15 @@ const OrderCard = ({ order }: OrderCardProps) => {
 };
 
 /* ── 주문 현황 카드 ── */
-const OrderStatusCard = () => {
+interface OrderStatusCardProps {
+  storeId: string | null;
+}
+
+const OrderStatusCard = ({ storeId }: OrderStatusCardProps) => {
   const [activeTab, setActiveTab] = useState<TabKey>('pending');
-  const orders = useOrderStore((s) => s.orders);
+  const { data: orders = [], isLoading } = useOrders(storeId);
+
+  useOrderSSE(storeId);
 
   const pendingCount = orders.filter((o) => o.status === 'pending').length;
   const filteredOrders = orders.filter((o) => o.status === activeTab);
@@ -125,7 +125,6 @@ const OrderStatusCard = () => {
         </CardTitle>
       </CardHeader>
 
-      {/* 탭 */}
       <div className="flex border-b shrink-0">
         {TABS.map((tab) => {
           const count = orders.filter((o) => o.status === tab.key).length;
@@ -155,15 +154,20 @@ const OrderStatusCard = () => {
         })}
       </div>
 
-      {/* 주문 목록 */}
       <CardContent className="flex-1 overflow-y-auto p-3 space-y-2">
-        {filteredOrders.length === 0 ? (
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-lg" />
+          ))
+        ) : filteredOrders.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-32 text-muted-foreground">
             <ShoppingBag className="size-8 mb-2 opacity-25" />
             <p className="text-xs">{EMPTY_MESSAGE[activeTab]}</p>
           </div>
         ) : (
-          filteredOrders.map((order) => <OrderCard key={order.id} order={order} />)
+          filteredOrders.map((order) =>
+            storeId ? <OrderCard key={order.id} order={order} storeId={storeId} /> : null,
+          )
         )}
       </CardContent>
     </Card>
