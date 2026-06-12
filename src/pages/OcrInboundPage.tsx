@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { ArrowLeft, ScanLine } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -19,14 +19,11 @@ const OcrInboundPage = () => {
   const location = useLocation();
   const applyInbound = useInventoryStore((s) => s.applyInbound);
   const storeId = useAuthStore((s) => s.storeId);
-  const [imageUrl, setImageUrl] = useState<string | null>(
-    () => (location.state as { imageUrl?: string } | null)?.imageUrl ?? null,
-  );
-  const [step, setStep] = useState<Step>(() => {
-    const incoming = (location.state as { imageUrl?: string } | null)?.imageUrl;
-    return incoming ? 'analyzing' : 'upload';
-  });
+  const locationState = location.state as { file?: File } | null;
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [step, setStep] = useState<Step>('upload');
   const [items, setItems] = useState<OcrInboundItem[]>([]);
+  const handledInitialFile = useRef(false);
 
   const handleFileSelect = useCallback(
     async (file: File) => {
@@ -50,6 +47,13 @@ const OcrInboundPage = () => {
     },
     [storeId],
   );
+
+  useEffect(() => {
+    if (locationState?.file && !handledInitialFile.current && storeId) {
+      handledInitialFile.current = true;
+      handleFileSelect(locationState.file);
+    }
+  }, [locationState, handleFileSelect, storeId]);
 
   const handleReset = () => {
     if (imageUrl) URL.revokeObjectURL(imageUrl);
