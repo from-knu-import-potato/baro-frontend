@@ -15,10 +15,17 @@ export async function fetchIngredients(storeId: string): Promise<IngredientDto[]
 
 export async function createIngredient(
   storeId: string,
-  data: Omit<IngredientDto, 'id' | 'currentStock' | 'safetyStock'>,
+  data: Omit<IngredientDto, 'id' | 'currentStock' | 'safetyStock'> & { safetyStock?: number },
 ): Promise<IngredientDto> {
   const res = await axiosInstance.post(`/stores/${storeId}/ingredients`, data);
   return res.data.data;
+}
+
+export async function confirmInbound(
+  storeId: string,
+  items: { ingredientId: string; amount: number }[],
+): Promise<void> {
+  await axiosInstance.post(`/stores/${storeId}/ingredients/inbound`, { items });
 }
 
 export async function updateIngredient(

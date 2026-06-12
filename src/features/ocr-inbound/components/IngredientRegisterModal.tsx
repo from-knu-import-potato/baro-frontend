@@ -1,7 +1,10 @@
 import { useState } from 'react';
 
 import { PackagePlus } from 'lucide-react';
+import { toast } from 'sonner';
 
+import useAuthStore from '@/features/auth/store/authStore';
+import { createIngredient } from '@/features/store-settings/api/ingredients.api';
 import type { OcrUnit } from '@/features/ocr-inbound/types/ocrInbound.types';
 import { Button } from '@/shadcn/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
@@ -22,7 +25,7 @@ interface IngredientRegisterModalProps {
   initialName: string;
   initialUnit: OcrUnit;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: (ingredientId: string) => void;
 }
 
 const IngredientRegisterModal = ({
@@ -32,16 +35,30 @@ const IngredientRegisterModal = ({
   onClose,
   onConfirm,
 }: IngredientRegisterModalProps) => {
+  const storeId = useAuthStore((s) => s.storeId);
   const [form, setForm] = useState<IngredientForm>({
     name: initialName,
     unit: initialUnit,
     safetyStock: '',
   });
+  const [isPending, setIsPending] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: API 연동
-    onConfirm();
+    if (!storeId) return;
+    setIsPending(true);
+    try {
+      const created = await createIngredient(storeId, {
+        name: form.name,
+        unit: form.unit,
+        safetyStock: form.safetyStock ? Number(form.safetyStock) : undefined,
+      });
+      onConfirm(created.id);
+    } catch {
+      toast.error('식자재 등록에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -115,10 +132,10 @@ const IngredientRegisterModal = ({
             </Button>
             <Button
               type="submit"
-              disabled={!form.name.trim()}
+              disabled={!form.name.trim() || isPending}
               className="flex-1 bg-baro-blue hover:bg-baro-blue/90 text-white"
             >
-              등록
+              {isPending ? '등록 중...' : '등록'}
             </Button>
           </div>
         </form>
