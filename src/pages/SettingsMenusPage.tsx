@@ -1,12 +1,25 @@
 import { useRef, useState } from 'react';
 
-import { ArrowLeft, ImageOff, ImagePlus, Loader2, Pencil, Plus, Trash2, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  ImageOff,
+  ImagePlus,
+  Loader2,
+  Pencil,
+  Plus,
+  ScanLine,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
 import useAuthStore from '@/features/auth/store/authStore';
 import type { MenuDto } from '@/features/store-settings/api/menus.api';
 import { uploadMenuImage } from '@/features/store-settings/api/menus.api';
+import MenuOcrModal, {
+  type OcrMenuConfirmItem,
+} from '@/features/store-settings/components/MenuOcrModal';
 import {
   useMenus,
   useCreateMenu,
@@ -33,12 +46,14 @@ const EMPTY_FORM: MenuForm = { name: '', description: '', price: '', imageUrl: n
 const MenuModal = ({
   open,
   editing,
+  existingNames = [],
   isSaving,
   onClose,
   onSave,
 }: {
   open: boolean;
   editing: MenuDto | null;
+  existingNames?: string[];
   isSaving: boolean;
   onClose: () => void;
   onSave: (form: Omit<MenuDto, 'id' | 'isAvailable'>) => void;
@@ -62,6 +77,12 @@ const MenuModal = ({
     const next: typeof errors = {};
     if (!form.name.trim()) next.name = '메뉴 이름을 입력해주세요';
     if (!form.price || isNaN(Number(form.price))) next.price = '올바른 가격을 입력해주세요';
+    if (
+      !editing &&
+      existingNames.some((n) => n.trim().toLowerCase() === form.name.trim().toLowerCase())
+    ) {
+      next.name = '이미 등록된 메뉴 이름입니다';
+    }
     setErrors(next);
     return !Object.keys(next).length;
   };
@@ -265,14 +286,20 @@ const MenuCard = ({
 /* ── 메인 페이지 ── */
 const SettingsMenusPage = () => {
   const navigate = useNavigate();
+  const storeId = useAuthStore((s) => s.storeId);
   const { data: menus, isLoading } = useMenus();
-  const { mutate: createMenu, isPending: isCreating } = useCreateMenu();
+  const {
+    mutate: createMenu,
+    mutateAsync: createMenuAsync,
+    isPending: isCreating,
+  } = useCreateMenu();
   const { mutate: updateMenu, isPending: isUpdating } = useUpdateMenu();
   const { mutate: deleteMenu } = useDeleteMenu();
 
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<MenuDto | null>(null);
   const [modalKey, setModalKey] = useState(0);
+  const [ocrOpen, setOcrOpen] = useState(false);
 
   const handleOpenNew = () => {
     setEditing(null);
@@ -297,6 +324,25 @@ const SettingsMenusPage = () => {
     }
   };
 
+  const handleOcrConfirm = async (items: OcrMenuConfirmItem[]) => {
+    for (const item of items) {
+      let imageUrl: string | null = null;
+      if (item.imageFile && storeId) {
+        try {
+          imageUrl = await uploadMenuImage(storeId, item.imageFile);
+        } catch {
+          // 이미지 업로드 실패 시 이미지 없이 메뉴 등록 진행
+        }
+      }
+      await createMenuAsync({
+        name: item.name,
+        price: item.price,
+        description: item.description,
+        imageUrl,
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <header className="flex items-center gap-3 border-b px-6 py-4">
@@ -307,13 +353,18 @@ const SettingsMenusPage = () => {
           <p className="text-sm font-semibold">메뉴 관리</p>
           <p className="text-xs text-muted-foreground">판매 메뉴를 등록하고 관리합니다.</p>
         </div>
-        <Button
-          size="sm"
-          className="ml-auto bg-baro-blue hover:bg-baro-blue/80 text-white"
-          onClick={handleOpenNew}
-        >
-          <Plus className="size-4 mr-1" /> 메뉴 추가
-        </Button>
+        <div className="ml-auto flex gap-2">
+          <Button size="sm" variant="outline" onClick={() => setOcrOpen(true)}>
+            <ScanLine className="size-4 mr-1" /> 메뉴판으로 등록
+          </Button>
+          <Button
+            size="sm"
+            className="bg-baro-blue hover:bg-baro-blue/80 text-white"
+            onClick={handleOpenNew}
+          >
+            <Plus className="size-4 mr-1" /> 메뉴 추가
+          </Button>
+        </div>
       </header>
 
       <div className="p-6">
@@ -324,23 +375,33 @@ const SettingsMenusPage = () => {
             ))}
           </div>
         ) : !menus?.length ? (
-          <div className="flex flex-col items-center gap-3 rounded-xl border-2 border-dashed border-gray-200 py-16 text-center">
+          <div className="flex flex-col items-center gap-4 rounded-xl border-2 border-dashed border-gray-200 py-16 text-center">
             <div className="flex size-12 items-center justify-center rounded-full bg-gray-100">
               <Plus className="size-6 text-gray-400" />
             </div>
             <div>
               <p className="text-sm font-medium text-muted-foreground">등록된 메뉴가 없습니다</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
-                아래 버튼으로 메뉴를 추가해주세요
+                메뉴를 등록하는 방법을 선택해주세요
               </p>
             </div>
-            <Button
-              size="sm"
-              onClick={handleOpenNew}
-              className="gap-1.5 bg-baro-blue text-white hover:bg-baro-blue/80"
-            >
-              <Plus className="size-4" /> 메뉴 등록하기
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setOcrOpen(true)}
+                className="gap-1.5"
+              >
+                <ScanLine className="size-4" /> 메뉴판으로 등록
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleOpenNew}
+                className="gap-1.5 bg-baro-blue text-white hover:bg-baro-blue/80"
+              >
+                <Plus className="size-4" /> 직접 등록하기
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -360,9 +421,18 @@ const SettingsMenusPage = () => {
         key={modalKey}
         open={open}
         editing={editing}
+        existingNames={(menus ?? []).map((m) => m.name)}
         isSaving={isCreating || isUpdating}
         onClose={handleClose}
         onSave={handleSave}
+      />
+
+      <MenuOcrModal
+        open={ocrOpen}
+        existingNames={(menus ?? []).map((m) => m.name)}
+        onClose={() => setOcrOpen(false)}
+        onConfirm={handleOcrConfirm}
+        isConfirming={isCreating}
       />
     </div>
   );
