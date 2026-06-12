@@ -8,6 +8,7 @@ export const MOCK_STORE_SETTINGS: StoreSettings = {
   ownerName: '유다연',
   businessType: 'individual',
   category: 'cafe',
+  memo: '',
 };
 
 export const MOCK_STORE_STAFF: StoreStaff[] = [
