@@ -10,6 +10,7 @@ export async function fetchStoreSettings(storeId: string): Promise<StoreSettings
     ownerName: d.ownerName,
     businessType: d.businessType,
     category: d.category,
+    memo: d.memo ?? '',
   };
 }
 
