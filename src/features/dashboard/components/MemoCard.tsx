@@ -1,9 +1,41 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { PenLine } from 'lucide-react';
 
+import { useStoreSettings, useUpdateStoreSettings } from '@/features/store-settings/hooks/useStoreSettings';
+
+const DEBOUNCE_MS = 1000;
+
 const MemoCard = () => {
+  const { data } = useStoreSettings();
+  const { mutate: updateStore } = useUpdateStoreSettings();
+
   const [memo, setMemo] = useState('');
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isInitialized = useRef(false);
+
+  useEffect(() => {
+    if (data && !isInitialized.current) {
+      setMemo(data.memo);
+      isInitialized.current = true;
+    }
+  }, [data]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setMemo(value);
+
+    if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    debounceTimer.current = setTimeout(() => {
+      updateStore({ memo: value });
+    }, DEBOUNCE_MS);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
+  }, []);
 
   return (
     <div className="flex-1 flex flex-col bg-yellow-100 dark:bg-zinc-800 rounded-sm shadow-md relative overflow-hidden">
@@ -28,7 +60,7 @@ const MemoCard = () => {
           "
           placeholder={'오늘의 메모를 남겨보세요\n(예: 오후 2시 재고 실사)'}
           value={memo}
-          onChange={(e) => setMemo(e.target.value)}
+          onChange={handleChange}
         />
       </div>
 
