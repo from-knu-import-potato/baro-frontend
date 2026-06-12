@@ -61,8 +61,8 @@ const DonutChart = ({ consumptionRatio }: DonutChartProps) => {
 const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
   const latest = data[data.length - 1];
   const profit = Math.max(0, latest.sales - latest.consumption);
-  const consumptionRatio = latest.consumption / latest.sales;
-  const profitRatio = profit / latest.sales;
+  const consumptionRatio = latest.sales > 0 ? latest.consumption / latest.sales : 0;
+  const profitRatio = latest.sales > 0 ? profit / latest.sales : 0;
 
   return (
     <Card size="sm" className="h-full">

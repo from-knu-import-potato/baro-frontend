@@ -52,13 +52,13 @@ const StoreStatusCard = ({ stats, storeId }: StoreStatusCardProps) => {
               ? `발주 추천 ${stats.aiOrderRecommendations}개 있어요`
               : '발주 추천 없어요'
           }
-          commentColor={stats.aiOrderRecommendations > 0 ? 'text-amber-500' : 'text-green-500'}
+          commentColor={stats.aiOrderRecommendations > 0 ? 'text-amber-500' : 'text-baro-green'}
         />
         <StatTile
           label="유통기한 임박"
           value={`${stats.expiringItems}개`}
           comment={stats.expiringItems > 0 ? '빠른 소진 및 발주 필요' : '임박 상품이 없어요'}
-          commentColor={stats.expiringItems > 0 ? 'text-red-500' : 'text-green-500'}
+          commentColor={stats.expiringItems > 0 ? 'text-red-500' : 'text-baro-green'}
         />
         <StatTile
           label="오늘 매출"

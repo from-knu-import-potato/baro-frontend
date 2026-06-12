@@ -12,8 +12,7 @@ const OcrUploadCard = () => {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const imageUrl = URL.createObjectURL(file);
-    navigate(routePaths.ocrInbound, { state: { imageUrl } });
+    navigate(routePaths.ocrInbound, { state: { file } });
     e.target.value = '';
   };
 
@@ -21,8 +20,7 @@ const OcrUploadCard = () => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
     if (!file?.type.startsWith('image/')) return;
-    const imageUrl = URL.createObjectURL(file);
-    navigate(routePaths.ocrInbound, { state: { imageUrl } });
+    navigate(routePaths.ocrInbound, { state: { file } });
   };
 
   return (
