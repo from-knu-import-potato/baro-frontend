@@ -4,8 +4,8 @@ import { PackagePlus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import useAuthStore from '@/features/auth/store/authStore';
-import { createIngredient } from '@/features/store-settings/api/ingredients.api';
 import type { OcrUnit } from '@/features/ocr-inbound/types/ocrInbound.types';
+import { createIngredient } from '@/features/store-settings/api/ingredients.api';
 import { Button } from '@/shadcn/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
 import { Input } from '@/shadcn/ui/input';

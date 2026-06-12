@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, ScanLine } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -11,7 +12,6 @@ import OcrReviewStep from '@/features/ocr-inbound/components/OcrReviewStep';
 import OcrUploadStep from '@/features/ocr-inbound/components/OcrUploadStep';
 import type { OcrInboundItem } from '@/features/ocr-inbound/types/ocrInbound.types';
 import { confirmInbound } from '@/features/store-settings/api/ingredients.api';
-import { useQueryClient } from '@tanstack/react-query';
 
 type Step = 'upload' | 'analyzing' | 'review';
 
