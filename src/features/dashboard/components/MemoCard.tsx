@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 
 import { PenLine } from 'lucide-react';
 
-import { useStoreSettings, useUpdateStoreSettings } from '@/features/store-settings/hooks/useStoreSettings';
+import {
+  useStoreSettings,
+  useUpdateStoreSettings,
+} from '@/features/store-settings/hooks/useStoreSettings';
 
 const DEBOUNCE_MS = 1000;
 
