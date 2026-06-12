@@ -1,7 +1,4 @@
-import type {
-  DashboardStats,
-  MonthlySalesData,
-} from '@/features/dashboard/types/dashboard.types';
+import type { DashboardStats, MonthlySalesData } from '@/features/dashboard/types/dashboard.types';
 import axiosInstance from '@/shared/api/axiosInstance';
 
 export const fetchDashboardStats = (storeId: string): Promise<DashboardStats> =>
