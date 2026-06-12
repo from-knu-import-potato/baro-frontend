@@ -176,7 +176,7 @@ const RecipePanel = ({ menu, recipe, ingredients, onRecipeChange }: RecipePanelP
             </p>
             {ingredients.length === 0 ? (
               <p className="text-xs text-muted-foreground italic">
-                위 섹션에서 식자재를 먼저 등록해주세요
+                왼쪽 패널에서 식자재를 먼저 등록해주세요
               </p>
             ) : (
               <div className="flex flex-wrap gap-1.5 mt-1">
@@ -325,10 +325,11 @@ const StepIngredientsAndRecipes = ({
   };
 
   return (
-    <div className="space-y-0">
-      {/* ── 상단 섹션: 식자재 등록 ── */}
-      <section className="space-y-4">
-        <div>
+    <div className="flex flex-1 min-h-0 gap-4">
+      {/* ── 왼쪽 패널: 식자재 등록 ── */}
+      <div className="flex flex-1 min-h-0 flex-col overflow-hidden rounded-xl border">
+        {/* 패널 헤더 */}
+        <div className="shrink-0 border-b px-4 py-3">
           <h3 className="text-sm font-semibold">식자재 등록</h3>
           <p className="mt-0.5 text-xs text-muted-foreground">
             사용하는 식자재 종류를 태그로 등록해주세요
@@ -336,100 +337,100 @@ const StepIngredientsAndRecipes = ({
         </div>
 
         {/* 입력 행 */}
-        <div className="flex gap-2">
-          <Input
-            placeholder="식자재 이름 (예: 원두)"
-            value={inputName}
-            onChange={(e) => setInputName(e.target.value)}
-            onKeyDown={handleKeyDown}
-            className="h-9 flex-1"
-          />
-          <Select value={inputUnit} onValueChange={(val) => val && setInputUnit(val)}>
-            <SelectTrigger className="h-9 w-24">
-              <span className={cn('text-sm', !inputUnit && 'text-muted-foreground')}>
-                {inputUnit || '단위'}
-              </span>
-            </SelectTrigger>
-            <SelectContent>
-              {INGREDIENT_UNIT_OPTIONS.map((opt) => (
-                <SelectItem key={opt.value} value={opt.value}>
-                  {opt.label}
-                </SelectItem>
+        <div className="shrink-0 border-b px-3 py-2.5">
+          <div className="flex gap-2">
+            <Input
+              placeholder="식자재 이름 (예: 원두)"
+              value={inputName}
+              onChange={(e) => setInputName(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className="h-8 flex-1 text-sm"
+            />
+            <Select value={inputUnit} onValueChange={(val) => val && setInputUnit(val)}>
+              <SelectTrigger className="h-8 w-20">
+                <span className={cn('text-sm', !inputUnit && 'text-muted-foreground')}>
+                  {inputUnit || '단위'}
+                </span>
+              </SelectTrigger>
+              <SelectContent>
+                {INGREDIENT_UNIT_OPTIONS.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleAddIngredient}
+              disabled={!inputName.trim() || !inputUnit}
+              className="h-8 gap-1 bg-baro-blue px-2.5 text-white hover:bg-baro-blue-dark"
+            >
+              <Plus className="size-3.5" />
+              추가
+            </Button>
+          </div>
+        </div>
+
+        {/* 식자재 태그 목록 — 스크롤 영역 */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-3">
+          {ingredients.length === 0 ? (
+            <div className="flex h-full items-center justify-center rounded-xl border-2 border-dashed border-gray-200 text-center">
+              <p className="text-xs text-muted-foreground">
+                식자재를 입력하면 여기에 태그로 표시됩니다
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {ingredients.map((ing) => (
+                <IngredientTag
+                  key={ing.id}
+                  ingredient={ing}
+                  onRemove={() => handleRemoveIngredient(ing.id)}
+                />
               ))}
-            </SelectContent>
-          </Select>
-          <Button
-            type="button"
-            size="sm"
-            onClick={handleAddIngredient}
-            disabled={!inputName.trim() || !inputUnit}
-            className="h-9 gap-1 bg-baro-blue px-3 text-white hover:bg-baro-blue-dark"
-          >
-            <Plus className="size-4" />
-            추가
-          </Button>
-        </div>
-
-        {/* 식자재 태그 목록 */}
-        {ingredients.length === 0 ? (
-          <div className="rounded-xl border-2 border-dashed border-gray-200 py-5 text-center">
-            <p className="text-xs text-muted-foreground">
-              식자재를 입력하면 여기에 태그로 표시됩니다
-            </p>
-          </div>
-        ) : (
-          <div className="flex min-h-12 flex-wrap gap-2 rounded-xl border border-dashed border-gray-200 p-3">
-            {ingredients.map((ing) => (
-              <IngredientTag
-                key={ing.id}
-                ingredient={ing}
-                onRemove={() => handleRemoveIngredient(ing.id)}
-              />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* 구분선 */}
-      <div className="relative py-6">
-        <div className="absolute inset-0 flex items-center px-0">
-          <div className="w-full border-t border-dashed border-gray-200" />
-        </div>
-        <div className="relative flex justify-center">
-          <span className="bg-card px-3 text-xs text-muted-foreground">레시피 등록</span>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ── 하단 섹션: 레시피 등록 ── */}
-      <section className="space-y-4">
-        <div>
+      {/* ── 오른쪽 패널: 레시피 등록 ── */}
+      <div className="flex flex-1 min-h-0 flex-col overflow-hidden rounded-xl border">
+        {/* 패널 헤더 */}
+        <div className="shrink-0 border-b px-4 py-3">
           <h3 className="text-sm font-semibold">메뉴별 레시피</h3>
           <p className="mt-0.5 text-xs text-muted-foreground">
-            위에서 등록한 식자재를 클릭하거나 드래그해서 레시피를 구성하세요
+            식자재를 클릭하거나 드래그해서 레시피를 구성하세요
           </p>
         </div>
 
-        {menuItems.length === 0 ? (
-          <div className="rounded-xl border-2 border-dashed border-gray-200 py-8 text-center">
-            <p className="text-sm text-muted-foreground">등록된 메뉴가 없습니다</p>
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              이전 단계에서 메뉴를 먼저 등록해주세요
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {menuItems.map((menu) => (
-              <RecipePanel
-                key={menu.id}
-                menu={menu}
-                recipe={getRecipeForMenu(menu.id)}
-                ingredients={ingredients}
-                onRecipeChange={handleRecipeChange}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+        {/* 레시피 패널 목록 — 스크롤 영역 */}
+        <div className="flex-1 min-h-0 overflow-y-auto p-3">
+          {menuItems.length === 0 ? (
+            <div className="flex h-full items-center justify-center rounded-xl border-2 border-dashed border-gray-200 text-center">
+              <div>
+                <p className="text-sm text-muted-foreground">등록된 메뉴가 없습니다</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  이전 단계에서 메뉴를 먼저 등록해주세요
+                </p>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {menuItems.map((menu) => (
+                <RecipePanel
+                  key={menu.id}
+                  menu={menu}
+                  recipe={getRecipeForMenu(menu.id)}
+                  ingredients={ingredients}
+                  onRecipeChange={handleRecipeChange}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

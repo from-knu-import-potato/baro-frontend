@@ -18,6 +18,7 @@ import type {
   StoreBasicInfo,
 } from '@/features/initial-setup/types/initialSetup.types';
 import { fetchMenus, updateMenu, uploadMenuImage } from '@/features/store-settings/api/menus.api';
+import { cn } from '@/lib/utils';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/ui/card';
 import baroLogo from '@/shared/assets/images/baro-logo.png';
@@ -148,9 +149,9 @@ const InitialSetupForm = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex h-screen flex-col overflow-hidden">
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 bg-background px-6 py-3.5">
+      <header className="flex shrink-0 items-center justify-between border-b border-gray-100 bg-background px-6 py-3.5 dark:border-gray-800">
         <div className="flex items-center gap-2.5">
           <img src={baroLogo} alt="BARO" className="h-7 w-auto" />
           <span className="text-sm font-semibold text-foreground">초기 설정</span>
@@ -165,14 +166,21 @@ const InitialSetupForm = () => {
       </header>
 
       {/* Main content */}
-      <main className="flex flex-1 justify-center px-4 py-8">
-        <div className="w-full max-w-xl space-y-6">
+      <main className="flex flex-1 min-h-0 flex-col items-center overflow-hidden px-4 py-4">
+        <div
+          className={cn(
+            'flex w-full flex-1 min-h-0 flex-col gap-4',
+            currentStep === 4 ? 'max-w-3xl' : 'max-w-xl',
+          )}
+        >
           {/* Progress bar */}
-          <SetupProgressBar currentStep={currentStep} />
+          <div className="mb-4 w-full max-w-xl shrink-0 self-center">
+            <SetupProgressBar currentStep={currentStep} />
+          </div>
 
           {/* Step card */}
-          <Card className="shadow-sm">
-            <CardHeader className="border-b">
+          <Card className="flex flex-1 min-h-0 flex-col shadow-sm">
+            <CardHeader>
               <div className="flex items-center gap-2">
                 <span className="flex size-6 items-center justify-center rounded-full bg-baro-blue text-xs font-bold text-white">
                   {currentStep}
@@ -181,11 +189,13 @@ const InitialSetupForm = () => {
               </div>
               <CardDescription className="mt-0.5">{currentStepConfig.description}</CardDescription>
             </CardHeader>
-            <CardContent>{renderStep()}</CardContent>
+            <CardContent className="flex flex-1 min-h-0 flex-col p-4">
+              <div className="flex flex-1 min-h-0 flex-col">{renderStep()}</div>
+            </CardContent>
           </Card>
 
           {/* Navigation */}
-          <div className="flex items-center justify-between">
+          <div className="flex shrink-0 items-center justify-between mb-16 mt-2">
             <Button
               type="button"
               variant="outline"

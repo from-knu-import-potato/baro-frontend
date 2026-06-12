@@ -1,5 +1,3 @@
-import { Clock } from 'lucide-react';
-
 import { DAY_OF_WEEK_CONFIG } from '@/features/initial-setup/constants/initialSetup.constants';
 import type { OperatingHour } from '@/features/initial-setup/types/initialSetup.types';
 import { cn } from '@/lib/utils';
@@ -16,15 +14,12 @@ interface TimeInputProps {
 }
 
 const TimeInput = ({ value, onChange }: TimeInputProps) => (
-  <div className="relative flex items-center">
-    <Clock className="pointer-events-none absolute left-2.5 size-3.5 text-muted-foreground" />
-    <input
-      type="time"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      className="h-8 w-36 rounded-lg border border-input pl-8 pr-3 text-sm outline-none transition-colors focus:border-baro-blue focus:ring-2 focus:ring-baro-blue/20"
-    />
-  </div>
+  <input
+    type="time"
+    value={value}
+    onChange={(e) => onChange(e.target.value)}
+    className="h-5 min-w-0 flex-1 rounded border border-input px-1 text-xs outline-none transition-colors focus:border-baro-blue focus:ring-1 focus:ring-baro-blue/20"
+  />
 );
 
 const StepOperatingHours = ({ data, onChange }: StepOperatingHoursProps) => {
@@ -32,55 +27,86 @@ const StepOperatingHours = ({ data, onChange }: StepOperatingHoursProps) => {
     onChange(data.map((hour, i) => (i === index ? { ...hour, ...updated } : hour)));
   };
 
+  const allOpen = data.every((h) => h.isOpen);
+  const handleToggleAll = () => {
+    onChange(data.map((h) => ({ ...h, isOpen: !allOpen })));
+  };
+
   return (
-    <div className="space-y-2">
+    <div className="grid grid-cols-2 gap-1.5">
       {DAY_OF_WEEK_CONFIG.map((day, index) => {
         const hour = data[index];
         const isSat = day.value === 'saturday';
         const isSun = day.value === 'sunday';
+        const shortLabel = day.label.slice(0, 1);
+
+        const dayTextColor = hour.isOpen
+          ? isSun
+            ? 'text-red-500'
+            : isSat
+              ? 'text-blue-500'
+              : 'text-baro-blue'
+          : 'text-gray-300';
 
         return (
           <div
             key={day.value}
             className={cn(
-              'flex items-center gap-3 rounded-lg border px-3 py-2.5 transition-colors',
+              'flex flex-col gap-1.5 rounded-xl p-2.5 transition-all duration-150',
               hour.isOpen
-                ? 'border-baro-blue/25 bg-baro-blue/5 dark:border-baro-blue-dark/15 dark:bg-baro-blue-dark/3'
-                : 'border-gray-100 bg-gray-50/80 dark:bg-baro-black/80 dark:border-baro-black',
+                ? 'border border-transparent bg-white shadow-[0_2px_8px_-1px_rgba(0,0,0,0.08)]'
+                : 'border border-gray-100 bg-gray-50',
             )}
           >
-            <span
-              className={cn(
-                'w-14 shrink-0 text-sm font-medium',
-                isSat ? 'text-blue-500' : isSun ? 'text-red-500' : 'text-foreground',
+            <div className="flex items-center justify-between">
+              <span className={cn('text-sm font-bold transition-colors', dayTextColor)}>
+                {shortLabel}
+              </span>
+              <Switch
+                checked={hour.isOpen}
+                onCheckedChange={(checked) => handleUpdate(index, { isOpen: checked })}
+              />
+            </div>
+
+            <div className="flex h-5 items-center gap-1">
+              {hour.isOpen ? (
+                <>
+                  <TimeInput
+                    value={hour.openTime}
+                    onChange={(v) => handleUpdate(index, { openTime: v })}
+                  />
+                  <span className="shrink-0 text-[10px] text-muted-foreground">~</span>
+                  <TimeInput
+                    value={hour.closeTime}
+                    onChange={(v) => handleUpdate(index, { closeTime: v })}
+                  />
+                </>
+              ) : (
+                <span className="text-xs font-medium text-gray-300">휴무</span>
               )}
-            >
-              {day.label}
-            </span>
-
-            <Switch
-              checked={hour.isOpen}
-              onCheckedChange={(checked) => handleUpdate(index, { isOpen: checked })}
-            />
-
-            {hour.isOpen ? (
-              <div className="flex flex-1 items-center gap-2">
-                <TimeInput
-                  value={hour.openTime}
-                  onChange={(v) => handleUpdate(index, { openTime: v })}
-                />
-                <span className="text-xs text-muted-foreground">~</span>
-                <TimeInput
-                  value={hour.closeTime}
-                  onChange={(v) => handleUpdate(index, { closeTime: v })}
-                />
-              </div>
-            ) : (
-              <span className="flex-1 text-sm text-muted-foreground">휴무</span>
-            )}
+            </div>
           </div>
         );
       })}
+
+      {/* 전체 토글 카드 */}
+      <button
+        type="button"
+        onClick={handleToggleAll}
+        className={cn(
+          'flex flex-col justify-between gap-1.5 rounded-xl p-2.5 text-left transition-all duration-150',
+          allOpen
+            ? 'bg-white shadow-[0_2px_8px_-1px_rgba(0,0,0,0.08)]'
+            : 'border border-dashed border-gray-200 hover:border-gray-300 hover:bg-gray-50/60',
+        )}
+      >
+        <span className={cn('text-sm font-bold', allOpen ? 'text-baro-blue' : 'text-gray-300')}>
+          전체
+        </span>
+        <span className={cn('text-xs font-medium', allOpen ? 'text-gray-400' : 'text-gray-300')}>
+          {allOpen ? '전체 닫기' : '모두 열기'}
+        </span>
+      </button>
     </div>
   );
 };
