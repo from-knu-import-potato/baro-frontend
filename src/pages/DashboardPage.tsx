@@ -4,10 +4,15 @@ import MemoCard from '@/features/dashboard/components/MemoCard';
 import OcrUploadCard from '@/features/dashboard/components/OcrUploadCard';
 import SalesConsumptionCard from '@/features/dashboard/components/SalesConsumptionCard';
 import StoreStatusCard from '@/features/dashboard/components/StoreStatusCard';
-import { MOCK_SALES_DATA, MOCK_STATS } from '@/features/dashboard/data/dashboard.mock';
+import { useDashboardSales } from '@/features/dashboard/hooks/useDashboardSales';
+import { useDashboardStats } from '@/features/dashboard/hooks/useDashboardStats';
+import { Skeleton } from '@/shadcn/ui/skeleton';
 
 const DashboardPage = () => {
   const storeId = useAuthStore((s) => s.storeId);
+
+  const { data: stats, isLoading: statsLoading } = useDashboardStats(storeId);
+  const { data: salesData, isLoading: salesLoading } = useDashboardSales(storeId);
 
   return (
     <main className="flex-1 min-h-0 overflow-hidden p-4 flex gap-4">
@@ -19,14 +24,22 @@ const DashboardPage = () => {
       {/* 오른쪽: 가게 현황 */}
       <div className="flex-1 min-w-0 flex flex-col gap-4">
         {/* 상단: 오늘의 가게 현황 요약 */}
-        <StoreStatusCard stats={MOCK_STATS} storeId={storeId} />
+        {statsLoading || !stats ? (
+          <Skeleton className="h-[92px] w-full rounded-xl" />
+        ) : (
+          <StoreStatusCard stats={stats} storeId={storeId} />
+        )}
 
         {/* 하단: 좌(이번달 현황 + OCR) / 우(메모) */}
         <div className="flex gap-5 flex-1 min-h-0">
           {/* 좌: 이번달 현황 + OCR 빠른 입고 처리 */}
           <div className="flex-1 min-w-0 flex flex-col gap-4 min-h-0">
             <div className="flex-1 min-h-0">
-              <SalesConsumptionCard data={MOCK_SALES_DATA} />
+              {salesLoading || !salesData || salesData.length === 0 ? (
+                <Skeleton className="h-full w-full rounded-xl" />
+              ) : (
+                <SalesConsumptionCard data={salesData} />
+              )}
             </div>
             <div className="shrink-0">
               <OcrUploadCard />
