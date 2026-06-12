@@ -43,3 +43,18 @@ export async function uploadMenuImage(storeId: string, file: File): Promise<stri
   });
   return res.data.data.url;
 }
+
+export interface MenuOcrApiItem {
+  name: string;
+  price: number;
+  description: string | null;
+}
+
+export async function uploadMenuOcrScan(storeId: string, file: File): Promise<MenuOcrApiItem[]> {
+  const formData = new FormData();
+  formData.append('file', file);
+  const res = await axiosInstance.post(`/stores/${storeId}/menus/ocr-scan`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data.data.items;
+}

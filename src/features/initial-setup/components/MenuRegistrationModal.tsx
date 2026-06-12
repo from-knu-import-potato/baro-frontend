@@ -11,6 +11,7 @@ import { Label } from '@/shadcn/ui/label';
 interface MenuRegistrationModalProps {
   open: boolean;
   editingMenu: MenuItem | null;
+  existingNames?: string[];
   onClose: () => void;
   onSave: (menu: MenuItem) => void;
 }
@@ -31,6 +32,7 @@ type FormState = typeof EMPTY_FORM;
 const MenuRegistrationModal = ({
   open,
   editingMenu,
+  existingNames = [],
   onClose,
   onSave,
 }: MenuRegistrationModalProps) => {
@@ -63,6 +65,12 @@ const MenuRegistrationModal = ({
     const next: typeof errors = {};
     if (!form.name.trim()) next.name = '메뉴 이름을 입력해주세요';
     if (!form.price || isNaN(Number(form.price))) next.price = '올바른 가격을 입력해주세요';
+    if (
+      !editingMenu &&
+      existingNames.some((n) => n.trim().toLowerCase() === form.name.trim().toLowerCase())
+    ) {
+      next.name = '이미 등록된 메뉴 이름입니다';
+    }
     setErrors(next);
     return Object.keys(next).length === 0;
   };
