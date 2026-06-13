@@ -447,7 +447,7 @@ const InventoryTable = () => {
           <div className="flex-1 flex items-center justify-center py-16 text-center text-sm text-muted-foreground">
             {items.length === 0
               ? '등록된 재고가 없어요. OCR 입고처리로 재고를 등록해보세요.'
-              : showFavoritesOnly && favorites.size === 0
+              : showFavoritesOnly && favoriteCount === 0
                 ? '즐겨찾기한 항목이 없어요.'
                 : '검색 결과가 없어요.'}
           </div>
