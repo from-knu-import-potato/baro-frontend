@@ -18,6 +18,7 @@ import type {
   StoreBasicInfo,
 } from '@/features/initial-setup/types/initialSetup.types';
 import { fetchMenus, updateMenu, uploadMenuImage } from '@/features/store-settings/api/menus.api';
+import { updateStoreSettings } from '@/features/store-settings/api/storeSettings.api';
 import { cn } from '@/lib/utils';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/ui/card';
@@ -82,6 +83,11 @@ const InitialSetupForm = () => {
       });
       setStoreId(storeId);
 
+      // /stores/setup은 safetyStockPct를 처리하지 않으므로 별도 PATCH로 저장
+      if (formData.safetyStockPct > 0) {
+        await updateStoreSettings(storeId, { safetyStockPct: formData.safetyStockPct });
+      }
+
       const menusWithPendingImages = formData.menuItems.filter((m) => m.imageFile);
       if (menusWithPendingImages.length > 0) {
         const backendMenus = await fetchMenus(storeId);
@@ -139,8 +145,12 @@ const InitialSetupForm = () => {
             menuItems={formData.menuItems}
             ingredients={formData.ingredients}
             recipes={formData.recipes}
+            safetyStockPct={formData.safetyStockPct}
             onIngredientsChange={(ingredients) => setFormData((prev) => ({ ...prev, ingredients }))}
             onRecipesChange={(recipes) => setFormData((prev) => ({ ...prev, recipes }))}
+            onSafetyStockPctChange={(safetyStockPct) =>
+              setFormData((prev) => ({ ...prev, safetyStockPct }))
+            }
           />
         );
       default:

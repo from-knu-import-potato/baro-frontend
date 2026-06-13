@@ -24,4 +24,5 @@ export const DEFAULT_SETUP_DATA: InitialSetupData = {
   menuItems: [],
   ingredients: [],
   recipes: [],
+  safetyStockPct: 20,
 };

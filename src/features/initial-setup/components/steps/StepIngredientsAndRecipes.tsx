@@ -14,13 +14,16 @@ import { Button } from '@/shadcn/ui/button';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/shadcn/ui/select';
+import SafetyStockDial from '@/shared/components/SafetyStockDial';
 
 interface StepIngredientsAndRecipesProps {
   menuItems: MenuItem[];
   ingredients: Ingredient[];
   recipes: Recipe[];
+  safetyStockPct: number;
   onIngredientsChange: (ingredients: Ingredient[]) => void;
   onRecipesChange: (recipes: Recipe[]) => void;
+  onSafetyStockPctChange: (pct: number) => void;
 }
 
 const generateId = () => Math.random().toString(36).slice(2, 9);
@@ -270,8 +273,10 @@ const StepIngredientsAndRecipes = ({
   menuItems,
   ingredients,
   recipes,
+  safetyStockPct,
   onIngredientsChange,
   onRecipesChange,
+  onSafetyStockPctChange,
 }: StepIngredientsAndRecipesProps) => {
   const [inputName, setInputName] = useState('');
   const [inputUnit, setInputUnit] = useState('');
@@ -334,6 +339,22 @@ const StepIngredientsAndRecipes = ({
           <p className="mt-0.5 text-xs text-muted-foreground">
             사용하는 식자재 종류를 태그로 등록해주세요
           </p>
+        </div>
+
+        {/* 안전 재고 기준 설정 */}
+        <div className="shrink-0 border-b px-3 py-2">
+          <div className="flex items-center justify-between gap-2">
+            <div>
+              <p className="text-xs font-medium">안전 재고 기준</p>
+              <p className="mt-0.5 text-[10px] text-muted-foreground">재고 없음 — 초기값 0</p>
+            </div>
+            <SafetyStockDial
+              value={safetyStockPct}
+              onChange={onSafetyStockPctChange}
+              step={5}
+              compact
+            />
+          </div>
         </div>
 
         {/* 입력 행 */}
