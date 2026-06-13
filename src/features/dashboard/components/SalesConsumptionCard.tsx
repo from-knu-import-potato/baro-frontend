@@ -20,25 +20,29 @@ const DonutChart = ({ consumptionRatio }: DonutChartProps) => {
   const C = 2 * Math.PI * r;
   const GAP = C * 0.015;
 
-  const consumptionArc = C * consumptionRatio - GAP;
-  const profitArc = C * (1 - consumptionRatio) - GAP;
+  const ratio = Math.min(1, Math.max(0, consumptionRatio));
+  const hasBoth = ratio > 0 && ratio < 1;
+  const consumptionArc = hasBoth ? C * ratio - GAP : C * ratio;
+  const profitArc = hasBoth ? C * (1 - ratio) - GAP : C * (1 - ratio);
 
   return (
     <svg viewBox="0 0 140 140" className="w-full h-full">
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f3f4f6" strokeWidth={sw} />
 
       <g transform={`rotate(-90 ${cx} ${cy})`}>
-        <circle
-          cx={cx}
-          cy={cy}
-          r={r}
-          fill="none"
-          stroke="#679436"
-          strokeWidth={sw}
-          strokeLinecap="butt"
-          strokeDasharray={`${consumptionArc} ${C}`}
-          strokeDashoffset={0}
-        />
+        {consumptionArc > 0 && (
+          <circle
+            cx={cx}
+            cy={cy}
+            r={r}
+            fill="none"
+            stroke="#679436"
+            strokeWidth={sw}
+            strokeLinecap="butt"
+            strokeDasharray={`${consumptionArc} ${C}`}
+            strokeDashoffset={0}
+          />
+        )}
         {profitArc > 0 && (
           <circle
             cx={cx}
@@ -49,7 +53,7 @@ const DonutChart = ({ consumptionRatio }: DonutChartProps) => {
             strokeWidth={sw}
             strokeLinecap="butt"
             strokeDasharray={`${profitArc} ${C}`}
-            strokeDashoffset={-(C * consumptionRatio)}
+            strokeDashoffset={hasBoth ? -(C * ratio) : 0}
           />
         )}
       </g>
@@ -60,7 +64,9 @@ const DonutChart = ({ consumptionRatio }: DonutChartProps) => {
 /* ── 메인 카드 ── */
 const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
   const latest = data[data.length - 1];
-  const profit = Math.max(0, latest.sales - latest.consumption);
+  const rawProfit = latest.sales - latest.consumption;
+  const isDeficit = rawProfit < 0;
+  const profit = Math.max(0, rawProfit);
   const consumptionRatio = latest.sales > 0 ? latest.consumption / latest.sales : 0;
   const profitRatio = latest.sales > 0 ? profit / latest.sales : 0;
 
@@ -80,7 +86,7 @@ const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
           <DonutChart consumptionRatio={consumptionRatio} />
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
             <p className="text-[10px] text-muted-foreground">{latest.month} 매출</p>
-            <p className="text-sm font-bold leading-none">{(latest.sales / 10000).toFixed(0)}만</p>
+            <p className="text-sm font-bold leading-none">{(latest.sales / 10000).toFixed(1)}만</p>
           </div>
         </div>
 
@@ -101,6 +107,11 @@ const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
             <div className="flex items-center gap-1.5 mb-0.5">
               <span className="size-2 rounded-full bg-baro-blue shrink-0" />
               <span className="text-xs text-muted-foreground">순이익</span>
+              {isDeficit && (
+                <span className="text-[10px] text-baro-red bg-red-50 border border-red-200/60 px-1.5 py-0.5 rounded-full leading-none">
+                  적자
+                </span>
+              )}
             </div>
             <p className="text-sm font-bold">{(profit / 10000).toFixed(0)}만원</p>
             <p className="text-xs text-muted-foreground mt-0.5">
