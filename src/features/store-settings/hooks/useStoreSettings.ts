@@ -23,8 +23,12 @@ export function useUpdateStoreSettings() {
 
   return useMutation({
     mutationFn: (data: Partial<StoreSettings>) => updateStoreSettings(storeId!, data),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['storeSettings', storeId] });
+      // safetyStockPct 변경 시 백엔드가 전체 식자재 안전재고를 일괄 업데이트하므로 함께 무효화
+      if (variables.safetyStockPct !== undefined) {
+        queryClient.invalidateQueries({ queryKey: ['ingredients', storeId] });
+      }
     },
   });
 }

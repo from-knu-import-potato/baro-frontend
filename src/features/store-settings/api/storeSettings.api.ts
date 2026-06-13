@@ -11,6 +11,7 @@ export async function fetchStoreSettings(storeId: string): Promise<StoreSettings
     businessType: d.businessType,
     category: d.category,
     memo: d.memo ?? '',
+    safetyStockPct: d.safetyStockPct ?? null,
   };
 }
 
