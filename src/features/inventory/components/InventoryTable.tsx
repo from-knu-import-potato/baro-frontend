@@ -17,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { routePaths } from '@/app/routes/routePaths';
 import type { InventoryItem, InventoryStatus } from '@/features/inventory/types/inventory.types';
 import type { IngredientDto } from '@/features/store-settings/api/ingredients.api';
-import { useIngredients } from '@/features/store-settings/hooks/useIngredients';
+import { useIngredients, useToggleFavorite } from '@/features/store-settings/hooks/useIngredients';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
 import { Input } from '@/shadcn/ui/input';
@@ -48,6 +48,7 @@ function toInventoryItem(dto: IngredientDto): InventoryItem {
     recipeCount: dto.relatedMenus?.length ?? 0,
     inboundDate: dto.lastInboundDate ? dto.lastInboundDate.slice(0, 10) : '',
     expiryDate: dto.nearestExpiryDate ?? undefined,
+    isFavorite: dto.isFavorite ?? false,
     status,
   };
 }
@@ -114,11 +115,10 @@ const GRID = 'grid-cols-[32px_2fr_1.2fr_1.2fr_1.2fr_1.5fr_1fr_100px]';
 /* ── 행 컴포넌트 ── */
 interface InventoryRowProps {
   item: InventoryItem;
-  isFavorite: boolean;
-  onToggleFavorite: (id: string) => void;
+  onToggleFavorite: (id: string, current: boolean) => void;
 }
 
-const InventoryRow = ({ item, isFavorite, onToggleFavorite }: InventoryRowProps) => {
+const InventoryRow = ({ item, onToggleFavorite }: InventoryRowProps) => {
   const config = STATUS_CONFIG[item.status];
   const dday = getDday(item.expiryDate);
 
@@ -132,14 +132,14 @@ const InventoryRow = ({ item, isFavorite, onToggleFavorite }: InventoryRowProps)
     >
       {/* 즐겨찾기 버튼 */}
       <button
-        onClick={() => onToggleFavorite(item.id)}
+        onClick={() => onToggleFavorite(item.id, item.isFavorite)}
         className="flex items-center justify-center"
-        aria-label={isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+        aria-label={item.isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
       >
         <Star
           className={cn(
             'w-4 h-4 transition-colors',
-            isFavorite
+            item.isFavorite
               ? 'fill-yellow-400 text-yellow-400'
               : 'text-muted-foreground/30 hover:text-yellow-400',
           )}
@@ -221,24 +221,16 @@ const InventoryRow = ({ item, isFavorite, onToggleFavorite }: InventoryRowProps)
 const InventoryTable = () => {
   const navigate = useNavigate();
   const { data: ingredientList = [], isLoading, isError } = useIngredients();
+  const toggleFavorite = useToggleFavorite();
   const items = ingredientList.map(toInventoryItem);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>('default');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
 
-  const handleToggleFavorite = (id: string) => {
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
+  const handleToggleFavorite = (id: string, current: boolean) => {
+    toggleFavorite.mutate({ id, isFavorite: !current });
   };
 
   const handleSortClick = (key: SortKey) => {
@@ -250,13 +242,15 @@ const InventoryTable = () => {
     }
   };
 
+  const favoriteCount = items.filter((i) => i.isFavorite).length;
+
   const countByStatus = (status: InventoryStatus) =>
     items.filter((i) => i.status === status).length;
 
   const filtered = items.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
     const matchesTab = activeTab === 'all' || item.status === activeTab;
-    const matchesFavorites = !showFavoritesOnly || favorites.has(item.id);
+    const matchesFavorites = !showFavoritesOnly || item.isFavorite;
     return matchesSearch && matchesTab && matchesFavorites;
   });
 
@@ -320,9 +314,9 @@ const InventoryTable = () => {
                 )}
               />
               즐겨찾기만
-              {showFavoritesOnly && favorites.size > 0 && (
+              {favoriteCount > 0 && (
                 <span className="ml-0.5 bg-yellow-400 text-white rounded-full w-4 h-4 inline-flex items-center justify-center text-[10px] font-bold">
-                  {favorites.size}
+                  {favoriteCount}
                 </span>
               )}
             </button>
@@ -446,12 +440,7 @@ const InventoryTable = () => {
         ) : sorted.length > 0 ? (
           <div className="divide-y flex-1 overflow-y-auto">
             {sorted.map((item) => (
-              <InventoryRow
-                key={item.id}
-                item={item}
-                isFavorite={favorites.has(item.id)}
-                onToggleFavorite={handleToggleFavorite}
-              />
+              <InventoryRow key={item.id} item={item} onToggleFavorite={handleToggleFavorite} />
             ))}
           </div>
         ) : (

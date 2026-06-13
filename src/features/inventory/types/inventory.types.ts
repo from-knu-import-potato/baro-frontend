@@ -12,4 +12,5 @@ export interface InventoryItem {
   inboundDate: string; // 'YYYY-MM-DD' 입고날짜
   expiryDate?: string; // 'YYYY-MM-DD' 유통기한
   status: InventoryStatus;
+  isFavorite: boolean;
 }

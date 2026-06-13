@@ -9,6 +9,7 @@ export interface IngredientDto {
   nearestExpiryDate: string | null;
   lastInboundDate: string | null;
   relatedMenus: string[];
+  isFavorite: boolean;
 }
 
 export async function fetchIngredients(storeId: string): Promise<IngredientDto[]> {
