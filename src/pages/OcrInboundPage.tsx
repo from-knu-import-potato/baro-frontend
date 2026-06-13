@@ -78,6 +78,7 @@ const OcrInboundPage = () => {
     const inboundItems = items.map((item) => ({
       ingredientId: (item.matchedInventoryId ?? item.newIngredientId)!,
       amount: item.quantity,
+      unitPrice: item.unitPrice ?? null,
     }));
 
     setIsConfirming(true);

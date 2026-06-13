@@ -23,7 +23,7 @@ export async function createIngredient(
 
 export async function confirmInbound(
   storeId: string,
-  items: { ingredientId: string; amount: number }[],
+  items: { ingredientId: string; amount: number; unitPrice?: number | null }[],
 ): Promise<void> {
   await axiosInstance.post(`/stores/${storeId}/ingredients/inbound`, { items });
 }
