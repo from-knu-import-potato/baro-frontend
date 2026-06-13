@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 
 import IngredientLinkModal from '@/features/ocr-inbound/components/IngredientLinkModal';
-import IngredientRegisterModal from '@/features/ocr-inbound/components/IngredientRegisterModal';
 import type {
   ExistingIngredient,
   OcrInboundItem,
@@ -23,6 +22,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/shadcn/ui/button';
 import { Input } from '@/shadcn/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/ui/select';
+import IngredientRegisterModal from '@/shared/components/IngredientRegisterModal';
 
 const UNITS: OcrUnit[] = ['g', 'ml', '개'];
 
