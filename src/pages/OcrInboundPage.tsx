@@ -12,6 +12,8 @@ import OcrReviewStep from '@/features/ocr-inbound/components/OcrReviewStep';
 import OcrUploadStep from '@/features/ocr-inbound/components/OcrUploadStep';
 import type { OcrInboundItem } from '@/features/ocr-inbound/types/ocrInbound.types';
 import { confirmInbound } from '@/features/store-settings/api/ingredients.api';
+import { updateStoreSettings } from '@/features/store-settings/api/storeSettings.api';
+import { useStoreSettings } from '@/features/store-settings/hooks/useStoreSettings';
 
 type Step = 'upload' | 'analyzing' | 'review';
 
@@ -20,6 +22,8 @@ const OcrInboundPage = () => {
   const location = useLocation();
   const storeId = useAuthStore((s) => s.storeId);
   const qc = useQueryClient();
+  const { data: storeSettings } = useStoreSettings();
+  const safetyStockPct = storeSettings?.safetyStockPct ?? 0;
 
   const locationState = location.state as { file?: File } | null;
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -84,7 +88,19 @@ const OcrInboundPage = () => {
     setIsConfirming(true);
     try {
       await confirmInbound(storeId, inboundItems);
+
+      // 입고 완료 후 PATCH /stores/:storeId { safetyStockPct } 한 번으로
+      // 백엔드가 전체 식자재 안전재고를 현재 재고 기준으로 일괄 재계산
+      if (safetyStockPct > 0) {
+        try {
+          await updateStoreSettings(storeId, { safetyStockPct });
+        } catch {
+          // 안전재고 갱신 실패는 입고 완료를 막지 않음
+        }
+      }
+
       qc.invalidateQueries({ queryKey: ['ingredients', storeId] });
+      qc.invalidateQueries({ queryKey: ['storeSettings', storeId] });
       toast.success('재고 등록이 완료되었습니다.');
       navigate(routePaths.storeSettings);
     } catch {

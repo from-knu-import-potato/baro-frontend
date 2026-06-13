@@ -1,47 +1,44 @@
 import { useState } from 'react';
 
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, ShieldCheck, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
 import {
   useIngredients,
-  useCreateIngredient,
   useDeleteIngredient,
 } from '@/features/store-settings/hooks/useIngredients';
+import {
+  useStoreSettings,
+  useUpdateStoreSettings,
+} from '@/features/store-settings/hooks/useStoreSettings';
 import { Button } from '@/shadcn/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
-import { Input } from '@/shadcn/ui/input';
-import { Label } from '@/shadcn/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/ui/select';
 import { Skeleton } from '@/shadcn/ui/skeleton';
-
-const UNITS = [
-  { value: 'g', label: 'g (그램)' },
-  { value: 'ml', label: 'ml (밀리리터)' },
-  { value: '개', label: '개' },
-] as const;
+import IngredientRegisterModal from '@/shared/components/IngredientRegisterModal';
+import SafetyStockDial from '@/shared/components/SafetyStockDial';
 
 const SettingsIngredientsPage = () => {
   const navigate = useNavigate();
   const { data: ingredients, isLoading } = useIngredients();
-  const { mutate: createIngredient, isPending: isCreating } = useCreateIngredient();
+  const { data: storeSettings } = useStoreSettings();
   const { mutate: deleteIngredient } = useDeleteIngredient();
+  const { mutate: updateStoreSettings, isPending: isSavingPct } = useUpdateStoreSettings();
 
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState<{ name: string; unit: 'g' | 'ml' | '개' }>({
-    name: '',
-    unit: 'g',
-  });
+  const [safetyPct, setSafetyPct] = useState(20);
+  const [addOpen, setAddOpen] = useState(false);
+  const [safetyOpen, setSafetyOpen] = useState(false);
 
-  const handleCreate = () => {
-    if (!form.name) return;
-    createIngredient(form, {
-      onSuccess: () => {
-        setOpen(false);
-        setForm({ name: '', unit: 'g' });
-      },
-    });
+  // 모달 열 때 서버 값으로 다이얼 초기화
+  const handleOpenSafety = () => {
+    setSafetyPct(storeSettings?.safetyStockPct ?? 20);
+    setSafetyOpen(true);
+  };
+
+  const handleApplySafety = () => {
+    // PATCH /stores/:storeId { safetyStockPct } 한 번으로 백엔드가 전체 식자재 일괄 업데이트
+    updateStoreSettings({ safetyStockPct: safetyPct });
+    setSafetyOpen(false);
   };
 
   return (
@@ -54,13 +51,18 @@ const SettingsIngredientsPage = () => {
           <p className="text-sm font-semibold">식자재 관리</p>
           <p className="text-xs text-muted-foreground">재고로 관리할 식자재를 등록합니다.</p>
         </div>
-        <Button
-          size="sm"
-          className="ml-auto bg-baro-blue hover:bg-baro-blue/80 text-white"
-          onClick={() => setOpen(true)}
-        >
-          <Plus className="size-4 mr-1" /> 식자재 추가
-        </Button>
+        <div className="ml-auto flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={handleOpenSafety}>
+            <ShieldCheck className="size-4 mr-1" /> 안전 재고 기준
+          </Button>
+          <Button
+            size="sm"
+            className="bg-baro-blue hover:bg-baro-blue/80 text-white"
+            onClick={() => setAddOpen(true)}
+          >
+            <Plus className="size-4 mr-1" /> 식자재 추가
+          </Button>
+        </div>
       </header>
 
       <div className="p-6 space-y-2">
@@ -83,11 +85,17 @@ const SettingsIngredientsPage = () => {
                 <p className="text-sm font-medium">{ing.name}</p>
                 <p className="text-xs text-muted-foreground">단위: {ing.unit}</p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-4">
                 <div className="text-right">
                   <p className="text-xs text-muted-foreground">현재 재고</p>
                   <p className="text-sm font-semibold">
                     {Number(ing.currentStock).toLocaleString()} {ing.unit}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-muted-foreground">안전 재고</p>
+                  <p className="text-sm font-semibold">
+                    {Number(ing.safetyStock).toLocaleString()} {ing.unit}
                   </p>
                 </div>
                 <Button
@@ -104,44 +112,31 @@ const SettingsIngredientsPage = () => {
         )}
       </div>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+      <IngredientRegisterModal open={addOpen} onClose={() => setAddOpen(false)} />
+
+      {/* ── 안전 재고 기준 다이얼로그 ── */}
+      <Dialog open={safetyOpen} onOpenChange={setSafetyOpen}>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>식자재 추가</DialogTitle>
+            <DialogTitle>안전 재고 기준 설정</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
-            <div className="space-y-1.5">
-              <Label>식자재명 *</Label>
-              <Input
-                placeholder="예: 원두"
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label>단위 *</Label>
-              <Select
-                value={form.unit}
-                onValueChange={(v) => setForm((f) => ({ ...f, unit: v as typeof form.unit }))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {UNITS.map((u) => (
-                    <SelectItem key={u.value} value={u.value}>
-                      {u.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              현재 재고의 몇 %를 안전 재고로 볼지 기준을 설정합니다.
+              <br />
+              <span className="text-xs">
+                OCR 입고 후에는 자동으로 반영됩니다. 지금 즉시 적용하려면 '전체 적용'을 눌러주세요.
+              </span>
+            </p>
+            <div className="flex justify-center">
+              <SafetyStockDial value={safetyPct} onChange={setSafetyPct} step={5} />
             </div>
             <Button
               className="w-full bg-baro-blue hover:bg-baro-blue/80 text-white"
-              onClick={handleCreate}
-              disabled={isCreating}
+              onClick={handleApplySafety}
+              disabled={isSavingPct}
             >
-              추가하기
+              전체 적용
             </Button>
           </div>
         </DialogContent>

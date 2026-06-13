@@ -70,4 +70,5 @@ export interface InitialSetupData {
   menuItems: MenuItem[];
   ingredients: Ingredient[];
   recipes: Recipe[];
+  safetyStockPct: number;
 }

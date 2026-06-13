@@ -22,7 +22,18 @@ export function useCreateIngredient() {
   const storeId = useAuthStore((s) => s.storeId);
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (data: Pick<IngredientDto, 'name' | 'unit'>) => createIngredient(storeId!, data),
+    mutationFn: (data: Pick<IngredientDto, 'name' | 'unit'> & { safetyStock?: number }) =>
+      createIngredient(storeId!, data),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['ingredients', storeId] }),
+  });
+}
+
+export function useUpdateIngredient() {
+  const storeId = useAuthStore((s) => s.storeId);
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<IngredientDto> }) =>
+      updateIngredient(storeId!, id, data),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['ingredients', storeId] }),
   });
 }
