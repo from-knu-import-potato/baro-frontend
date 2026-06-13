@@ -283,7 +283,7 @@ const InventoryTable = () => {
   }
 
   return (
-    <Card>
+    <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
       {/* 카드 헤더 */}
       <CardHeader className="border-b pb-0">
         <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
@@ -412,7 +412,7 @@ const InventoryTable = () => {
         </div>
       </CardHeader>
 
-      <CardContent className="p-0">
+      <CardContent className="p-0 flex-1 min-h-0 flex flex-col overflow-hidden">
         {/* 컬럼 헤더 */}
         <div
           className={`hidden md:grid ${GRID} gap-4 px-5 py-2.5 bg-muted/40 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide`}
@@ -429,7 +429,7 @@ const InventoryTable = () => {
 
         {/* 행 목록 */}
         {isLoading ? (
-          <div className="divide-y">
+          <div className="divide-y flex-1 overflow-y-auto">
             {Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className={`hidden md:grid ${GRID} gap-4 px-5 py-4 items-center`}>
                 <Skeleton className="w-4 h-4 rounded-full" />
@@ -444,7 +444,7 @@ const InventoryTable = () => {
             ))}
           </div>
         ) : sorted.length > 0 ? (
-          <div className="divide-y">
+          <div className="divide-y flex-1 overflow-y-auto">
             {sorted.map((item) => (
               <InventoryRow
                 key={item.id}
@@ -455,7 +455,7 @@ const InventoryTable = () => {
             ))}
           </div>
         ) : (
-          <div className="py-16 text-center text-sm text-muted-foreground">
+          <div className="flex-1 flex items-center justify-center py-16 text-center text-sm text-muted-foreground">
             {items.length === 0
               ? '등록된 재고가 없어요. OCR 입고처리로 재고를 등록해보세요.'
               : showFavoritesOnly && favorites.size === 0
