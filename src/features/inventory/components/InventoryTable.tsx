@@ -46,7 +46,7 @@ function toInventoryItem(dto: IngredientDto): InventoryItem {
     safetyStock: safety,
     safetyStockUnit: dto.unit,
     recipeCount: dto.relatedMenus?.length ?? 0,
-    inboundDate: dto.lastInboundDate ? dto.lastInboundDate.split('T')[0] : '',
+    inboundDate: dto.lastInboundDate ? dto.lastInboundDate.slice(0, 10) : '',
     expiryDate: dto.nearestExpiryDate ?? undefined,
     status,
   };
@@ -169,7 +169,11 @@ const InventoryRow = ({ item, isFavorite, onToggleFavorite }: InventoryRowProps)
 
       {/* 입고날짜 */}
       <div>
-        <span className="text-sm text-foreground">{item.inboundDate}</span>
+        {item.inboundDate ? (
+          <span className="text-sm text-foreground">{item.inboundDate}</span>
+        ) : (
+          <span className="text-sm text-muted-foreground/40">—</span>
+        )}
       </div>
 
       {/* 유통기한 */}
