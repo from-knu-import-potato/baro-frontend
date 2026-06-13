@@ -113,7 +113,14 @@ const OcrReviewStep = ({
   const handleAdd = () => {
     onItemsChange([
       ...items,
-      { id: `new-${Date.now()}`, name: '', quantity: 0, unit: 'g', isMatched: false },
+      {
+        id: `new-${Date.now()}`,
+        name: '',
+        quantity: 0,
+        unit: 'g',
+        unitPrice: null,
+        isMatched: false,
+      },
     ]);
   };
 
@@ -214,11 +221,12 @@ const OcrReviewStep = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-[24px_2fr_1.2fr_80px_1fr_36px] gap-3 px-4 py-2 bg-muted/40 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide shrink-0">
+        <div className="grid grid-cols-[24px_2fr_1.2fr_80px_1fr_1fr_36px] gap-3 px-4 py-2 bg-muted/40 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide shrink-0">
           <span />
           <span>식자재명</span>
           <span>수량</span>
           <span>단위</span>
+          <span>단가(원)</span>
           <span className="text-center">상태</span>
           <span />
         </div>
@@ -228,7 +236,7 @@ const OcrReviewStep = ({
             <div
               key={item.id}
               className={cn(
-                'grid grid-cols-[24px_2fr_1.2fr_80px_1fr_36px] gap-3 px-4 py-2.5 items-center border-b hover:bg-muted/10 transition-colors',
+                'grid grid-cols-[24px_2fr_1.2fr_80px_1fr_1fr_36px] gap-3 px-4 py-2.5 items-center border-b hover:bg-muted/10 transition-colors',
                 !item.isMatched && 'bg-green-50/20',
               )}
             >
@@ -268,6 +276,22 @@ const OcrReviewStep = ({
                   </SelectContent>
                 </Select>
               )}
+              <Input
+                type="number"
+                value={item.unitPrice ?? ''}
+                onChange={(e) =>
+                  onItemsChange(
+                    items.map((i) =>
+                      i.id === item.id
+                        ? { ...i, unitPrice: e.target.value === '' ? null : Number(e.target.value) }
+                        : i,
+                    ),
+                  )
+                }
+                className="h-8 text-sm"
+                min={0}
+                placeholder="미입력"
+              />
               <div className="flex items-center gap-1 justify-center flex-wrap">
                 {item.isMatched ? (
                   <span className="inline-flex items-center gap-1 text-xs text-baro-blue bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/60 whitespace-nowrap">

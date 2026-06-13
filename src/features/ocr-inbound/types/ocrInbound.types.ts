@@ -5,6 +5,7 @@ export interface OcrInboundItem {
   name: string;
   quantity: number;
   unit: OcrUnit;
+  unitPrice: number | null;
   isMatched: boolean;
   matchedInventoryId?: string;
   newIngredientId?: string;

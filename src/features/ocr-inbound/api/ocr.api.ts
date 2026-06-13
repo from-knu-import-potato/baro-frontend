@@ -17,6 +17,7 @@ export async function uploadOcrImage(storeId: string, file: File): Promise<OcrIn
     name: item.name,
     quantity: item.amount,
     unit: item.unit,
+    unitPrice: item.unitPrice ?? null,
     isMatched: false,
   }));
 }
