@@ -113,7 +113,14 @@ const OcrReviewStep = ({
   const handleAdd = () => {
     onItemsChange([
       ...items,
-      { id: `new-${Date.now()}`, name: '', quantity: 0, unit: 'g', unitPrice: null, isMatched: false },
+      {
+        id: `new-${Date.now()}`,
+        name: '',
+        quantity: 0,
+        unit: 'g',
+        unitPrice: null,
+        isMatched: false,
+      },
     ]);
   };
 
