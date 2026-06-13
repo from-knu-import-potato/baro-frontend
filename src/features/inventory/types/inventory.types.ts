@@ -3,7 +3,7 @@ export type InventoryStatus = 'normal' | 'warning' | 'critical' | 'depleted';
 export interface InventoryItem {
   id: string;
   name: string;
-  category: string;
+  category?: string;
   currentStock: number;
   unit: string;
   safetyStock: number;

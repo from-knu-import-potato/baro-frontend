@@ -15,11 +15,42 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
-import { useInventoryStore } from '@/features/inventory/store/inventoryStore';
 import type { InventoryItem, InventoryStatus } from '@/features/inventory/types/inventory.types';
+import type { IngredientDto } from '@/features/store-settings/api/ingredients.api';
+import { useIngredients } from '@/features/store-settings/hooks/useIngredients';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
 import { Input } from '@/shadcn/ui/input';
+import { Skeleton } from '@/shadcn/ui/skeleton';
+
+/* ── API → UI 매퍼 ── */
+function toInventoryItem(dto: IngredientDto): InventoryItem {
+  const current = Number(dto.currentStock);
+  const safety = Number(dto.safetyStock);
+
+  let status: InventoryStatus;
+  if (current <= 0) status = 'depleted';
+  else if (safety === 0) status = 'normal';
+  else {
+    const ratio = current / safety;
+    if (ratio < 0.5) status = 'critical';
+    else if (ratio < 1.0) status = 'warning';
+    else status = 'normal';
+  }
+
+  return {
+    id: dto.id,
+    name: dto.name,
+    currentStock: current,
+    unit: dto.unit,
+    safetyStock: safety,
+    safetyStockUnit: dto.unit,
+    recipeCount: dto.relatedMenus?.length ?? 0,
+    inboundDate: dto.lastInboundDate ? dto.lastInboundDate.split('T')[0] : '',
+    expiryDate: dto.nearestExpiryDate ?? undefined,
+    status,
+  };
+}
 
 /* ── 상태 설정 ── */
 const STATUS_CONFIG: Record<
@@ -185,7 +216,8 @@ const InventoryRow = ({ item, isFavorite, onToggleFavorite }: InventoryRowProps)
 /* ── 메인 컴포넌트 ── */
 const InventoryTable = () => {
   const navigate = useNavigate();
-  const items = useInventoryStore((s) => s.items);
+  const { data: ingredientList = [], isLoading, isError } = useIngredients();
+  const items = ingredientList.map(toInventoryItem);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
@@ -227,12 +259,24 @@ const InventoryTable = () => {
   const sorted = [...filtered].sort((a, b) => {
     if (sortKey === 'default') return 0;
 
-    const aVal = sortKey === 'expiryDate' ? (a.expiryDate ?? '9999-99-99') : a.inboundDate;
-    const bVal = sortKey === 'expiryDate' ? (b.expiryDate ?? '9999-99-99') : b.inboundDate;
+    const aVal =
+      sortKey === 'expiryDate' ? (a.expiryDate ?? '9999-99-99') : a.inboundDate || '0000-00-00';
+    const bVal =
+      sortKey === 'expiryDate' ? (b.expiryDate ?? '9999-99-99') : b.inboundDate || '0000-00-00';
 
     const cmp = aVal.localeCompare(bVal);
     return sortDir === 'asc' ? cmp : -cmp;
   });
+
+  if (isError) {
+    return (
+      <Card>
+        <CardContent className="py-16 text-center text-sm text-muted-foreground">
+          재고 목록을 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>
@@ -380,7 +424,22 @@ const InventoryTable = () => {
         </div>
 
         {/* 행 목록 */}
-        {sorted.length > 0 ? (
+        {isLoading ? (
+          <div className="divide-y">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className={`hidden md:grid ${GRID} gap-4 px-5 py-4 items-center`}>
+                <Skeleton className="w-4 h-4 rounded-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-12" />
+                <Skeleton className="h-6 w-16 rounded-full mx-auto" />
+              </div>
+            ))}
+          </div>
+        ) : sorted.length > 0 ? (
           <div className="divide-y">
             {sorted.map((item) => (
               <InventoryRow
@@ -393,9 +452,11 @@ const InventoryTable = () => {
           </div>
         ) : (
           <div className="py-16 text-center text-sm text-muted-foreground">
-            {showFavoritesOnly && favorites.size === 0
-              ? '즐겨찾기한 항목이 없어요.'
-              : '검색 결과가 없어요.'}
+            {items.length === 0
+              ? '등록된 재고가 없어요. OCR 입고처리로 재고를 등록해보세요.'
+              : showFavoritesOnly && favorites.size === 0
+                ? '즐겨찾기한 항목이 없어요.'
+                : '검색 결과가 없어요.'}
           </div>
         )}
       </CardContent>

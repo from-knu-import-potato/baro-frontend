@@ -6,6 +6,9 @@ export interface IngredientDto {
   unit: 'g' | 'ml' | '개';
   currentStock: string;
   safetyStock: string;
+  nearestExpiryDate: string | null;
+  lastInboundDate: string | null;
+  relatedMenus: string[];
 }
 
 export async function fetchIngredients(storeId: string): Promise<IngredientDto[]> {
