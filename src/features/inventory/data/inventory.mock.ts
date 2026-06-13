@@ -11,6 +11,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     safetyStockUnit: 'kg',
     recipeCount: 3,
     inboundDate: '2026-05-19',
+    isFavorite: false,
     status: 'critical',
   },
   {
@@ -23,6 +24,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     safetyStockUnit: 'kg',
     recipeCount: 2,
     inboundDate: '2026-05-18',
+    isFavorite: false,
     status: 'normal',
   },
   {
@@ -36,6 +38,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     recipeCount: 8,
     inboundDate: '2026-05-20',
     expiryDate: '2026-05-22',
+    isFavorite: false,
     status: 'critical',
   },
   {
@@ -49,6 +52,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     recipeCount: 4,
     inboundDate: '2026-05-18',
     expiryDate: '2026-05-28',
+    isFavorite: false,
     status: 'normal',
   },
   {
@@ -62,6 +66,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     recipeCount: 5,
     inboundDate: '2026-05-17',
     expiryDate: '2026-05-24',
+    isFavorite: false,
     status: 'critical',
   },
   {
@@ -75,6 +80,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     recipeCount: 3,
     inboundDate: '2026-05-15',
     expiryDate: '2026-05-24',
+    isFavorite: false,
     status: 'warning',
   },
   {
@@ -87,6 +93,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     safetyStockUnit: 'ml',
     recipeCount: 2,
     inboundDate: '2026-05-14',
+    isFavorite: false,
     status: 'normal',
   },
   {
@@ -99,6 +106,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     safetyStockUnit: 'ml',
     recipeCount: 1,
     inboundDate: '2026-05-12',
+    isFavorite: false,
     status: 'normal',
   },
   {
@@ -111,6 +119,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     safetyStockUnit: 'g',
     recipeCount: 2,
     inboundDate: '2026-05-16',
+    isFavorite: false,
     status: 'normal',
   },
   {
@@ -123,6 +132,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     safetyStockUnit: 'g',
     recipeCount: 2,
     inboundDate: '2026-05-15',
+    isFavorite: false,
     status: 'normal',
   },
   {
@@ -136,6 +146,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     recipeCount: 2,
     inboundDate: '2026-05-10',
     expiryDate: '2026-06-10',
+    isFavorite: false,
     status: 'normal',
   },
   {
@@ -149,6 +160,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     recipeCount: 1,
     inboundDate: '2026-05-08',
     expiryDate: '2026-06-20',
+    isFavorite: false,
     status: 'normal',
   },
   {
@@ -161,6 +173,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     safetyStockUnit: 'kg',
     recipeCount: 6,
     inboundDate: '2026-05-18',
+    isFavorite: false,
     status: 'warning',
   },
   {
@@ -174,6 +187,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     recipeCount: 3,
     inboundDate: '2026-05-13',
     expiryDate: '2026-06-01',
+    isFavorite: false,
     status: 'normal',
   },
   {
@@ -186,6 +200,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     safetyStockUnit: '개',
     recipeCount: 0,
     inboundDate: '2026-05-10',
+    isFavorite: false,
     status: 'normal',
   },
   {
@@ -198,6 +213,7 @@ export const MOCK_INVENTORY_ITEMS: InventoryItem[] = [
     safetyStockUnit: '개',
     recipeCount: 0,
     inboundDate: '2026-05-19',
+    isFavorite: false,
     status: 'warning',
   },
 ];

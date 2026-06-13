@@ -15,11 +15,43 @@ import {
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
-import { useInventoryStore } from '@/features/inventory/store/inventoryStore';
 import type { InventoryItem, InventoryStatus } from '@/features/inventory/types/inventory.types';
+import type { IngredientDto } from '@/features/store-settings/api/ingredients.api';
+import { useIngredients, useToggleFavorite } from '@/features/store-settings/hooks/useIngredients';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
 import { Input } from '@/shadcn/ui/input';
+import { Skeleton } from '@/shadcn/ui/skeleton';
+
+/* ── API → UI 매퍼 ── */
+function toInventoryItem(dto: IngredientDto): InventoryItem {
+  const current = Number(dto.currentStock);
+  const safety = Number(dto.safetyStock);
+
+  let status: InventoryStatus;
+  if (current <= 0) status = 'depleted';
+  else if (safety === 0) status = 'normal';
+  else {
+    const ratio = current / safety;
+    if (ratio < 0.5) status = 'critical';
+    else if (ratio < 1.0) status = 'warning';
+    else status = 'normal';
+  }
+
+  return {
+    id: dto.id,
+    name: dto.name,
+    currentStock: current,
+    unit: dto.unit,
+    safetyStock: safety,
+    safetyStockUnit: dto.unit,
+    recipeCount: dto.relatedMenus?.length ?? 0,
+    inboundDate: dto.lastInboundDate ? dto.lastInboundDate.slice(0, 10) : '',
+    expiryDate: dto.nearestExpiryDate ?? undefined,
+    isFavorite: dto.isFavorite ?? false,
+    status,
+  };
+}
 
 /* ── 상태 설정 ── */
 const STATUS_CONFIG: Record<
@@ -83,11 +115,10 @@ const GRID = 'grid-cols-[32px_2fr_1.2fr_1.2fr_1.2fr_1.5fr_1fr_100px]';
 /* ── 행 컴포넌트 ── */
 interface InventoryRowProps {
   item: InventoryItem;
-  isFavorite: boolean;
-  onToggleFavorite: (id: string) => void;
+  onToggleFavorite: (id: string, current: boolean) => void;
 }
 
-const InventoryRow = ({ item, isFavorite, onToggleFavorite }: InventoryRowProps) => {
+const InventoryRow = ({ item, onToggleFavorite }: InventoryRowProps) => {
   const config = STATUS_CONFIG[item.status];
   const dday = getDday(item.expiryDate);
 
@@ -101,14 +132,14 @@ const InventoryRow = ({ item, isFavorite, onToggleFavorite }: InventoryRowProps)
     >
       {/* 즐겨찾기 버튼 */}
       <button
-        onClick={() => onToggleFavorite(item.id)}
+        onClick={() => onToggleFavorite(item.id, item.isFavorite)}
         className="flex items-center justify-center"
-        aria-label={isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+        aria-label={item.isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
       >
         <Star
           className={cn(
             'w-4 h-4 transition-colors',
-            isFavorite
+            item.isFavorite
               ? 'fill-yellow-400 text-yellow-400'
               : 'text-muted-foreground/30 hover:text-yellow-400',
           )}
@@ -138,7 +169,11 @@ const InventoryRow = ({ item, isFavorite, onToggleFavorite }: InventoryRowProps)
 
       {/* 입고날짜 */}
       <div>
-        <span className="text-sm text-foreground">{item.inboundDate}</span>
+        {item.inboundDate ? (
+          <span className="text-sm text-foreground">{item.inboundDate}</span>
+        ) : (
+          <span className="text-sm text-muted-foreground/40">—</span>
+        )}
       </div>
 
       {/* 유통기한 */}
@@ -185,24 +220,17 @@ const InventoryRow = ({ item, isFavorite, onToggleFavorite }: InventoryRowProps)
 /* ── 메인 컴포넌트 ── */
 const InventoryTable = () => {
   const navigate = useNavigate();
-  const items = useInventoryStore((s) => s.items);
+  const { data: ingredientList = [], isLoading, isError } = useIngredients();
+  const toggleFavorite = useToggleFavorite();
+  const items = ingredientList.map(toInventoryItem);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
-  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>('default');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
 
-  const handleToggleFavorite = (id: string) => {
-    setFavorites((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
+  const handleToggleFavorite = (id: string, current: boolean) => {
+    toggleFavorite.mutate({ id, isFavorite: !current });
   };
 
   const handleSortClick = (key: SortKey) => {
@@ -214,28 +242,42 @@ const InventoryTable = () => {
     }
   };
 
+  const favoriteCount = items.filter((i) => i.isFavorite).length;
+
   const countByStatus = (status: InventoryStatus) =>
     items.filter((i) => i.status === status).length;
 
   const filtered = items.filter((item) => {
     const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
     const matchesTab = activeTab === 'all' || item.status === activeTab;
-    const matchesFavorites = !showFavoritesOnly || favorites.has(item.id);
+    const matchesFavorites = !showFavoritesOnly || item.isFavorite;
     return matchesSearch && matchesTab && matchesFavorites;
   });
 
   const sorted = [...filtered].sort((a, b) => {
     if (sortKey === 'default') return 0;
 
-    const aVal = sortKey === 'expiryDate' ? (a.expiryDate ?? '9999-99-99') : a.inboundDate;
-    const bVal = sortKey === 'expiryDate' ? (b.expiryDate ?? '9999-99-99') : b.inboundDate;
+    const aVal =
+      sortKey === 'expiryDate' ? (a.expiryDate ?? '9999-99-99') : a.inboundDate || '0000-00-00';
+    const bVal =
+      sortKey === 'expiryDate' ? (b.expiryDate ?? '9999-99-99') : b.inboundDate || '0000-00-00';
 
     const cmp = aVal.localeCompare(bVal);
     return sortDir === 'asc' ? cmp : -cmp;
   });
 
+  if (isError) {
+    return (
+      <Card>
+        <CardContent className="py-16 text-center text-sm text-muted-foreground">
+          재고 목록을 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card>
+    <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
       {/* 카드 헤더 */}
       <CardHeader className="border-b pb-0">
         <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
@@ -272,9 +314,9 @@ const InventoryTable = () => {
                 )}
               />
               즐겨찾기만
-              {showFavoritesOnly && favorites.size > 0 && (
+              {favoriteCount > 0 && (
                 <span className="ml-0.5 bg-yellow-400 text-white rounded-full w-4 h-4 inline-flex items-center justify-center text-[10px] font-bold">
-                  {favorites.size}
+                  {favoriteCount}
                 </span>
               )}
             </button>
@@ -364,7 +406,7 @@ const InventoryTable = () => {
         </div>
       </CardHeader>
 
-      <CardContent className="p-0">
+      <CardContent className="p-0 flex-1 min-h-0 flex flex-col overflow-hidden">
         {/* 컬럼 헤더 */}
         <div
           className={`hidden md:grid ${GRID} gap-4 px-5 py-2.5 bg-muted/40 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide`}
@@ -380,22 +422,34 @@ const InventoryTable = () => {
         </div>
 
         {/* 행 목록 */}
-        {sorted.length > 0 ? (
-          <div className="divide-y">
+        {isLoading ? (
+          <div className="divide-y flex-1 overflow-y-auto">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className={`hidden md:grid ${GRID} gap-4 px-5 py-4 items-center`}>
+                <Skeleton className="w-4 h-4 rounded-full" />
+                <Skeleton className="h-4 w-3/4" />
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-4 w-12" />
+                <Skeleton className="h-6 w-16 rounded-full mx-auto" />
+              </div>
+            ))}
+          </div>
+        ) : sorted.length > 0 ? (
+          <div className="divide-y flex-1 overflow-y-auto">
             {sorted.map((item) => (
-              <InventoryRow
-                key={item.id}
-                item={item}
-                isFavorite={favorites.has(item.id)}
-                onToggleFavorite={handleToggleFavorite}
-              />
+              <InventoryRow key={item.id} item={item} onToggleFavorite={handleToggleFavorite} />
             ))}
           </div>
         ) : (
-          <div className="py-16 text-center text-sm text-muted-foreground">
-            {showFavoritesOnly && favorites.size === 0
-              ? '즐겨찾기한 항목이 없어요.'
-              : '검색 결과가 없어요.'}
+          <div className="flex-1 flex items-center justify-center py-16 text-center text-sm text-muted-foreground">
+            {items.length === 0
+              ? '등록된 재고가 없어요. OCR 입고처리로 재고를 등록해보세요.'
+              : showFavoritesOnly && favoriteCount === 0
+                ? '즐겨찾기한 항목이 없어요.'
+                : '검색 결과가 없어요.'}
           </div>
         )}
       </CardContent>

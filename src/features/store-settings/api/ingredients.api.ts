@@ -6,6 +6,10 @@ export interface IngredientDto {
   unit: 'g' | 'ml' | '개';
   currentStock: string;
   safetyStock: string;
+  nearestExpiryDate: string | null;
+  lastInboundDate: string | null;
+  relatedMenus: string[];
+  isFavorite: boolean;
 }
 
 export async function fetchIngredients(storeId: string): Promise<IngredientDto[]> {
@@ -15,7 +19,7 @@ export async function fetchIngredients(storeId: string): Promise<IngredientDto[]
 
 export async function createIngredient(
   storeId: string,
-  data: Omit<IngredientDto, 'id' | 'currentStock' | 'safetyStock'> & { safetyStock?: number },
+  data: { name: string; unit: 'g' | 'ml' | '개'; safetyStock?: number },
 ): Promise<IngredientDto> {
   const res = await axiosInstance.post(`/stores/${storeId}/ingredients`, data);
   return res.data.data;
