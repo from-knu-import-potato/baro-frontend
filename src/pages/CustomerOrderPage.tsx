@@ -163,17 +163,18 @@ interface OrderSuccessProps {
   orderId: string;
   totalAmount: number;
   items: CartItem[];
+  themeHex: string;
   onReorder: () => void;
 }
 
-const OrderSuccess = ({ orderId, totalAmount, items, onReorder }: OrderSuccessProps) => {
+const OrderSuccess = ({ orderId, totalAmount, items, themeHex, onReorder }: OrderSuccessProps) => {
   const [expanded, setExpanded] = useState(false);
   const hasMore = items.length > PREVIEW_COUNT;
   const visibleItems = expanded ? items : items.slice(0, PREVIEW_COUNT);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-6 gap-4">
-      <div className="size-14 rounded-full bg-baro-blue flex items-center justify-center">
+      <div className="size-14 rounded-full flex items-center justify-center" style={{ backgroundColor: themeHex }}>
         <CheckCircle className="size-7 text-white" strokeWidth={2.5} />
       </div>
       <div className="text-center">
@@ -209,12 +210,13 @@ const OrderSuccess = ({ orderId, totalAmount, items, onReorder }: OrderSuccessPr
           </div>
           <div className="border-t pt-3 flex justify-between items-center text-sm">
             <span className="text-gray-500 font-medium">합계</span>
-            <span className="font-bold text-baro-blue">{totalAmount.toLocaleString()}원</span>
+            <span className="font-bold" style={{ color: themeHex }}>{totalAmount.toLocaleString()}원</span>
           </div>
         </CardContent>
       </Card>
       <Button
-        className="w-full max-w-xs bg-baro-blue text-white hover:bg-baro-blue/90 rounded-xl h-11 text-sm font-semibold"
+        className="w-full max-w-xs text-white rounded-xl h-11 text-sm font-semibold"
+        style={{ backgroundColor: themeHex }}
         onClick={onReorder}
       >
         다시 주문하기
@@ -325,6 +327,7 @@ const CustomerOrderPage = () => {
         orderId={successInfo.orderId}
         totalAmount={successInfo.totalAmount}
         items={successInfo.items}
+        themeHex={themeHex}
         onReorder={() => setSuccessInfo(null)}
       />
     );
