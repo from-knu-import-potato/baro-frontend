@@ -1,4 +1,8 @@
-import type { ApiMenu } from '@/features/customer-order/types/customerOrder.api.types';
+import type {
+  ApiMenu,
+  ApiMenuCategory,
+  ApiStoreTheme,
+} from '@/features/customer-order/types/customerOrder.api.types';
 import publicAxiosInstance from '@/shared/api/publicAxiosInstance';
 
 // ⚠️ GET /stores/:storeId/menus 는 현재 백엔드에서 인증 필수.
@@ -6,4 +10,14 @@ import publicAxiosInstance from '@/shared/api/publicAxiosInstance';
 export const fetchStoreMenus = (storeId: string): Promise<ApiMenu[]> =>
   publicAxiosInstance
     .get<{ success: boolean; data: ApiMenu[] }>(`/stores/${storeId}/menus`)
+    .then((res) => res.data.data);
+
+export const fetchStoreMenuCategories = (storeId: string): Promise<ApiMenuCategory[]> =>
+  publicAxiosInstance
+    .get<{ success: boolean; data: ApiMenuCategory[] }>(`/stores/${storeId}/menu-categories`)
+    .then((res) => res.data.data);
+
+export const fetchStoreTheme = (storeId: string): Promise<ApiStoreTheme> =>
+  publicAxiosInstance
+    .get<{ success: boolean; data: ApiStoreTheme }>(`/stores/${storeId}/theme`)
     .then((res) => res.data.data);

@@ -7,6 +7,7 @@ export interface MenuDto {
   description: string | null;
   imageUrl: string | null;
   isAvailable: boolean;
+  categoryId: string | null;
 }
 
 export async function fetchMenus(storeId: string): Promise<MenuDto[]> {

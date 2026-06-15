@@ -1,7 +1,9 @@
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import {
   ArrowLeft,
+  ChevronDown,
+  ChevronUp,
   ImageOff,
   ImagePlus,
   Loader2,
@@ -15,11 +17,19 @@ import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
 import useAuthStore from '@/features/auth/store/authStore';
+import type { MenuCategoryDto } from '@/features/store-settings/api/menuCategories.api';
 import type { MenuDto } from '@/features/store-settings/api/menus.api';
 import { uploadMenuImage } from '@/features/store-settings/api/menus.api';
 import MenuOcrModal, {
   type OcrMenuConfirmItem,
 } from '@/features/store-settings/components/MenuOcrModal';
+import {
+  useMenuCategories,
+  useCreateMenuCategory,
+  useUpdateMenuCategory,
+  useDeleteMenuCategory,
+  useReorderMenuCategories,
+} from '@/features/store-settings/hooks/useMenuCategories';
 import {
   useMenus,
   useCreateMenu,
@@ -30,6 +40,7 @@ import { Button } from '@/shadcn/ui/button';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@/shadcn/ui/select';
 import { Skeleton } from '@/shadcn/ui/skeleton';
 
 /* ── 모달 폼 타입 ── */
@@ -38,14 +49,22 @@ type MenuForm = {
   description: string;
   price: string;
   imageUrl: string | null;
+  categoryId: string;
 };
 
-const EMPTY_FORM: MenuForm = { name: '', description: '', price: '', imageUrl: null };
+const EMPTY_FORM: MenuForm = {
+  name: '',
+  description: '',
+  price: '',
+  imageUrl: null,
+  categoryId: '',
+};
 
 /* ── 메뉴 등록/수정 모달 ── */
 const MenuModal = ({
   open,
   editing,
+  categories,
   existingNames = [],
   isSaving,
   onClose,
@@ -53,6 +72,7 @@ const MenuModal = ({
 }: {
   open: boolean;
   editing: MenuDto | null;
+  categories: MenuCategoryDto[];
   existingNames?: string[];
   isSaving: boolean;
   onClose: () => void;
@@ -66,6 +86,7 @@ const MenuModal = ({
           description: editing.description ?? '',
           price: String(editing.price),
           imageUrl: editing.imageUrl,
+          categoryId: editing.categoryId ?? '',
         }
       : EMPTY_FORM,
   );
@@ -111,6 +132,7 @@ const MenuModal = ({
       description: form.description.trim() || null,
       price: Number(form.price),
       imageUrl: form.imageUrl,
+      categoryId: form.categoryId || null,
     });
   };
 
@@ -159,6 +181,35 @@ const MenuModal = ({
               onChange={handleImageChange}
             />
           </div>
+
+          {/* 카테고리 */}
+          {categories.length > 0 && (
+            <div className="space-y-1.5">
+              <Label htmlFor="menu-category">카테고리</Label>
+              <Select
+                value={form.categoryId}
+                onValueChange={(val) => setForm((p) => ({ ...p, categoryId: val ?? '' }))}
+              >
+                <SelectTrigger id="menu-category" className="h-10 w-full">
+                  {form.categoryId ? (
+                    <span className="text-sm">
+                      {categories.find((c) => c.id === form.categoryId)?.name ?? '미분류'}
+                    </span>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">카테고리 선택 (선택)</span>
+                  )}
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">미분류</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* 메뉴 이름 */}
           <div className="space-y-1.5">
@@ -241,7 +292,6 @@ const MenuCard = ({
   onDelete: () => void;
 }) => (
   <div className="group overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-md">
-    {/* 사진 영역 */}
     <div className="relative h-28 bg-gray-100 dark:bg-gray-800">
       {menu.imageUrl ? (
         <img src={menu.imageUrl} alt={menu.name} className="h-full w-full object-cover" />
@@ -250,8 +300,6 @@ const MenuCard = ({
           <ImageOff className="size-8 text-gray-300" />
         </div>
       )}
-
-      {/* 액션 버튼 (호버 시) */}
       <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
         <button
           type="button"
@@ -269,8 +317,6 @@ const MenuCard = ({
         </button>
       </div>
     </div>
-
-    {/* 정보 영역 */}
     <div className="px-3 py-2.5">
       <p className="truncate text-sm font-semibold">{menu.name}</p>
       {menu.description && (
@@ -283,11 +329,246 @@ const MenuCard = ({
   </div>
 );
 
+/* ── 카테고리 관리 섹션 ── */
+const CategorySection = () => {
+  const { data: categories = [], isLoading } = useMenuCategories();
+  const { mutate: createCategory, isPending: isCreating } = useCreateMenuCategory();
+  const { mutate: updateCategory } = useUpdateMenuCategory();
+  const { mutate: deleteCategory } = useDeleteMenuCategory();
+  const { mutate: reorder } = useReorderMenuCategories();
+
+  const [isAdding, setIsAdding] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+
+  const handleAdd = () => {
+    if (!newName.trim()) return;
+    createCategory(newName.trim(), {
+      onSuccess: () => {
+        setNewName('');
+        setIsAdding(false);
+      },
+    });
+  };
+
+  const handleEditSave = (categoryId: string) => {
+    if (!editName.trim()) return;
+    updateCategory({ categoryId, name: editName.trim() }, { onSuccess: () => setEditingId(null) });
+  };
+
+  const handleMove = (index: number, direction: 'up' | 'down') => {
+    const ids = categories.map((c) => c.id);
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    const [removed] = ids.splice(index, 1);
+    ids.splice(newIndex, 0, removed);
+    reorder(ids);
+  };
+
+  return (
+    <div className="mb-6 rounded-xl border bg-card p-4">
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <p className="text-sm font-semibold">카테고리 관리</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            메뉴를 그룹으로 묶어 메뉴판을 구성합니다.
+          </p>
+        </div>
+        {!isAdding && (
+          <Button size="sm" variant="outline" onClick={() => setIsAdding(true)}>
+            <Plus className="size-3.5 mr-1" /> 카테고리 추가
+          </Button>
+        )}
+      </div>
+
+      {isLoading ? (
+        <div className="space-y-2">
+          {[1, 2].map((i) => (
+            <Skeleton key={i} className="h-10 rounded-lg" />
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-1.5">
+          {categories.length === 0 && !isAdding && (
+            <div className="rounded-lg border-2 border-dashed border-gray-200 py-6 text-center">
+              <p className="text-xs text-muted-foreground">
+                카테고리를 추가하면 메뉴판을 섹션별로 구성할 수 있어요
+              </p>
+            </div>
+          )}
+
+          {categories.map((cat, index) =>
+            editingId === cat.id ? (
+              <div key={cat.id} className="flex items-center gap-2 rounded-lg bg-baro-blue/5 p-2">
+                <Input
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="h-8 text-sm"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleEditSave(cat.id);
+                    if (e.key === 'Escape') setEditingId(null);
+                  }}
+                />
+                <Button
+                  size="sm"
+                  onClick={() => handleEditSave(cat.id)}
+                  className="h-8 shrink-0 bg-baro-blue text-white hover:bg-baro-blue/80"
+                >
+                  저장
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setEditingId(null)}
+                  className="h-8 shrink-0"
+                >
+                  취소
+                </Button>
+              </div>
+            ) : (
+              <div key={cat.id} className="flex items-center gap-2 rounded-lg p-2 hover:bg-gray-50">
+                <div className="flex flex-col">
+                  <button
+                    disabled={index === 0}
+                    onClick={() => handleMove(index, 'up')}
+                    className="flex size-4 items-center justify-center text-gray-400 transition-colors hover:text-gray-600 disabled:opacity-20"
+                  >
+                    <ChevronUp className="size-3" />
+                  </button>
+                  <button
+                    disabled={index === categories.length - 1}
+                    onClick={() => handleMove(index, 'down')}
+                    className="flex size-4 items-center justify-center text-gray-400 transition-colors hover:text-gray-600 disabled:opacity-20"
+                  >
+                    <ChevronDown className="size-3" />
+                  </button>
+                </div>
+                <p className="flex-1 text-sm">{cat.name}</p>
+                <button
+                  onClick={() => {
+                    setEditingId(cat.id);
+                    setEditName(cat.name);
+                  }}
+                  className="flex size-6 items-center justify-center text-gray-400 transition-colors hover:text-baro-blue"
+                >
+                  <Pencil className="size-3" />
+                </button>
+                <button
+                  onClick={() => deleteCategory(cat.id)}
+                  className="flex size-6 items-center justify-center text-gray-400 transition-colors hover:text-red-500"
+                >
+                  <Trash2 className="size-3" />
+                </button>
+              </div>
+            ),
+          )}
+
+          {isAdding && (
+            <div className="flex items-center gap-2 rounded-lg bg-baro-blue/5 p-2">
+              <Input
+                placeholder="새 카테고리 이름"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className="h-8 text-sm"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAdd();
+                  if (e.key === 'Escape') {
+                    setIsAdding(false);
+                    setNewName('');
+                  }
+                }}
+              />
+              <Button
+                size="sm"
+                onClick={handleAdd}
+                disabled={isCreating}
+                className="h-8 shrink-0 bg-baro-blue text-white hover:bg-baro-blue/80"
+              >
+                추가
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => {
+                  setIsAdding(false);
+                  setNewName('');
+                }}
+                className="h-8 shrink-0"
+              >
+                취소
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ── 메뉴 그리드 (카테고리별 그룹화) ── */
+const MenuGrid = ({
+  menus,
+  categories,
+  onEdit,
+  onDelete,
+}: {
+  menus: MenuDto[];
+  categories: MenuCategoryDto[];
+  onEdit: (menu: MenuDto) => void;
+  onDelete: (menuId: string) => void;
+}) => {
+  const grouped = useMemo(() => {
+    const result: { category: MenuCategoryDto | null; items: MenuDto[] }[] = [];
+
+    if (categories.length === 0) {
+      return [{ category: null, items: menus }];
+    }
+
+    for (const cat of categories) {
+      const items = menus.filter((m) => m.categoryId === cat.id);
+      if (items.length > 0) result.push({ category: cat, items });
+    }
+
+    const uncategorized = menus.filter(
+      (m) => !m.categoryId || !categories.find((c) => c.id === m.categoryId),
+    );
+    if (uncategorized.length > 0) result.push({ category: null, items: uncategorized });
+
+    return result;
+  }, [menus, categories]);
+
+  return (
+    <div className="space-y-6">
+      {grouped.map(({ category, items }) => (
+        <div key={category?.id ?? 'uncategorized'}>
+          {category && <p className="mb-3 text-sm font-semibold text-gray-700">{category.name}</p>}
+          {!category && categories.length > 0 && (
+            <p className="mb-3 text-sm font-semibold text-gray-400">미분류</p>
+          )}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((menu) => (
+              <MenuCard
+                key={menu.id}
+                menu={menu}
+                onEdit={() => onEdit(menu)}
+                onDelete={() => onDelete(menu.id)}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 /* ── 메인 페이지 ── */
 const SettingsMenusPage = () => {
   const navigate = useNavigate();
   const storeId = useAuthStore((s) => s.storeId);
   const { data: menus, isLoading } = useMenus();
+  const { data: categories = [] } = useMenuCategories();
   const {
     mutate: createMenu,
     mutateAsync: createMenuAsync,
@@ -339,13 +620,14 @@ const SettingsMenusPage = () => {
         price: item.price,
         description: item.description,
         imageUrl,
+        categoryId: null,
       });
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="flex items-center gap-3 border-b px-6 py-4">
+    <div className="flex flex-1 flex-col overflow-hidden bg-background">
+      <header className="shrink-0 flex items-center gap-3 border-b px-6 py-4 bg-background">
         <Button variant="ghost" size="icon" onClick={() => navigate(routePaths.storeSettings)}>
           <ArrowLeft className="size-4" />
         </Button>
@@ -367,7 +649,9 @@ const SettingsMenusPage = () => {
         </div>
       </header>
 
-      <div className="p-6">
+      <div className="flex-1 overflow-y-auto p-6">
+        <CategorySection />
+
         {isLoading ? (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }).map((_, i) => (
@@ -404,16 +688,12 @@ const SettingsMenusPage = () => {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {menus.map((menu) => (
-              <MenuCard
-                key={menu.id}
-                menu={menu}
-                onEdit={() => handleOpenEdit(menu)}
-                onDelete={() => deleteMenu(menu.id)}
-              />
-            ))}
-          </div>
+          <MenuGrid
+            menus={menus}
+            categories={categories}
+            onEdit={handleOpenEdit}
+            onDelete={(id) => deleteMenu(id)}
+          />
         )}
       </div>
 
@@ -421,6 +701,7 @@ const SettingsMenusPage = () => {
         key={modalKey}
         open={open}
         editing={editing}
+        categories={categories}
         existingNames={(menus ?? []).map((m) => m.name)}
         isSaving={isCreating || isUpdating}
         onClose={handleClose}

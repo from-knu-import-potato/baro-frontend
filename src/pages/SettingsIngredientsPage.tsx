@@ -42,8 +42,8 @@ const SettingsIngredientsPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="flex items-center gap-3 border-b px-6 py-4">
+    <div className="flex flex-1 flex-col overflow-hidden bg-background">
+      <header className="shrink-0 flex items-center gap-3 border-b px-6 py-4 bg-background">
         <Button variant="ghost" size="icon" onClick={() => navigate(routePaths.storeSettings)}>
           <ArrowLeft className="size-4" />
         </Button>
@@ -65,7 +65,7 @@ const SettingsIngredientsPage = () => {
         </div>
       </header>
 
-      <div className="p-6 space-y-2">
+      <div className="flex-1 overflow-y-auto p-6 space-y-2">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-14 w-full rounded-xl" />

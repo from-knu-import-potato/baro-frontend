@@ -1,13 +1,22 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { AlertCircle, CheckCircle, Loader2, Minus, Plus, ShoppingCart } from 'lucide-react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import { fetchStoreMenus } from '@/features/customer-order/api/menu.api';
+import {
+  fetchStoreMenuCategories,
+  fetchStoreMenus,
+  fetchStoreTheme,
+} from '@/features/customer-order/api/menu.api';
 import { createOrder } from '@/features/customer-order/api/order.api';
-import type { ApiMenu } from '@/features/customer-order/types/customerOrder.api.types';
+import type {
+  ApiMenu,
+  ApiStoreTheme,
+} from '@/features/customer-order/types/customerOrder.api.types';
 import type { CartItem } from '@/features/customer-order/types/customerOrder.types';
+import { THEME_HEX } from '@/features/store-settings/api/storeTheme.api';
+import { cn } from '@/lib/utils';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent } from '@/shadcn/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
@@ -15,24 +24,32 @@ import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
 import { Skeleton } from '@/shadcn/ui/skeleton';
 
-type CategoryTab = 'all' | 'available';
+const DEFAULT_THEME: ApiStoreTheme = {
+  themeColor: 'blue',
+  layout: 'list',
+  bannerImageUrl: null,
+  bannerPosition: '50% 50%',
+};
 
-/* ── 메뉴 아이템 카드 ── */
+/* ── 메뉴 아이템 카드 (리스트) ── */
 interface MenuItemCardProps {
   item: ApiMenu;
   quantity: number;
+  themeHex: string;
   onUpdate: (id: string, delta: number) => void;
 }
 
-const MenuItemCard = ({ item, quantity, onUpdate }: MenuItemCardProps) => (
+const MenuItemListCard = ({ item, quantity, themeHex, onUpdate }: MenuItemCardProps) => (
   <div
-    className={`flex items-center gap-3 bg-white rounded-xl px-4 py-3 transition-all ${
+    className={cn(
+      'flex items-center gap-3 bg-white rounded-xl px-4 py-3 transition-all',
       !item.isAvailable
         ? 'opacity-50'
         : quantity > 0
-          ? 'ring-2 ring-baro-blue/25'
-          : 'border border-gray-100'
-    }`}
+          ? 'ring-2 ring-offset-0'
+          : 'border border-gray-100',
+    )}
+    style={quantity > 0 ? ({ '--tw-ring-color': `${themeHex}40` } as React.CSSProperties) : {}}
   >
     {item.imageUrl ? (
       <img
@@ -45,7 +62,6 @@ const MenuItemCard = ({ item, quantity, onUpdate }: MenuItemCardProps) => (
         ☕
       </div>
     )}
-
     <div className="flex-1 min-w-0">
       <div className="flex items-center gap-1.5">
         <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
@@ -60,9 +76,57 @@ const MenuItemCard = ({ item, quantity, onUpdate }: MenuItemCardProps) => (
       )}
       <p className="text-sm font-bold text-gray-900 mt-1.5">{item.price.toLocaleString()}원</p>
     </div>
+    <MenuQuantityControl item={item} quantity={quantity} themeHex={themeHex} onUpdate={onUpdate} />
+  </div>
+);
 
+/* ── 메뉴 아이템 카드 (그리드) ── */
+const MenuItemGridCard = ({ item, quantity, themeHex, onUpdate }: MenuItemCardProps) => (
+  <div
+    className={cn(
+      'overflow-hidden rounded-xl bg-white shadow-xs transition-all',
+      !item.isAvailable ? 'opacity-50' : quantity > 0 ? 'ring-2' : 'border border-gray-100',
+    )}
+    style={quantity > 0 ? ({ '--tw-ring-color': `${themeHex}60` } as React.CSSProperties) : {}}
+  >
+    <div className="relative h-32 bg-orange-50">
+      {item.imageUrl ? (
+        <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
+      ) : (
+        <div className="flex h-full items-center justify-center text-3xl select-none">☕</div>
+      )}
+      {!item.isAvailable && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+          <span className="rounded-full bg-white/90 px-2 py-0.5 text-xs font-medium text-gray-500">
+            품절
+          </span>
+        </div>
+      )}
+    </div>
+    <div className="p-3">
+      <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
+      {item.description && (
+        <p className="mt-0.5 text-xs text-gray-400 line-clamp-1">{item.description}</p>
+      )}
+      <div className="mt-2 flex items-center justify-between">
+        <p className="text-sm font-bold text-gray-900">{item.price.toLocaleString()}원</p>
+        <MenuQuantityControl
+          item={item}
+          quantity={quantity}
+          themeHex={themeHex}
+          onUpdate={onUpdate}
+        />
+      </div>
+    </div>
+  </div>
+);
+
+/* ── 수량 조절 버튼 (리스트·그리드 공용) ── */
+const MenuQuantityControl = ({ item, quantity, themeHex, onUpdate }: MenuItemCardProps) => {
+  if (!item.isAvailable) return null;
+  return (
     <div className="flex items-center gap-2 shrink-0">
-      {!item.isAvailable ? null : quantity > 0 ? (
+      {quantity > 0 ? (
         <>
           <button
             onClick={() => onUpdate(item.id, -1)}
@@ -73,7 +137,8 @@ const MenuItemCard = ({ item, quantity, onUpdate }: MenuItemCardProps) => (
           <span className="w-4 text-center text-sm font-bold text-gray-900">{quantity}</span>
           <button
             onClick={() => onUpdate(item.id, 1)}
-            className="size-8 flex items-center justify-center rounded-full bg-baro-blue text-white active:scale-90 transition-transform"
+            className="size-8 flex items-center justify-center rounded-full text-white active:scale-90 transition-transform"
+            style={{ backgroundColor: themeHex }}
           >
             <Plus className="size-3.5" />
           </button>
@@ -81,14 +146,15 @@ const MenuItemCard = ({ item, quantity, onUpdate }: MenuItemCardProps) => (
       ) : (
         <button
           onClick={() => onUpdate(item.id, 1)}
-          className="size-8 flex items-center justify-center rounded-full bg-baro-blue text-white active:scale-90 transition-transform"
+          className="size-8 flex items-center justify-center rounded-full text-white active:scale-90 transition-transform"
+          style={{ backgroundColor: themeHex }}
         >
           <Plus className="size-3.5" />
         </button>
       )}
     </div>
-  </div>
-);
+  );
+};
 
 const PREVIEW_COUNT = 2;
 
@@ -97,25 +163,27 @@ interface OrderSuccessProps {
   orderId: string;
   totalAmount: number;
   items: CartItem[];
+  themeHex: string;
   onReorder: () => void;
 }
 
-const OrderSuccess = ({ orderId, totalAmount, items, onReorder }: OrderSuccessProps) => {
+const OrderSuccess = ({ orderId, totalAmount, items, themeHex, onReorder }: OrderSuccessProps) => {
   const [expanded, setExpanded] = useState(false);
   const hasMore = items.length > PREVIEW_COUNT;
   const visibleItems = expanded ? items : items.slice(0, PREVIEW_COUNT);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-6 gap-4">
-      <div className="size-14 rounded-full bg-baro-blue flex items-center justify-center">
+      <div
+        className="size-14 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: themeHex }}
+      >
         <CheckCircle className="size-7 text-white" strokeWidth={2.5} />
       </div>
-
       <div className="text-center">
         <h1 className="text-lg font-bold text-gray-900">주문 접수 완료</h1>
         <p className="text-sm text-gray-400 mt-1">사장님이 곧 준비를 시작할 거예요</p>
       </div>
-
       <Card className="w-full max-w-xs">
         <CardContent className="px-5 py-4 space-y-3">
           <div className="flex justify-between items-center text-sm">
@@ -145,13 +213,15 @@ const OrderSuccess = ({ orderId, totalAmount, items, onReorder }: OrderSuccessPr
           </div>
           <div className="border-t pt-3 flex justify-between items-center text-sm">
             <span className="text-gray-500 font-medium">합계</span>
-            <span className="font-bold text-baro-blue">{totalAmount.toLocaleString()}원</span>
+            <span className="font-bold" style={{ color: themeHex }}>
+              {totalAmount.toLocaleString()}원
+            </span>
           </div>
         </CardContent>
       </Card>
-
       <Button
-        className="w-full max-w-xs bg-baro-blue text-white hover:bg-baro-blue/90 rounded-xl h-11 text-sm font-semibold"
+        className="w-full max-w-xs text-white rounded-xl h-11 text-sm font-semibold"
+        style={{ backgroundColor: themeHex }}
         onClick={onReorder}
       >
         다시 주문하기
@@ -166,7 +236,7 @@ const CustomerOrderPage = () => {
   const [searchParams] = useSearchParams();
   const tableNumber = searchParams.get('table');
 
-  const [activeTab, setActiveTab] = useState<CategoryTab>('all');
+  const [activeTab, setActiveTab] = useState<string>('all');
   const [cart, setCart] = useState<Record<string, number>>({});
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [customerNote, setCustomerNote] = useState('');
@@ -186,6 +256,20 @@ const CustomerOrderPage = () => {
     enabled: !!storeId,
   });
 
+  const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
+    queryKey: ['public-menu-categories', storeId],
+    queryFn: () => fetchStoreMenuCategories(storeId!),
+    enabled: !!storeId,
+  });
+
+  const { data: theme = DEFAULT_THEME } = useQuery({
+    queryKey: ['public-store-theme', storeId],
+    queryFn: () => fetchStoreTheme(storeId!),
+    enabled: !!storeId,
+  });
+
+  const themeHex = THEME_HEX[theme.themeColor];
+
   const orderMutation = useMutation({
     mutationFn: (data: Parameters<typeof createOrder>[1]) => createOrder(storeId!, data),
     onSuccess: (order) => {
@@ -198,7 +282,6 @@ const CustomerOrderPage = () => {
           quantity: cart[item.id]!,
           imageUrl: item.imageUrl ?? undefined,
         }));
-
       setIsCheckoutOpen(false);
       setSuccessInfo({
         orderId: order.id.slice(-4).toUpperCase(),
@@ -210,7 +293,17 @@ const CustomerOrderPage = () => {
     },
   });
 
-  const visibleMenu = activeTab === 'available' ? menus.filter((m) => m.isAvailable) : menus;
+  const tabs = useMemo(() => {
+    const base = [{ key: 'all', label: '전체' }];
+    const categoryTabs = categories.map((cat) => ({ key: cat.id, label: cat.name }));
+    return [...base, ...categoryTabs, { key: 'available', label: '주문 가능' }];
+  }, [categories]);
+
+  const visibleMenu = useMemo(() => {
+    if (activeTab === 'available') return menus.filter((m) => m.isAvailable);
+    if (activeTab === 'all') return menus;
+    return menus.filter((m) => m.categoryId === activeTab);
+  }, [menus, activeTab]);
 
   const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
   const totalAmount = menus.reduce((sum, item) => sum + (cart[item.id] ?? 0) * item.price, 0);
@@ -230,7 +323,6 @@ const CustomerOrderPage = () => {
     const items = menus
       .filter((item) => (cart[item.id] ?? 0) > 0)
       .map((item) => ({ menuId: item.id, quantity: cart[item.id]! }));
-
     orderMutation.mutate({ tableNumber: Number(tableNumber), items });
   };
 
@@ -240,15 +332,21 @@ const CustomerOrderPage = () => {
         orderId={successInfo.orderId}
         totalAmount={successInfo.totalAmount}
         items={successInfo.items}
+        themeHex={themeHex}
         onReorder={() => setSuccessInfo(null)}
       />
     );
   }
 
+  const isLoading = isMenuLoading || isCategoriesLoading;
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="h-svh bg-gray-50 flex flex-col overflow-hidden">
       {/* 헤더 */}
-      <header className="bg-baro-blue px-5 py-4 flex items-center justify-between gap-3">
+      <header
+        className="shrink-0 px-5 py-4 flex items-center justify-between gap-3"
+        style={{ backgroundColor: themeHex }}
+      >
         <div className="flex items-center gap-3">
           <div className="size-9 rounded-lg bg-white/20 flex items-center justify-center text-lg select-none shrink-0">
             🍽️
@@ -266,56 +364,91 @@ const CustomerOrderPage = () => {
         )}
       </header>
 
+      {/* 배너 이미지 */}
+      {theme.bannerImageUrl && (
+        <div className="shrink-0 h-36 w-full overflow-hidden">
+          <img
+            src={theme.bannerImageUrl}
+            alt="가게 배너"
+            className="h-full w-full object-cover"
+            style={{ objectPosition: theme.bannerPosition ?? '50% 50%' }}
+          />
+        </div>
+      )}
+
       {/* 카테고리 탭 */}
-      <div className="sticky top-0 z-10 bg-white border-b">
-        <div className="flex px-4">
-          {(
-            [
-              { key: 'all', label: '전체' },
-              { key: 'available', label: '주문 가능' },
-            ] as { key: CategoryTab; label: string }[]
-          ).map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === tab.key
-                  ? 'border-baro-blue text-baro-blue'
-                  : 'border-transparent text-gray-400 hover:text-gray-600'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+      <div className="shrink-0 bg-white border-b">
+        <div className="flex overflow-x-auto scrollbar-none px-4">
+          {isCategoriesLoading
+            ? [1, 2, 3].map((i) => <Skeleton key={i} className="my-3 mr-2 h-5 w-16 shrink-0" />)
+            : tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className="shrink-0 px-4 py-3 text-sm font-medium border-b-2 transition-colors"
+                  style={
+                    activeTab === tab.key
+                      ? { borderBottomColor: themeHex, color: themeHex }
+                      : { borderBottomColor: 'transparent', color: '#9ca3af' }
+                  }
+                >
+                  {tab.label}
+                </button>
+              ))}
         </div>
       </div>
 
       {/* 메뉴 목록 */}
-      <div className="px-4 pt-3 pb-28 space-y-2">
-        {isMenuLoading ? (
-          Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-24 w-full rounded-xl" />
-          ))
-        ) : isMenuError ? (
-          <div className="flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
-            <AlertCircle className="size-10 opacity-40" />
-            <p className="text-sm">메뉴를 불러오지 못했어요.</p>
-            <p className="text-xs">잠시 후 다시 시도해 주세요.</p>
-          </div>
-        ) : visibleMenu.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-gray-400">
-            <p className="text-sm">주문 가능한 메뉴가 없어요.</p>
-          </div>
-        ) : (
-          visibleMenu.map((item) => (
-            <MenuItemCard
-              key={item.id}
-              item={item}
-              quantity={cart[item.id] ?? 0}
-              onUpdate={updateCart}
-            />
-          ))
-        )}
+      <div className={cn('flex-1 overflow-y-auto pt-3', totalItems > 0 ? 'pb-28' : 'pb-4')}>
+        <div
+          className={
+            theme.layout === 'grid'
+              ? 'px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3'
+              : 'px-4 space-y-2'
+          }
+        >
+          {isLoading ? (
+            theme.layout === 'grid' ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-52 w-full rounded-xl" />
+              ))
+            ) : (
+              Array.from({ length: 4 }).map((_, i) => (
+                <Skeleton key={i} className="h-24 w-full rounded-xl" />
+              ))
+            )
+          ) : isMenuError ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-16 gap-3 text-gray-400">
+              <AlertCircle className="size-10 opacity-40" />
+              <p className="text-sm">메뉴를 불러오지 못했어요.</p>
+              <p className="text-xs">잠시 후 다시 시도해 주세요.</p>
+            </div>
+          ) : visibleMenu.length === 0 ? (
+            <div className="col-span-full flex flex-col items-center justify-center py-16 text-gray-400">
+              <p className="text-sm">주문 가능한 메뉴가 없어요.</p>
+            </div>
+          ) : theme.layout === 'grid' ? (
+            visibleMenu.map((item) => (
+              <MenuItemGridCard
+                key={item.id}
+                item={item}
+                quantity={cart[item.id] ?? 0}
+                themeHex={themeHex}
+                onUpdate={updateCart}
+              />
+            ))
+          ) : (
+            visibleMenu.map((item) => (
+              <MenuItemListCard
+                key={item.id}
+                item={item}
+                quantity={cart[item.id] ?? 0}
+                themeHex={themeHex}
+                onUpdate={updateCart}
+              />
+            ))
+          )}
+        </div>
       </div>
 
       {/* 장바구니 바 */}
@@ -323,7 +456,8 @@ const CustomerOrderPage = () => {
         <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t">
           <button
             onClick={() => setIsCheckoutOpen(true)}
-            className="w-full h-12 bg-baro-blue text-white rounded-xl text-sm font-semibold flex items-center justify-between px-5 active:opacity-90 transition-opacity"
+            className="w-full h-12 text-white rounded-xl text-sm font-semibold flex items-center justify-between px-5 active:opacity-90 transition-opacity"
+            style={{ backgroundColor: themeHex }}
           >
             <span className="size-6 flex items-center justify-center rounded-full bg-white/25 text-xs font-bold">
               {totalItems}
@@ -336,41 +470,45 @@ const CustomerOrderPage = () => {
 
       {/* 주문 확인 모달 */}
       <Dialog open={isCheckoutOpen} onOpenChange={setIsCheckoutOpen}>
-        <DialogContent className="max-w-sm">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base">
-              <ShoppingCart className="size-4 text-baro-blue" />
+              <ShoppingCart className="size-4" style={{ color: themeHex }} />
               주문 확인
             </DialogTitle>
           </DialogHeader>
-
           <div className="space-y-4">
             <div className="rounded-xl bg-gray-50 px-4 py-3 space-y-2">
-              {menus
-                .filter((item) => (cart[item.id] ?? 0) > 0)
-                .map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <span className="text-gray-500">
-                      {item.name} <span className="text-gray-400">× {cart[item.id]}</span>
-                    </span>
-                    <span className="font-medium text-gray-900">
-                      {((cart[item.id] ?? 0) * item.price).toLocaleString()}원
-                    </span>
-                  </div>
-                ))}
+              <div className="max-h-40 overflow-y-auto space-y-2">
+                {menus
+                  .filter((item) => (cart[item.id] ?? 0) > 0)
+                  .map((item) => (
+                    <div key={item.id} className="flex justify-between text-sm">
+                      <span className="text-gray-500">
+                        {item.name} <span className="text-gray-400">× {cart[item.id]}</span>
+                      </span>
+                      <span className="font-medium text-gray-900">
+                        {((cart[item.id] ?? 0) * item.price).toLocaleString()}원
+                      </span>
+                    </div>
+                  ))}
+              </div>
               <div className="border-t border-gray-200 pt-2 flex justify-between text-sm font-bold">
                 <span className="text-gray-900">합계</span>
-                <span className="text-baro-blue">{totalAmount.toLocaleString()}원</span>
+                <span style={{ color: themeHex }}>{totalAmount.toLocaleString()}원</span>
               </div>
             </div>
-
             {tableNumber && (
-              <div className="flex items-center justify-between rounded-xl bg-baro-blue/8 px-4 py-2.5">
+              <div
+                className="flex items-center justify-between rounded-xl px-4 py-2.5"
+                style={{ backgroundColor: `${themeHex}14` }}
+              >
                 <span className="text-sm text-gray-500">테이블 번호</span>
-                <span className="text-sm font-semibold text-baro-blue">{tableNumber}번 테이블</span>
+                <span className="text-sm font-semibold" style={{ color: themeHex }}>
+                  {tableNumber}번 테이블
+                </span>
               </div>
             )}
-
             <div className="space-y-1.5">
               <Label htmlFor="customer-note" className="text-sm text-gray-700">
                 요청사항 <span className="text-gray-400 font-normal">(선택)</span>
@@ -383,9 +521,9 @@ const CustomerOrderPage = () => {
                 className="h-10"
               />
             </div>
-
             <Button
-              className="w-full bg-baro-blue text-white hover:bg-baro-blue/90 rounded-xl h-11 text-sm font-semibold"
+              className="w-full text-white rounded-xl h-11 text-sm font-semibold"
+              style={{ backgroundColor: themeHex }}
               onClick={handleOrder}
               disabled={orderMutation.isPending}
             >

@@ -1,3 +1,28 @@
+export interface ApiMenuCategory {
+  id: string;
+  name: string;
+  order: number;
+}
+
+export interface ApiStoreTheme {
+  themeColor:
+    | 'navy'
+    | 'slate'
+    | 'teal'
+    | 'charcoal'
+    | 'mauve'
+    | 'sage'
+    | 'lavender'
+    | 'terra'
+    | 'warmgray'
+    | 'coolgray'
+    | 'blue'
+    | 'green';
+  layout: 'list' | 'grid';
+  bannerImageUrl: string | null;
+  bannerPosition: string;
+}
+
 export interface ApiMenu {
   id: string;
   storeId: string;
@@ -6,6 +31,7 @@ export interface ApiMenu {
   description: string | null;
   imageUrl: string | null;
   isAvailable: boolean;
+  categoryId: string | null;
   createdAt: string;
   updatedAt: string;
 }

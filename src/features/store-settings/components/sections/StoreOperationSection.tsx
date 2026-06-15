@@ -1,4 +1,4 @@
-import { ChevronRight, ClipboardList, Layers, Salad, UtensilsCrossed } from 'lucide-react';
+import { ChevronRight, ClipboardList, Layers, Palette, Salad, UtensilsCrossed } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
@@ -42,6 +42,12 @@ const StoreOperationSection = () => {
           label="메뉴 관리"
           description="판매 중인 메뉴 목록을 추가·수정·삭제합니다."
           onClick={() => navigate(routePaths.storeSettingsMenus)}
+        />
+        <NavRow
+          icon={<Palette className="h-4 w-4" />}
+          label="메뉴판 설정"
+          description="손님 메뉴판의 테마 색상, 레이아웃, 배너 이미지를 설정합니다."
+          onClick={() => navigate(routePaths.storeSettingsMenuBoard)}
         />
         <NavRow
           icon={<UtensilsCrossed className="h-4 w-4" />}

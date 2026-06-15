@@ -14,6 +14,7 @@ import NotFoundPage from '@/pages/NotFoundPage';
 import OcrInboundPage from '@/pages/OcrInboundPage';
 import OrderGuidePage from '@/pages/OrderGuidePage';
 import SettingsIngredientsPage from '@/pages/SettingsIngredientsPage';
+import SettingsMenuBoardPage from '@/pages/SettingsMenuBoardPage';
 import SettingsMenusPage from '@/pages/SettingsMenusPage';
 import SettingsRecipesPage from '@/pages/SettingsRecipesPage';
 import StoreSelectionPage from '@/pages/StoreSelectionPage';
@@ -41,6 +42,7 @@ export default function Router() {
         {/* 가게 설정 */}
         <Route path={routePaths.storeSettings} element={<StoreSettingsPage />} />
         <Route path={routePaths.storeSettingsMenus} element={<SettingsMenusPage />} />
+        <Route path={routePaths.storeSettingsMenuBoard} element={<SettingsMenuBoardPage />} />
         <Route path={routePaths.storeSettingsRecipes} element={<SettingsRecipesPage />} />
         <Route path={routePaths.storeSettingsIngredients} element={<SettingsIngredientsPage />} />
         {/* 회원 설정 */}
