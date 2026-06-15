@@ -10,6 +10,7 @@ export const routePaths = {
   notifications: '/notifications',
   storeSettings: '/store-settings',
   storeSettingsMenus: '/store-settings/menus',
+  storeSettingsMenuBoard: '/store-settings/menu-board',
   storeSettingsRecipes: '/store-settings/recipes',
   storeSettingsIngredients: '/store-settings/ingredients',
   settings: '/settings',
