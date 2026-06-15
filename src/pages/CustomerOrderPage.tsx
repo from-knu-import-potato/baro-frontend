@@ -174,7 +174,10 @@ const OrderSuccess = ({ orderId, totalAmount, items, themeHex, onReorder }: Orde
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-6 gap-4">
-      <div className="size-14 rounded-full flex items-center justify-center" style={{ backgroundColor: themeHex }}>
+      <div
+        className="size-14 rounded-full flex items-center justify-center"
+        style={{ backgroundColor: themeHex }}
+      >
         <CheckCircle className="size-7 text-white" strokeWidth={2.5} />
       </div>
       <div className="text-center">
@@ -210,7 +213,9 @@ const OrderSuccess = ({ orderId, totalAmount, items, themeHex, onReorder }: Orde
           </div>
           <div className="border-t pt-3 flex justify-between items-center text-sm">
             <span className="text-gray-500 font-medium">합계</span>
-            <span className="font-bold" style={{ color: themeHex }}>{totalAmount.toLocaleString()}원</span>
+            <span className="font-bold" style={{ color: themeHex }}>
+              {totalAmount.toLocaleString()}원
+            </span>
           </div>
         </CardContent>
       </Card>
