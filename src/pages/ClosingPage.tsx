@@ -33,6 +33,7 @@ const ClosingPage = () => {
   const [deductionRows, setDeductionRows] = useState<DeductionRow[]>([]);
   const [afterModalOpen, setAfterModalOpen] = useState(false);
   const [finalRevenue, setFinalRevenue] = useState(0);
+  const [closingId, setClosingId] = useState('');
   const [isInitialized, setIsInitialized] = useState(false);
 
   const { mutate: submitClosing, isPending } = useClosing(storeId ?? '');
@@ -67,6 +68,7 @@ const ClosingPage = () => {
       {
         onSuccess: (res) => {
           setFinalRevenue(res.totalRevenue);
+          setClosingId(res.closingId);
           setAfterModalOpen(true);
         },
       },
@@ -115,8 +117,8 @@ const ClosingPage = () => {
         {/* 스크롤 영역 */}
         <div className="flex-1 flex flex-col gap-6 p-6 pb-28">
           {/* 총 매출 카드 */}
-          <Card className="bg-linear-to-br from-blue-50 to-white dark:from-blue-950/20 dark:to-background border-baro-blue/30">
-            <CardContent className="py-5 px-6 flex items-center justify-between">
+          <Card>
+            <CardContent className="px-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-baro-blue/10 flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 text-baro-blue" />
@@ -158,7 +160,12 @@ const ClosingPage = () => {
       </div>
 
       {storeId && (
-        <AfterClosingModal open={afterModalOpen} totalRevenue={finalRevenue} storeId={storeId} />
+        <AfterClosingModal
+          open={afterModalOpen}
+          totalRevenue={finalRevenue}
+          storeId={storeId}
+          closingId={closingId}
+        />
       )}
     </>
   );
