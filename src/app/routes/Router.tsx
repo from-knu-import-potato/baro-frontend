@@ -4,9 +4,11 @@ import AppLayout from '@/app/layouts/AppLayout';
 import { routePaths } from '@/app/routes/routePaths';
 import SettingsPage from '@/pages/AccountSettingsPage';
 import AuthCallbackPage from '@/pages/AuthCallbackPage';
+import ClosingOrderGuidePage from '@/pages/ClosingOrderGuidePage';
 import ClosingPage from '@/pages/ClosingPage';
 import CustomerOrderPage from '@/pages/CustomerOrderPage';
 import DashboardPage from '@/pages/DashboardPage';
+import DayClosedPage from '@/pages/DayClosedPage';
 import InitialSetupPage from '@/pages/InitialSetupPage';
 import InventoryPage from '@/pages/InventoryPage';
 import LandingPage from '@/pages/LandingPage';
@@ -20,6 +22,7 @@ import SettingsMenusPage from '@/pages/SettingsMenusPage';
 import SettingsRecipesPage from '@/pages/SettingsRecipesPage';
 import StoreSelectionPage from '@/pages/StoreSelectionPage';
 import StoreSettingsPage from '@/pages/StoreSettingsPage';
+import SystemStartPage from '@/pages/SystemStartPage';
 
 export default function Router() {
   return (
@@ -29,8 +32,10 @@ export default function Router() {
       <Route path={routePaths.authCallback} element={<AuthCallbackPage />} />
       <Route path={routePaths.login} element={<LoginPage />} />
       <Route path={routePaths.storeSelection} element={<StoreSelectionPage />} />
-      <Route path={routePaths.authCallback} element={<AuthCallbackPage />} />
       <Route path={routePaths.initialSetup} element={<InitialSetupPage />} />
+      <Route path={routePaths.systemStart} element={<SystemStartPage />} />
+      <Route path={routePaths.dayClosed} element={<DayClosedPage />} />
+      <Route path={routePaths.closingOrderGuideDetail} element={<ClosingOrderGuidePage />} />
       <Route path={routePaths.ocrInbound} element={<OcrInboundPage />} />
       <Route path={routePaths.customerOrder} element={<CustomerOrderPage />} />
       <Route path={routePaths.notFound} element={<NotFoundPage />} />

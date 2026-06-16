@@ -42,7 +42,7 @@ const AuthCallbackPage = () => {
           }
         })
         .catch(() => {})
-        .finally(() => navigate(routePaths.dashboard, { replace: true }));
+        .finally(() => navigate(routePaths.systemStart, { replace: true }));
     }
   }, [navigate, setTokens, setStoreId]);
 

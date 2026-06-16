@@ -178,10 +178,12 @@ const OrderGuideList = ({ items }: OrderGuideListProps) => {
                     <div className="flex flex-col justify-center gap-1">
                       <span className="md:hidden text-xs text-muted-foreground">발주 이유</span>
                       <p className="text-sm text-muted-foreground leading-relaxed">{item.reason}</p>
-                      <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/70">
-                        <CalendarDays className="w-3 h-3" />
-                        마지막 발주 {item.lastOrderDate}
-                      </span>
+                      {item.lastOrderDate && (
+                        <span className="inline-flex items-center gap-1 text-[11px] text-muted-foreground/70">
+                          <CalendarDays className="w-3 h-3" />
+                          마지막 입고 {item.lastOrderDate}
+                        </span>
+                      )}
                     </div>
 
                     <div className="flex items-start justify-start md:justify-center pt-0.5">
