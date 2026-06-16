@@ -7,6 +7,7 @@ export const routePaths = {
   inventory: '/inventory',
   ocrInbound: '/ocr-inbound',
   orderGuide: '/order-guide',
+  closing: '/closing',
   notifications: '/notifications',
   storeSettings: '/store-settings',
   storeSettingsMenus: '/store-settings/menus',
