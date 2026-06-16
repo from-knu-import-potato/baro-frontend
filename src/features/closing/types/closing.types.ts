@@ -16,6 +16,8 @@ export interface ClosingInventoryDeduction {
 
 export interface ClosingPreview {
   date: string;
+  isClosed: boolean;
+  closingId: string | null;
   totalRevenue: number;
   soldMenus: ClosingSoldMenu[];
   inventoryDeductions: ClosingInventoryDeduction[];
@@ -43,4 +45,21 @@ export interface ClosingResponse {
   closingId: string;
   totalRevenue: number;
   deductedIngredients: ClosingDeductionResult[];
+}
+
+export interface ClosingStatus {
+  isCompleted: boolean;
+  closingDate?: string;
+  closingId?: string;
+}
+
+export interface ClosingHistoryItem {
+  id: string;
+  date: string;
+  totalRevenue: number;
+  createdAt: string;
+}
+
+export interface ClosingHistory {
+  closings: ClosingHistoryItem[];
 }

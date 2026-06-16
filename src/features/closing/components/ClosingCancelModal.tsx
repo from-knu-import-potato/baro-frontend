@@ -1,0 +1,131 @@
+import { useState } from 'react';
+
+import { CalendarDays, Loader2, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+import { useCancelClosing } from '@/features/closing/hooks/useCancelClosing';
+import { useClosingHistory } from '@/features/closing/hooks/useClosingHistory';
+import { Button } from '@/shadcn/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/shadcn/ui/dialog';
+import { Skeleton } from '@/shadcn/ui/skeleton';
+
+interface ClosingCancelModalProps {
+  open: boolean;
+  onClose: () => void;
+  storeId: string;
+}
+
+const formatDate = (dateStr: string) => {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    weekday: 'short',
+  });
+};
+
+const formatCurrency = (amount: number) => `${amount.toLocaleString('ko-KR')}원`;
+
+const ClosingCancelModal = ({ open, onClose, storeId }: ClosingCancelModalProps) => {
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { data: history, isLoading } = useClosingHistory(storeId);
+  const { mutate: cancel, isPending } = useCancelClosing(storeId);
+
+  const handleCancel = () => {
+    if (!selectedId) return;
+    cancel(selectedId, {
+      onSuccess: () => {
+        toast.success('마감이 취소되었습니다.');
+        setSelectedId(null);
+        onClose();
+      },
+      onError: () => {
+        toast.error('마감 취소에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      },
+    });
+  };
+
+  const handleClose = () => {
+    setSelectedId(null);
+    onClose();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Trash2 className="w-4 h-4 text-baro-red" />
+            마감 취소
+          </DialogTitle>
+          <DialogDescription>
+            취소할 마감 날짜를 선택해 주세요. 해당 날짜의 재고 차감이 원래대로 복구됩니다.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-2 max-h-64 overflow-y-auto">
+          {isLoading ? (
+            <>
+              <Skeleton className="h-14 w-full rounded-lg" />
+              <Skeleton className="h-14 w-full rounded-lg" />
+              <Skeleton className="h-14 w-full rounded-lg" />
+            </>
+          ) : !history?.closings.length ? (
+            <div className="py-8 text-center text-sm text-muted-foreground">
+              취소할 수 있는 마감 이력이 없어요.
+            </div>
+          ) : (
+            history.closings.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setSelectedId(item.id)}
+                className={`w-full flex items-center justify-between p-3 rounded-lg border text-left transition-colors
+                  ${
+                    selectedId === item.id
+                      ? 'border-baro-red bg-red-50 dark:bg-red-950/20'
+                      : 'border-border hover:bg-muted/50'
+                  }`}
+              >
+                <div className="flex items-center gap-2">
+                  <CalendarDays className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <span className="text-sm font-medium">{formatDate(item.date)}</span>
+                </div>
+                <span className="text-sm text-muted-foreground">
+                  {formatCurrency(item.totalRevenue)}
+                </span>
+              </button>
+            ))
+          )}
+        </div>
+
+        <div className="flex gap-2 pt-1">
+          <Button variant="outline" className="flex-1" onClick={handleClose} disabled={isPending}>
+            닫기
+          </Button>
+          <Button
+            variant="destructive"
+            className="flex-1 flex items-center gap-1.5"
+            onClick={handleCancel}
+            disabled={!selectedId || isPending}
+          >
+            {isPending ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Trash2 className="w-4 h-4" />
+            )}
+            마감 취소하기
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default ClosingCancelModal;
