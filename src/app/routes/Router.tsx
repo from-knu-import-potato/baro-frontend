@@ -4,6 +4,7 @@ import AppLayout from '@/app/layouts/AppLayout';
 import { routePaths } from '@/app/routes/routePaths';
 import SettingsPage from '@/pages/AccountSettingsPage';
 import AuthCallbackPage from '@/pages/AuthCallbackPage';
+import ClosingPage from '@/pages/ClosingPage';
 import CustomerOrderPage from '@/pages/CustomerOrderPage';
 import DashboardPage from '@/pages/DashboardPage';
 import InitialSetupPage from '@/pages/InitialSetupPage';
@@ -39,6 +40,7 @@ export default function Router() {
         <Route path={routePaths.dashboard} element={<DashboardPage />} />
         <Route path={routePaths.inventory} element={<InventoryPage />} />
         <Route path={routePaths.orderGuide} element={<OrderGuidePage />} />
+        <Route path={routePaths.closing} element={<ClosingPage />} />
         {/* 가게 설정 */}
         <Route path={routePaths.storeSettings} element={<StoreSettingsPage />} />
         <Route path={routePaths.storeSettingsMenus} element={<SettingsMenusPage />} />

@@ -1,0 +1,16 @@
+import type {
+  ClosingPreview,
+  ClosingRequest,
+  ClosingResponse,
+} from '@/features/closing/types/closing.types';
+import axiosInstance from '@/shared/api/axiosInstance';
+
+export const fetchClosingPreview = (storeId: string): Promise<ClosingPreview> =>
+  axiosInstance
+    .get<{ success: boolean; data: ClosingPreview }>(`/stores/${storeId}/closing/preview`)
+    .then((res) => res.data.data);
+
+export const submitClosing = (storeId: string, body: ClosingRequest): Promise<ClosingResponse> =>
+  axiosInstance
+    .post<{ success: boolean; data: ClosingResponse }>(`/stores/${storeId}/closing`, body)
+    .then((res) => res.data.data);

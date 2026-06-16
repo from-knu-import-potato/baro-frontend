@@ -11,7 +11,7 @@ interface OrderGuideListProps {
 
 type FilterTab = 'all' | UrgencyLevel;
 
-const FILTER_TABS: { key: FilterTab; label: string; count?: number }[] = [
+const FILTER_TABS: { key: FilterTab; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'critical', label: '긴급' },
   { key: 'warning', label: '주의' },
@@ -57,8 +57,9 @@ const OrderGuideList = ({ items }: OrderGuideListProps) => {
     items.filter((item) => item.urgency === urgency).length;
 
   return (
-    <Card>
-      <CardHeader className="border-b pb-0">
+    <Card className="flex-1 min-h-0 gap-0 pb-0">
+      {/* 고정 헤더: 타이틀 + 필터 탭 */}
+      <CardHeader className="border-b pb-0 shrink-0">
         <div className="flex items-center justify-between mb-3">
           <CardTitle className="text-sm flex items-center gap-2">
             <Package className="w-4 h-4 text-muted-foreground" />
@@ -69,7 +70,6 @@ const OrderGuideList = ({ items }: OrderGuideListProps) => {
           </CardTitle>
         </div>
 
-        {/* 필터 탭 */}
         <div className="flex gap-1">
           {FILTER_TABS.map((tab) => {
             const count =
@@ -109,15 +109,16 @@ const OrderGuideList = ({ items }: OrderGuideListProps) => {
         </div>
       </CardHeader>
 
-      <CardContent className="p-0">
+      {/* 스크롤 영역 */}
+      <CardContent className="p-0 flex-1 min-h-0 overflow-y-auto flex flex-col">
         {filteredItems.length === 0 ? (
-          <div className="py-16 text-center text-sm text-muted-foreground">
+          <div className="flex-1 flex items-center justify-center py-16 text-sm text-muted-foreground">
             해당 조건의 발주 항목이 없어요.
           </div>
         ) : (
           <>
-            {/* 테이블 헤더 */}
-            <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_3fr_80px] gap-4 px-5 py-2.5 bg-muted/40 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+            {/* 고정 컬럼 헤더 (스크롤 내 sticky) */}
+            <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_3fr_80px] gap-4 px-5 py-2.5 bg-muted/40 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide sticky top-0 z-10">
               <span>재료명</span>
               <span>현재 재고</span>
               <span>안전 재고 기준</span>
@@ -126,7 +127,7 @@ const OrderGuideList = ({ items }: OrderGuideListProps) => {
               <span className="text-center">긴급도</span>
             </div>
 
-            {/* 테이블 바디 */}
+            {/* 항목 리스트 */}
             <div className="divide-y">
               {filteredItems.map((item) => {
                 const config = URGENCY_CONFIG[item.urgency];
@@ -136,7 +137,6 @@ const OrderGuideList = ({ items }: OrderGuideListProps) => {
                     key={item.id}
                     className={`grid grid-cols-1 md:grid-cols-[2fr_1fr_1fr_1fr_3fr_80px] gap-3 md:gap-4 px-5 py-4 hover:bg-muted/20 transition-colors ${config.rowClass}`}
                   >
-                    {/* 재료명 */}
                     <div className="flex flex-col gap-0.5">
                       <span className="text-sm font-semibold text-foreground">{item.name}</span>
                       <span className="text-xs text-muted-foreground">{item.category}</span>
@@ -148,7 +148,6 @@ const OrderGuideList = ({ items }: OrderGuideListProps) => {
                       )}
                     </div>
 
-                    {/* 현재 재고 */}
                     <div className="flex flex-col justify-center">
                       <span className="md:hidden text-xs text-muted-foreground mb-0.5">
                         현재 재고
@@ -158,7 +157,6 @@ const OrderGuideList = ({ items }: OrderGuideListProps) => {
                       </span>
                     </div>
 
-                    {/* 안전 재고 기준 */}
                     <div className="flex flex-col justify-center">
                       <span className="md:hidden text-xs text-muted-foreground mb-0.5">
                         안전 재고
@@ -168,7 +166,6 @@ const OrderGuideList = ({ items }: OrderGuideListProps) => {
                       </span>
                     </div>
 
-                    {/* 권장 발주량 */}
                     <div className="flex flex-col justify-center">
                       <span className="md:hidden text-xs text-muted-foreground mb-0.5">
                         권장 발주량
@@ -178,7 +175,6 @@ const OrderGuideList = ({ items }: OrderGuideListProps) => {
                       </span>
                     </div>
 
-                    {/* 발주 이유 */}
                     <div className="flex flex-col justify-center gap-1">
                       <span className="md:hidden text-xs text-muted-foreground">발주 이유</span>
                       <p className="text-sm text-muted-foreground leading-relaxed">{item.reason}</p>
@@ -188,7 +184,6 @@ const OrderGuideList = ({ items }: OrderGuideListProps) => {
                       </span>
                     </div>
 
-                    {/* 긴급도 배지 */}
                     <div className="flex items-start justify-start md:justify-center pt-0.5">
                       <span
                         className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${config.badgeClass}`}
