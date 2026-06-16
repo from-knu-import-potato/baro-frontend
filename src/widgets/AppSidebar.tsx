@@ -2,6 +2,8 @@ import { LayoutDashboard, Package, Truck, Store, Settings, Home } from 'lucide-r
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
+import useAuthStore from '@/features/auth/store/authStore';
+import { useClosingStatus } from '@/features/closing/hooks/useClosingStatus';
 import {
   Sidebar,
   SidebarContent,
@@ -30,6 +32,8 @@ interface AppSidebarProps {
 
 const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
   const location = useLocation();
+  const storeId = useAuthStore((s) => s.storeId);
+  const { isCompleted } = useClosingStatus(storeId);
 
   return (
     <Sidebar collapsible="icon">
@@ -53,8 +57,10 @@ const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
               <SidebarMenuItem>
                 <SidebarMenuButton
                   isActive={location.pathname === routePaths.dashboard}
-                  tooltip="대시보드"
-                  render={<NavLink to={routePaths.dashboard} />}
+                  tooltip={isCompleted ? '오늘 마감이 완료되었습니다' : '대시보드'}
+                  disabled={isCompleted}
+                  render={isCompleted ? undefined : <NavLink to={routePaths.dashboard} />}
+                  className={isCompleted ? 'opacity-40 cursor-not-allowed' : undefined}
                 >
                   <LayoutDashboard />
                   <span>대시보드</span>
