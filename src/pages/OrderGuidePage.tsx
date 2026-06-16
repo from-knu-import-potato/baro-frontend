@@ -1,4 +1,4 @@
-import { Package } from 'lucide-react';
+import { ClipboardList, Package } from 'lucide-react';
 
 import useAuthStore from '@/features/auth/store/authStore';
 import OrderGuideList from '@/features/order-guide/components/OrderGuideList';
@@ -27,6 +27,22 @@ const OrderGuidePage = () => {
             <Package className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
             <p className="text-sm text-muted-foreground">
               발주 가이드를 불러오는 데 실패했습니다. 잠시 후 다시 시도해 주세요.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (data.generatedAt === null) {
+    return (
+      <div className="p-6">
+        <Card>
+          <CardContent className="py-16 text-center">
+            <ClipboardList className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
+            <p className="text-sm font-medium text-foreground">아직 발주 가이드가 없어요</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              마감을 완료하면 AI가 자동으로 발주 가이드를 생성해 드려요.
             </p>
           </CardContent>
         </Card>

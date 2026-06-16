@@ -6,7 +6,7 @@ export const useGenerateOrderGuide = (storeId: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => generateOrderGuide(storeId),
+    mutationFn: (closingId: string) => generateOrderGuide(storeId, { closingId }),
     onSuccess: (data) => {
       queryClient.setQueryData(['order-guide', storeId], data);
     },
