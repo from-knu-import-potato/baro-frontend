@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import {
   AlertTriangle,
+  Archive,
   ArrowUpDown,
   BookOpen,
   CheckCircle2,
@@ -19,9 +20,14 @@ import { routePaths } from '@/app/routes/routePaths';
 import InventoryStockEditDialog from '@/features/inventory/components/InventoryStockEditDialog';
 import type { InventoryItem, InventoryStatus } from '@/features/inventory/types/inventory.types';
 import type { IngredientDto } from '@/features/store-settings/api/ingredients.api';
-import { useIngredients, useToggleFavorite } from '@/features/store-settings/hooks/useIngredients';
+import {
+  useIngredients,
+  useArchivedIngredients,
+  useToggleFavorite,
+} from '@/features/store-settings/hooks/useIngredients';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
 import { Input } from '@/shadcn/ui/input';
 import { Skeleton } from '@/shadcn/ui/skeleton';
 
@@ -235,6 +241,7 @@ const InventoryRow = ({ item, onToggleFavorite, onEdit }: InventoryRowProps) => 
 const InventoryTable = () => {
   const navigate = useNavigate();
   const { data: ingredientList = [], isLoading, isError } = useIngredients();
+  const { data: archivedList = [] } = useArchivedIngredients();
   const toggleFavorite = useToggleFavorite();
   const items = ingredientList.map(toInventoryItem);
   const [search, setSearch] = useState('');
@@ -243,6 +250,7 @@ const InventoryTable = () => {
   const [sortKey, setSortKey] = useState<SortKey>('default');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [editingItem, setEditingItem] = useState<InventoryItem | null>(null);
+  const [archivedOpen, setArchivedOpen] = useState(false);
 
   const handleToggleFavorite = (id: string, current: boolean) => {
     toggleFavorite.mutate({ id, isFavorite: !current });
@@ -312,6 +320,18 @@ const InventoryTable = () => {
               >
                 <ScanLine className="w-3.5 h-3.5" />
                 재고 등록하기
+              </button>
+              <button
+                onClick={() => setArchivedOpen(true)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border border-input text-muted-foreground hover:bg-muted/50 transition-colors"
+              >
+                <Archive className="w-3.5 h-3.5" />
+                보관된 식자재
+                {archivedList.length > 0 && (
+                  <span className="ml-0.5 bg-muted text-muted-foreground rounded-full w-4 h-4 inline-flex items-center justify-center text-[10px] font-bold">
+                    {archivedList.length}
+                  </span>
+                )}
               </button>
               {/* 즐겨찾기 필터 버튼 */}
               <button
@@ -482,6 +502,40 @@ const InventoryTable = () => {
         onClose={() => setEditingItem(null)}
         item={editingItem}
       />
+
+      {/* 보관된 식자재 조회 모달 */}
+      <Dialog open={archivedOpen} onOpenChange={setArchivedOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Archive className="w-4 h-4 text-muted-foreground" />
+              보관된 식자재
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+            {archivedList.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                보관된 식자재가 없습니다.
+              </p>
+            ) : (
+              archivedList.map((ing) => (
+                <div
+                  key={ing.id}
+                  className="flex items-center justify-between rounded-lg border px-4 py-2.5 bg-muted/30"
+                >
+                  <div>
+                    <p className="text-sm font-medium">{ing.name}</p>
+                    <p className="text-xs text-muted-foreground">단위: {ing.unit}</p>
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {Number(ing.currentStock).toLocaleString()} {ing.unit}
+                  </p>
+                </div>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

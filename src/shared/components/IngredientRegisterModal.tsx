@@ -1,8 +1,11 @@
 import { useState } from 'react';
 
-import { PackagePlus } from 'lucide-react';
+import { PackagePlus, Pencil } from 'lucide-react';
 
-import { useCreateIngredient } from '@/features/store-settings/hooks/useIngredients';
+import {
+  useCreateIngredient,
+  useUpdateIngredient,
+} from '@/features/store-settings/hooks/useIngredients';
 import { Button } from '@/shadcn/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
 import { Input } from '@/shadcn/ui/input';
@@ -17,6 +20,8 @@ interface IngredientRegisterModalProps {
   open: boolean;
   initialName?: string;
   initialUnit?: IngredientUnit;
+  /** 전달 시 수정 모드로 동작 */
+  editingId?: string;
   onClose: () => void;
   onConfirm?: (ingredientId: string) => void;
 }
@@ -25,24 +30,37 @@ const IngredientRegisterModal = ({
   open,
   initialName = '',
   initialUnit = 'g',
+  editingId,
   onClose,
   onConfirm,
 }: IngredientRegisterModalProps) => {
-  const { mutate: createIngredient, isPending } = useCreateIngredient();
+  const { mutate: createIngredient, isPending: isCreating } = useCreateIngredient();
+  const { mutate: updateIngredient, isPending: isUpdating } = useUpdateIngredient();
   const [form, setForm] = useState({ name: initialName, unit: initialUnit });
+
+  const isEditMode = !!editingId;
+  const isPending = isCreating || isUpdating;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name.trim()) return;
-    createIngredient(
-      { name: form.name, unit: form.unit },
-      {
-        onSuccess: (created) => {
-          onConfirm?.(created.id);
-          onClose();
+
+    if (isEditMode) {
+      updateIngredient(
+        { id: editingId, data: { name: form.name, unit: form.unit } },
+        { onSuccess: () => onClose() },
+      );
+    } else {
+      createIngredient(
+        { name: form.name, unit: form.unit },
+        {
+          onSuccess: (created) => {
+            onConfirm?.(created.id);
+            onClose();
+          },
         },
-      },
-    );
+      );
+    }
   };
 
   return (
@@ -51,12 +69,18 @@ const IngredientRegisterModal = ({
         <DialogHeader className="gap-0">
           <DialogTitle className="text-lg! leading-none! flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-baro-blue/10 flex items-center justify-center shrink-0">
-              <PackagePlus className="w-4 h-4 text-baro-blue" />
+              {isEditMode ? (
+                <Pencil className="w-4 h-4 text-baro-blue" />
+              ) : (
+                <PackagePlus className="w-4 h-4 text-baro-blue" />
+              )}
             </div>
-            식자재 등록
+            {isEditMode ? '식자재 수정' : '식자재 등록'}
           </DialogTitle>
           <p className="text-xs text-muted-foreground">
-            등록한 단위는 이후 재고 관리에 고정으로 사용됩니다
+            {isEditMode
+              ? '식자재 이름과 단위를 수정합니다.'
+              : '등록한 단위는 이후 재고 관리에 고정으로 사용됩니다'}
           </p>
         </DialogHeader>
 
@@ -106,7 +130,13 @@ const IngredientRegisterModal = ({
               disabled={!form.name.trim() || isPending}
               className="flex-1 bg-baro-blue hover:bg-baro-blue/90 text-white"
             >
-              {isPending ? '등록 중...' : '등록'}
+              {isPending
+                ? isEditMode
+                  ? '수정 중...'
+                  : '등록 중...'
+                : isEditMode
+                  ? '수정'
+                  : '등록'}
             </Button>
           </div>
         </form>
