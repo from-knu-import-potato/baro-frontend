@@ -9,6 +9,8 @@ import {
   type IngredientDto,
 } from '@/features/store-settings/api/ingredients.api';
 
+export type { IngredientDto };
+
 export function useIngredients() {
   const storeId = useAuthStore((s) => s.storeId);
   return useQuery({
@@ -38,11 +40,39 @@ export function useUpdateIngredient() {
   });
 }
 
+export function useArchivedIngredients() {
+  const storeId = useAuthStore((s) => s.storeId);
+  return useQuery({
+    queryKey: ['ingredients', storeId, 'archived'],
+    queryFn: () => fetchIngredients(storeId!, true),
+    enabled: !!storeId,
+  });
+}
+
+export function useArchiveIngredient() {
+  const storeId = useAuthStore((s) => s.storeId);
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, isArchived }: { id: string; isArchived: boolean }) =>
+      updateIngredient(storeId!, id, { isArchived }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['ingredients', storeId] }),
+  });
+}
+
 export function useDeleteIngredient() {
   const storeId = useAuthStore((s) => s.storeId);
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => deleteIngredient(storeId!, id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['ingredients', storeId] }),
+  });
+}
+
+export function useForceDeleteIngredient() {
+  const storeId = useAuthStore((s) => s.storeId);
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteIngredient(storeId!, id, true),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['ingredients', storeId] }),
   });
 }

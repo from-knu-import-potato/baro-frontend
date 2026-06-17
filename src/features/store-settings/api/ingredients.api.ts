@@ -10,10 +10,21 @@ export interface IngredientDto {
   lastInboundDate: string | null;
   relatedMenus: string[];
   isFavorite: boolean;
+  isArchived: boolean;
 }
 
-export async function fetchIngredients(storeId: string): Promise<IngredientDto[]> {
-  const res = await axiosInstance.get(`/stores/${storeId}/ingredients`);
+export interface DeleteConflictDetail {
+  inboundCount: number;
+  closingCount: number;
+}
+
+export async function fetchIngredients(
+  storeId: string,
+  archived = false,
+): Promise<IngredientDto[]> {
+  const res = await axiosInstance.get(`/stores/${storeId}/ingredients`, {
+    params: archived ? { archived: true } : undefined,
+  });
   return res.data.data;
 }
 
@@ -41,6 +52,8 @@ export async function updateIngredient(
   return res.data.data;
 }
 
-export async function deleteIngredient(storeId: string, id: string): Promise<void> {
-  await axiosInstance.delete(`/stores/${storeId}/ingredients/${id}`);
+export async function deleteIngredient(storeId: string, id: string, force = false): Promise<void> {
+  await axiosInstance.delete(`/stores/${storeId}/ingredients/${id}`, {
+    params: force ? { force: true } : undefined,
+  });
 }
