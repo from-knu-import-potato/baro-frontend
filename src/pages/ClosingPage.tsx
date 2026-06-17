@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
-import { CalendarDays, CheckCircle, TrendingUp } from 'lucide-react';
+import { AlertTriangle, CalendarDays, CheckCircle, TrendingUp } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
 import useAuthStore from '@/features/auth/store/authStore';
 import AfterClosingModal from '@/features/closing/components/AfterClosingModal';
@@ -28,7 +29,11 @@ const formatDate = (dateStr: string) => {
 
 const ClosingPage = () => {
   const storeId = useAuthStore((s) => s.storeId);
-  const { data: preview, isLoading, isError } = useClosingPreview(storeId);
+  const [searchParams] = useSearchParams();
+  const dateParam = searchParams.get('date') ?? undefined;
+  const isRetroactive = !!dateParam;
+
+  const { data: preview, isLoading, isError } = useClosingPreview(storeId, dateParam);
 
   const [deductionRows, setDeductionRows] = useState<DeductionRow[]>([]);
   const [afterModalOpen, setAfterModalOpen] = useState(false);
@@ -114,6 +119,17 @@ const ClosingPage = () => {
           </div>
         </div>
 
+        {/* 소급 마감 안내 배너 */}
+        {isRetroactive && (
+          <div className="mx-6 mt-4 flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+            <p>
+              전날 마감을 소급 처리합니다. 오늘 이미 발생한 매출과 재고 차감 순서가 실제와 다를 수
+              있습니다.
+            </p>
+          </div>
+        )}
+
         {/* 스크롤 영역 */}
         <div className="flex-1 flex flex-col gap-6 p-6 pb-28">
           {/* 총 매출 카드 */}
@@ -124,7 +140,9 @@ const ClosingPage = () => {
                   <TrendingUp className="w-5 h-5 text-baro-blue" />
                 </div>
                 <div>
-                  <p className="text-xs text-muted-foreground">오늘 총 매출</p>
+                  <p className="text-xs text-muted-foreground">
+                    {isRetroactive ? '해당일 총 매출' : '오늘 총 매출'}
+                  </p>
                   <p className="text-2xl font-bold text-foreground">
                     {formatCurrency(preview.totalRevenue)}
                   </p>
