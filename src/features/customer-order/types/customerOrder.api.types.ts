@@ -53,6 +53,7 @@ export interface ApiOrder {
   tableNumber: number;
   status: ApiOrderStatus;
   totalPrice: number;
+  customerNote?: string;
   createdAt: string;
   updatedAt: string;
   items?: ApiOrderItem[];
@@ -61,6 +62,7 @@ export interface ApiOrder {
 export interface CreateOrderRequest {
   tableNumber: number;
   items: { menuId: string; quantity: number }[];
+  customerNote?: string;
 }
 
 export interface UpdateOrderStatusRequest {

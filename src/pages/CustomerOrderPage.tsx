@@ -163,11 +163,19 @@ interface OrderSuccessProps {
   orderId: string;
   totalAmount: number;
   items: CartItem[];
+  customerNote?: string;
   themeHex: string;
   onReorder: () => void;
 }
 
-const OrderSuccess = ({ orderId, totalAmount, items, themeHex, onReorder }: OrderSuccessProps) => {
+const OrderSuccess = ({
+  orderId,
+  totalAmount,
+  items,
+  customerNote,
+  themeHex,
+  onReorder,
+}: OrderSuccessProps) => {
   const [expanded, setExpanded] = useState(false);
   const hasMore = items.length > PREVIEW_COUNT;
   const visibleItems = expanded ? items : items.slice(0, PREVIEW_COUNT);
@@ -211,6 +219,12 @@ const OrderSuccess = ({ orderId, totalAmount, items, themeHex, onReorder }: Orde
               </button>
             )}
           </div>
+          {customerNote && (
+            <div className="border-t pt-3 text-sm text-gray-500">
+              <span className="font-medium text-gray-400">요청사항</span>
+              <p className="mt-1 text-gray-600">{customerNote}</p>
+            </div>
+          )}
           <div className="border-t pt-3 flex justify-between items-center text-sm">
             <span className="text-gray-500 font-medium">합계</span>
             <span className="font-bold" style={{ color: themeHex }}>
@@ -224,7 +238,7 @@ const OrderSuccess = ({ orderId, totalAmount, items, themeHex, onReorder }: Orde
         style={{ backgroundColor: themeHex }}
         onClick={onReorder}
       >
-        다시 주문하기
+        추가 주문하기
       </Button>
     </div>
   );
@@ -240,11 +254,20 @@ const CustomerOrderPage = () => {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [customerNote, setCustomerNote] = useState('');
+  const lsKey = `baro_order_success_${storeId}`;
   const [successInfo, setSuccessInfo] = useState<{
     orderId: string;
     totalAmount: number;
     items: CartItem[];
-  } | null>(null);
+    customerNote?: string;
+  } | null>(() => {
+    try {
+      const raw = localStorage.getItem(`baro_order_success_${storeId}`);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const {
     data: menus = [],
@@ -283,11 +306,14 @@ const CustomerOrderPage = () => {
           imageUrl: item.imageUrl ?? undefined,
         }));
       setIsCheckoutOpen(false);
-      setSuccessInfo({
+      const info = {
         orderId: order.id.slice(-4).toUpperCase(),
         totalAmount: order.totalPrice,
         items: cartItems,
-      });
+        customerNote: customerNote || undefined,
+      };
+      localStorage.setItem(lsKey, JSON.stringify(info));
+      setSuccessInfo(info);
       setCart({});
       setCustomerNote('');
     },
@@ -323,7 +349,11 @@ const CustomerOrderPage = () => {
     const items = menus
       .filter((item) => (cart[item.id] ?? 0) > 0)
       .map((item) => ({ menuId: item.id, quantity: cart[item.id]! }));
-    orderMutation.mutate({ tableNumber: Number(tableNumber), items });
+    orderMutation.mutate({
+      tableNumber: Number(tableNumber),
+      items,
+      customerNote: customerNote || undefined,
+    });
   };
 
   if (successInfo) {
@@ -332,8 +362,12 @@ const CustomerOrderPage = () => {
         orderId={successInfo.orderId}
         totalAmount={successInfo.totalAmount}
         items={successInfo.items}
+        customerNote={successInfo.customerNote}
         themeHex={themeHex}
-        onReorder={() => setSuccessInfo(null)}
+        onReorder={() => {
+          localStorage.removeItem(lsKey);
+          setSuccessInfo(null);
+        }}
       />
     );
   }
