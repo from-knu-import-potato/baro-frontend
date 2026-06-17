@@ -194,6 +194,35 @@ src/
 5. **담당자 설정 필수**: 이슈·PR 생성 시 `gh api user --jq .login` 으로 현재 GitHub 사용자를 확인해 `--assignee` 옵션으로 설정할 것.
 6. **커밋 전 린트·타입 검사 필수**: 커밋 전 반드시 `pnpm build` → `pnpm lint --fix` → `pnpm tsc --noEmit` 순서로 실행하여 린트 오류와 타입 오류를 모두 해결한 후 커밋할 것.
 
+## 배포 규칙
+
+### 버전 관리 (Semantic Versioning)
+
+`Major.Minor.Patch` 형식을 사용한다.
+
+| 구분 | 올리는 시점 | 예시 |
+|---|---|---|
+| **Major** | 하위 호환되지 않는 큰 변경 (UI 전면 개편, 서비스 구조 변경) | `1.0.0` → `2.0.0` |
+| **Minor** | 하위 호환되는 기능 추가 (새 페이지, 새 기능 컴포넌트) | `0.1.0` → `0.2.0` |
+| **Patch** | 하위 호환되는 버그 수정, 소규모 개선 | `0.1.0` → `0.1.1` |
+
+### 배포 흐름
+
+```
+develop → release/vX.Y.Z → main
+```
+
+1. **배포 이슈 생성**: `.github/ISSUE_TEMPLATE/deploy.md` 템플릿 사용
+2. **릴리즈 브랜치 생성**: `develop`에서 `release/vX.Y.Z` 브랜치 생성
+3. **PR 생성**: `release/vX.Y.Z` → `main` PR 작성 (배포 이슈 연결)
+   - PR 제목 형식: `🚀 (#배포이슈번호) deploy: 배포 버전과 배포 제목` (예: `🚀 (#56) deploy: v0.1.1 랜딩 페이지 개편 배포`)
+4. **태그·릴리즈**: main 머지 후 GitHub Release 및 태그(`vX.Y.Z`) 생성
+
+### 브랜치 네이밍
+
+- 릴리즈 브랜치: `release/vX.Y.Z` (예: `release/v0.2.0`)
+- 일반 작업 브랜치: `작업유형/이슈번호-작업이름` (예: `feature/15-menu-ocr-scan`)
+
 ## 프롬프트 단축키
 
 - **"기능 개발 [도메인명]"**: `features/[도메인명]` 내 `api`, `hooks`, `types`, `components` 기본 구조 생성
