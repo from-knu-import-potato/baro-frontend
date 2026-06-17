@@ -17,6 +17,7 @@ import {
   SidebarSeparator,
   SidebarTrigger,
 } from '@/shadcn/ui/sidebar';
+import { Skeleton } from '@/shadcn/ui/skeleton';
 import BaroLogo from '@/shared/assets/images/baro-logo.png';
 
 const BOTTOM_NAV_ITEMS = [
@@ -25,12 +26,25 @@ const BOTTOM_NAV_ITEMS = [
   { label: '랜딩 페이지', icon: Home, to: routePaths.landing },
 ];
 
+const BUSINESS_TYPE_LABEL: Record<string, string> = {
+  franchise: '프랜차이즈',
+  'directly-operated': '직영',
+  individual: '개인',
+};
+
 interface AppSidebarProps {
   storeName: string;
   storeCategory: string;
+  businessType?: string;
+  isLoading?: boolean;
 }
 
-const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
+const AppSidebar = ({
+  storeName,
+  storeCategory,
+  businessType,
+  isLoading = false,
+}: AppSidebarProps) => {
   const location = useLocation();
   const storeId = useAuthStore((s) => s.storeId);
   const { isCompleted } = useClosingStatus(storeId);
@@ -128,15 +142,29 @@ const AppSidebar = ({ storeName, storeCategory }: AppSidebarProps) => {
         <SidebarSeparator className="mx-0" />
 
         {/* 가게 정보 */}
-        <SidebarMenuButton size="lg" tooltip={storeName}>
-          <div className="w-8 h-8 rounded-full bg-[#449CD4] flex items-center justify-center shrink-0">
-            <span className="text-white text-xs font-bold">{storeName.charAt(0)}</span>
+        {isLoading ? (
+          <div className="flex items-center gap-2 px-2 py-1.5">
+            <Skeleton className="w-8 h-8 rounded-full shrink-0" />
+            <div className="flex flex-col gap-1 min-w-0 group-data-[collapsible=icon]:hidden">
+              <Skeleton className="h-2.5 w-16" />
+              <Skeleton className="h-3.5 w-24" />
+            </div>
           </div>
-          <div className="flex flex-col min-w-0">
-            <span className="text-[10px] text-muted-foreground truncate">{storeCategory}</span>
-            <span className="text-sm font-semibold text-foreground truncate">{storeName}</span>
-          </div>
-        </SidebarMenuButton>
+        ) : (
+          <SidebarMenuButton size="lg" tooltip={storeName}>
+            <div className="w-8 h-8 rounded-full bg-[#449CD4] flex items-center justify-center shrink-0">
+              <span className="text-white text-xs font-bold">{storeName.charAt(0)}</span>
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="text-[10px] text-muted-foreground truncate">
+                {[storeCategory, businessType ? BUSINESS_TYPE_LABEL[businessType] : undefined]
+                  .filter(Boolean)
+                  .join(' · ')}
+              </span>
+              <span className="text-sm font-semibold text-foreground truncate">{storeName}</span>
+            </div>
+          </SidebarMenuButton>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

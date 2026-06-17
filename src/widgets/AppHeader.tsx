@@ -3,14 +3,16 @@ import { ChevronDown } from 'lucide-react';
 import useAuthStore from '@/features/auth/store/authStore';
 import { useClosingStatus } from '@/features/closing/hooks/useClosingStatus';
 import { Button } from '@/shadcn/ui/button';
+import { Skeleton } from '@/shadcn/ui/skeleton';
 
 interface AppHeaderProps {
   userName: string;
   userRole: string;
+  isLoading?: boolean;
   onClosingClick?: () => void;
 }
 
-const AppHeader = ({ userName, userRole, onClosingClick }: AppHeaderProps) => {
+const AppHeader = ({ userName, userRole, isLoading = false, onClosingClick }: AppHeaderProps) => {
   const storeId = useAuthStore((s) => s.storeId);
   const { isCompleted } = useClosingStatus(storeId);
 
@@ -31,16 +33,27 @@ const AppHeader = ({ userName, userRole, onClosingClick }: AppHeaderProps) => {
       <div className="h-5 w-px bg-border" />
 
       {/* 유저 정보 */}
-      <div className="flex items-center gap-4 cursor-pointer rounded-lg transition-colors">
-        <div className="w-7 h-7 rounded-full bg-baro-blue flex items-center justify-center">
-          <span className="text-xs font-semibold text-white">{userName.charAt(0)}</span>
+      {isLoading ? (
+        <div className="flex items-center gap-4">
+          <Skeleton className="w-7 h-7 rounded-full" />
+          <div className="flex flex-col gap-1">
+            <Skeleton className="h-3 w-16" />
+            <Skeleton className="h-3 w-8" />
+          </div>
+          <ChevronDown className="w-4 h-4 text-gray-400" />
         </div>
-        <div className="flex flex-col">
-          <span className="text-xs font-semibold leading-tight">{userName}</span>
-          <span className="text-xs leading-tight text-muted-foreground">{userRole}</span>
+      ) : (
+        <div className="flex items-center gap-4 cursor-pointer rounded-lg transition-colors">
+          <div className="w-7 h-7 rounded-full bg-baro-blue flex items-center justify-center">
+            <span className="text-xs font-semibold text-white">{userName.charAt(0)}</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xs font-semibold leading-tight">{userName}</span>
+            <span className="text-xs leading-tight text-muted-foreground">{userRole}</span>
+          </div>
+          <ChevronDown className="w-4 h-4 text-gray-400" />
         </div>
-        <ChevronDown className="w-4 h-4 text-gray-400" />
-      </div>
+      )}
     </header>
   );
 };
