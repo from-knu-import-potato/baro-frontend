@@ -51,20 +51,6 @@ const Navbar = () => {
             >
               기능소개
             </a>
-            <a
-              href="#analytics"
-              onClick={(e) => handleNavLinkClick(e, 'analytics')}
-              className="text-sm font-medium text-baro-black-muted hover:text-baro-blue transition-colors"
-            >
-              데이터분석
-            </a>
-            <a
-              href="#guide"
-              onClick={(e) => handleNavLinkClick(e, 'guide')}
-              className="text-sm font-medium text-baro-black-muted hover:text-baro-blue transition-colors"
-            >
-              이용가이드
-            </a>
             <div className="flex items-center gap-3 ml-4">
               <Button
                 className="bg-baro-blue hover:bg-baro-blue-dark text-xs rounded-full text-white"
@@ -95,20 +81,6 @@ const Navbar = () => {
               className="block px-3 py-2 text-base font-medium text-baro-black-muted"
             >
               기능소개
-            </a>
-            <a
-              href="#analytics"
-              onClick={(e) => handleNavLinkClick(e, 'analytics')}
-              className="block px-3 py-2 text-base font-medium text-baro-black-muted"
-            >
-              데이터분석
-            </a>
-            <a
-              href="#guide"
-              onClick={(e) => handleNavLinkClick(e, 'guide')}
-              className="block px-3 py-2 text-base font-medium text-baro-black-muted"
-            >
-              이용가이드
             </a>
             <Button
               className="bg-baro-blue hover:bg-baro-blue/90 w-full h-11 text-white"
