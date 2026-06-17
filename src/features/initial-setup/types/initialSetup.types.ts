@@ -20,8 +20,6 @@ export type DayOfWeek =
   | 'sunday';
 
 export interface StoreBasicInfo {
-  /** 카카오톡에서 받아온 대표자 이름 (읽기 전용 표시) */
-  ownerName: string;
   storeName: string;
   businessType: BusinessType;
   category: StoreCategory;

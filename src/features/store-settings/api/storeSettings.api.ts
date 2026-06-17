@@ -7,7 +7,12 @@ export async function fetchStoreSettings(storeId: string): Promise<StoreSettings
   return {
     id: d.id,
     storeName: d.name,
-    ownerName: d.ownerName,
+    owner: {
+      id: d.owner.id,
+      name: d.owner.name,
+      profileImage: d.owner.profileImage ?? null,
+    },
+    myRole: d.myRole ?? null,
     businessType: d.businessType,
     category: d.category,
     memo: d.memo ?? '',
