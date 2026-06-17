@@ -5,6 +5,7 @@ export interface OcrApiItem {
   amount: number;
   unit: OcrUnit;
   unitPrice: number | null;
+  ingredientId: string | null;
 }
 
 export interface OcrApiResponse {
