@@ -246,9 +246,7 @@ const SettingsRecipesPage = () => {
     const toDelete = localRecipes.filter((r) => r.deleted).map((r) => r.id);
     const toUpdate = localRecipes.filter(
       (r) =>
-        !r.deleted &&
-        editAmounts[r.id] !== undefined &&
-        editAmounts[r.id] !== String(r.amount),
+        !r.deleted && editAmounts[r.id] !== undefined && editAmounts[r.id] !== String(r.amount),
     );
     const toCreate = pendingItems.filter((p) => p.amount && Number(p.amount) > 0);
 
@@ -424,9 +422,7 @@ const SettingsRecipesPage = () => {
                             placeholder="0"
                             min={0}
                             value={editAmounts[recipe.id] ?? String(recipe.amount)}
-                            onChange={(e) =>
-                              handleExistingAmountChange(recipe.id, e.target.value)
-                            }
+                            onChange={(e) => handleExistingAmountChange(recipe.id, e.target.value)}
                             className="h-8 px-2 text-right text-sm"
                           />
                           <span className="text-xs text-muted-foreground">
@@ -491,25 +487,25 @@ const SettingsRecipesPage = () => {
               onClick={handleSave}
               disabled={isCreating || isDeleting}
             >
-              {isCreating || isDeleting ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                '저장하기'
-              )}
+              {isCreating || isDeleting ? <Loader2 className="size-4 animate-spin" /> : '저장하기'}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <Dialog open={deletingMenuId !== null} onOpenChange={(v) => { if (!v) setDeletingMenuId(null); }}>
+      <Dialog
+        open={deletingMenuId !== null}
+        onOpenChange={(v) => {
+          if (!v) setDeletingMenuId(null);
+        }}
+      >
         <DialogContent className="max-w-sm">
           <DialogHeader>
             <DialogTitle>레시피 삭제</DialogTitle>
             <DialogDescription>
               <span className="font-medium text-foreground">{deletingMenuName}</span>의 레시피에
               등록된 식자재를 모두 삭제하시겠습니까?
-              <br />
-              이 작업은 되돌릴 수 없습니다.
+              <br />이 작업은 되돌릴 수 없습니다.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
