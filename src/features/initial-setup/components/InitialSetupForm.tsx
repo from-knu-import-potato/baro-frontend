@@ -32,15 +32,11 @@ const InitialSetupForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<InitialSetupData>(DEFAULT_SETUP_DATA);
   const [basicInfoErrors, setBasicInfoErrors] = useState<BasicInfoErrors>({});
+  const [userName, setUserName] = useState('');
 
   useEffect(() => {
     fetchMe()
-      .then((user) => {
-        setFormData((prev) => ({
-          ...prev,
-          basicInfo: { ...prev.basicInfo, ownerName: user.name },
-        }));
-      })
+      .then((user) => setUserName(user.name))
       .catch(() => {});
   }, []);
 
@@ -121,6 +117,7 @@ const InitialSetupForm = () => {
         return (
           <StepBasicInfo
             data={formData.basicInfo}
+            userName={userName}
             onChange={(basicInfo) => setFormData((prev) => ({ ...prev, basicInfo }))}
             errors={basicInfoErrors}
           />

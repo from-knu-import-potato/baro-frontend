@@ -11,11 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger } from '@/shadcn/ui/se
 
 interface StepBasicInfoProps {
   data: StoreBasicInfo;
+  userName: string;
   onChange: (data: StoreBasicInfo) => void;
   errors: Partial<Record<keyof StoreBasicInfo, string>>;
 }
 
-const StepBasicInfo = ({ data, onChange, errors }: StepBasicInfoProps) => {
+const StepBasicInfo = ({ data, userName, onChange, errors }: StepBasicInfoProps) => {
   return (
     <div className="space-y-5">
       {/* 대표자 이름 — 카카오톡에서 가져온 정보 */}
@@ -25,7 +26,7 @@ const StepBasicInfo = ({ data, onChange, errors }: StepBasicInfoProps) => {
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-[11px] text-muted-foreground">카카오톡 계정</p>
-          <p className="text-sm font-semibold text-foreground">{data.ownerName}</p>
+          <p className="text-sm font-semibold text-foreground">{userName}</p>
         </div>
         <span className="rounded-full bg-[#FEE500]/60 px-2 py-0.5 text-[10px] font-medium text-[#3C1E1E]">
           대표자

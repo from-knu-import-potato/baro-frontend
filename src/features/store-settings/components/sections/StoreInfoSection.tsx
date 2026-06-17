@@ -106,10 +106,10 @@ const StoreInfoSection = () => {
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs text-muted-foreground">대표자명</Label>
-            <Input
-              value={form.ownerName}
-              onChange={(e) => setForm((f) => f && { ...f, ownerName: e.target.value })}
-            />
+            <Input value={form.owner.name} disabled />
+            <p className="text-[11px] text-muted-foreground">
+              직원 추가 기능 오픈 후 변경 가능합니다.
+            </p>
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs text-muted-foreground">사업 유형</Label>
@@ -153,7 +153,7 @@ const StoreInfoSection = () => {
       ) : (
         <div className="space-y-1">
           <InfoRow label="가게명" value={data.storeName} />
-          <InfoRow label="대표자명" value={data.ownerName} />
+          <InfoRow label="대표자명" value={data.owner.name} />
           <InfoRow label="사업 유형" value={labelOf(BUSINESS_TYPE_OPTIONS, data.businessType)} />
           <InfoRow label="업종" value={labelOf(CATEGORY_OPTIONS, data.category)} />
         </div>
