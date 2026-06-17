@@ -7,9 +7,11 @@ import type {
 } from '@/features/closing/types/closing.types';
 import axiosInstance from '@/shared/api/axiosInstance';
 
-export const fetchClosingPreview = (storeId: string): Promise<ClosingPreview> =>
+export const fetchClosingPreview = (storeId: string, date?: string): Promise<ClosingPreview> =>
   axiosInstance
-    .get<{ success: boolean; data: ClosingPreview }>(`/stores/${storeId}/closing/preview`)
+    .get<{ success: boolean; data: ClosingPreview }>(`/stores/${storeId}/closing/preview`, {
+      params: date ? { date } : undefined,
+    })
     .then((res) => res.data.data);
 
 export const submitClosing = (storeId: string, body: ClosingRequest): Promise<ClosingResponse> =>

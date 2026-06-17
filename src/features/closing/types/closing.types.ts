@@ -29,7 +29,7 @@ export interface ClosingDeductionItem {
 }
 
 export interface ClosingRequest {
-  date: string;
+  date?: string;
   inventoryDeductions: ClosingDeductionItem[];
 }
 
@@ -43,6 +43,7 @@ export interface ClosingDeductionResult {
 
 export interface ClosingResponse {
   closingId: string;
+  date: string;
   totalRevenue: number;
   deductedIngredients: ClosingDeductionResult[];
 }
