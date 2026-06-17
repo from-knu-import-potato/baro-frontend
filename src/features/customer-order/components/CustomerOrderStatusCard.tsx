@@ -43,10 +43,13 @@ const OrderCard = ({ order, storeId }: OrderCardProps) => {
   const itemSummary = order.items?.map((i) => `${i.menu.name} x${i.quantity}`).join(' · ') ?? '';
 
   return (
-    <div className="rounded-lg border bg-card p-3 space-y-2">
+    <div className="rounded-lg border bg-card p-3 space-y-3">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
           <span className="text-sm font-medium truncate">{order.tableNumber}번 테이블</span>
+          <span className="text-xs text-muted-foreground shrink-0">
+            #{order.id.slice(-4).toUpperCase()}
+          </span>
           <OrderStatusBadge status={order.status} />
         </div>
         <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
@@ -56,6 +59,10 @@ const OrderCard = ({ order, storeId }: OrderCardProps) => {
       </div>
 
       {itemSummary && <p className="text-xs text-muted-foreground line-clamp-2">{itemSummary}</p>}
+
+      {order.customerNote && (
+        <p className="text-xs text-muted-foreground line-clamp-2 py-1">💬 {order.customerNote}</p>
+      )}
 
       <div className="flex items-center justify-between">
         <span className="text-sm font-semibold">{order.totalPrice.toLocaleString()}원</span>
