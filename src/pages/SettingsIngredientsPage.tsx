@@ -7,6 +7,7 @@ import {
   ArrowLeft,
   Pencil,
   Plus,
+  Search,
   ShieldCheck,
   Trash2,
 } from 'lucide-react';
@@ -37,6 +38,7 @@ import {
 } from '@/shadcn/ui/alert-dialog';
 import { Button } from '@/shadcn/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
+import { Input } from '@/shadcn/ui/input';
 import { Skeleton } from '@/shadcn/ui/skeleton';
 import IngredientRegisterModal from '@/shared/components/IngredientRegisterModal';
 import SafetyStockDial from '@/shared/components/SafetyStockDial';
@@ -55,6 +57,7 @@ const SettingsIngredientsPage = () => {
   const { mutate: forceDeleteIngredient, isPending: isForceDeleting } = useForceDeleteIngredient();
   const { mutate: updateStoreSettings, isPending: isSavingPct } = useUpdateStoreSettings();
 
+  const [searchQuery, setSearchQuery] = useState('');
   const [showArchived, setShowArchived] = useState(false);
   const [safetyPct, setSafetyPct] = useState(20);
   const [addOpen, setAddOpen] = useState(false);
@@ -65,6 +68,9 @@ const SettingsIngredientsPage = () => {
 
   const displayedIngredients = showArchived ? archivedIngredients : activeIngredients;
   const isLoading = showArchived ? isArchivedLoading : isActiveLoading;
+  const filteredIngredients = displayedIngredients?.filter((ing) =>
+    ing.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   const handleOpenSafety = () => {
     setSafetyPct(storeSettings?.safetyStockPct ?? 20);
@@ -118,6 +124,15 @@ const SettingsIngredientsPage = () => {
           </p>
         </div>
         <div className="ml-auto flex items-center gap-2">
+          <div className="relative w-52">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+            <Input
+              placeholder="식자재 이름 검색"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-8 pl-8 pr-3 text-sm"
+            />
+          </div>
           <Button variant="outline" size="sm" onClick={handleOpenSafety}>
             <ShieldCheck className="size-4 mr-1" /> 안전 재고 기준
           </Button>
@@ -161,8 +176,12 @@ const SettingsIngredientsPage = () => {
               </>
             )}
           </div>
+        ) : !filteredIngredients?.length ? (
+          <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+            <p className="text-sm">검색 결과가 없습니다.</p>
+          </div>
         ) : (
-          displayedIngredients.map((ing) => (
+          filteredIngredients.map((ing) => (
             <div
               key={ing.id}
               className="flex items-center justify-between rounded-xl border px-4 py-3 bg-card"

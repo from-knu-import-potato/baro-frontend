@@ -10,6 +10,7 @@ import {
   Pencil,
   Plus,
   ScanLine,
+  Search,
   Trash2,
   X,
 } from 'lucide-react';
@@ -577,10 +578,15 @@ const SettingsMenusPage = () => {
   const { mutate: updateMenu, isPending: isUpdating } = useUpdateMenu();
   const { mutate: deleteMenu } = useDeleteMenu();
 
+  const [searchQuery, setSearchQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<MenuDto | null>(null);
   const [modalKey, setModalKey] = useState(0);
   const [ocrOpen, setOcrOpen] = useState(false);
+
+  const filteredMenus = menus?.filter((m) =>
+    m.name.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   const handleOpenNew = () => {
     setEditing(null);
@@ -635,7 +641,16 @@ const SettingsMenusPage = () => {
           <p className="text-sm font-semibold">메뉴 관리</p>
           <p className="text-xs text-muted-foreground">판매 메뉴를 등록하고 관리합니다.</p>
         </div>
-        <div className="ml-auto flex gap-2">
+        <div className="ml-auto flex items-center gap-2">
+          <div className="relative w-52">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
+            <Input
+              placeholder="메뉴 이름 검색"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-8 pl-8 pr-3 text-sm"
+            />
+          </div>
           <Button size="sm" variant="outline" onClick={() => setOcrOpen(true)}>
             <ScanLine className="size-4 mr-1" /> 메뉴판으로 등록
           </Button>
@@ -687,9 +702,13 @@ const SettingsMenusPage = () => {
               </Button>
             </div>
           </div>
+        ) : !filteredMenus?.length ? (
+          <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+            <p className="text-sm">검색 결과가 없습니다.</p>
+          </div>
         ) : (
           <MenuGrid
-            menus={menus}
+            menus={filteredMenus}
             categories={categories}
             onEdit={handleOpenEdit}
             onDelete={(id) => deleteMenu(id)}

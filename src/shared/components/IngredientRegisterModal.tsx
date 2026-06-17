@@ -1,13 +1,17 @@
 import { useState } from 'react';
 
-import { PackagePlus, Pencil } from 'lucide-react';
-
 import {
   useCreateIngredient,
   useUpdateIngredient,
 } from '@/features/store-settings/hooks/useIngredients';
 import { Button } from '@/shadcn/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/shadcn/ui/dialog';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/ui/select';
@@ -66,22 +70,15 @@ const IngredientRegisterModal = ({
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-sm">
-        <DialogHeader className="gap-0">
+        <DialogHeader>
           <DialogTitle className="text-lg! leading-none! flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-baro-blue/10 flex items-center justify-center shrink-0">
-              {isEditMode ? (
-                <Pencil className="w-4 h-4 text-baro-blue" />
-              ) : (
-                <PackagePlus className="w-4 h-4 text-baro-blue" />
-              )}
-            </div>
             {isEditMode ? '식자재 수정' : '식자재 등록'}
           </DialogTitle>
-          <p className="text-xs text-muted-foreground">
+          <DialogDescription className="text-xs text-muted-foreground">
             {isEditMode
               ? '식자재 이름과 단위를 수정합니다.'
               : '등록한 단위는 이후 재고 관리에 고정으로 사용됩니다'}
-          </p>
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 pt-1">
