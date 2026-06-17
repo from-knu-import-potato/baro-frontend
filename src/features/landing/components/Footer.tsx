@@ -15,9 +15,9 @@ const Footer = () => {
               <span className="text-xl font-bold tracking-tight">BARO</span>
             </Link>
             <p className="text-baro-black-muted text-sm leading-relaxed mb-6">
-              사장님들의 가장 든든한 AI 재고 관리 파트너.
+              주문부터 재고, 발주, 마감까지 관리하는
               <br />
-              찍으면 바로, 분석과 예측도 바로!
+              소규모 카페·식당을 위한 올인원 가게 운영 플랫폼.
             </p>
           </div>
 
