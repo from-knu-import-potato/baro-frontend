@@ -6,6 +6,9 @@ export interface OcrInboundItem {
   quantity: number;
   unit: OcrUnit;
   unitPrice: number | null;
+  supplyPrice: number | null;
+  expiryDate: string | null;
+  memo: string | null;
   isMatched: boolean;
   matchedInventoryId?: string;
   newIngredientId?: string;
