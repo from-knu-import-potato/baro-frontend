@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 
 import {
+  Building2,
+  CalendarIcon,
   CheckCircle2,
   FileText,
+  Hash,
   Link,
   Plus,
   RotateCcw,
@@ -12,6 +15,7 @@ import {
 } from 'lucide-react';
 
 import IngredientLinkModal from '@/features/ocr-inbound/components/IngredientLinkModal';
+import type { OcrMetadata } from '@/features/ocr-inbound/types/ocrInbound.api.types';
 import type {
   ExistingIngredient,
   OcrInboundItem,
@@ -20,7 +24,9 @@ import type {
 import { useIngredients } from '@/features/store-settings/hooks/useIngredients';
 import { cn } from '@/lib/utils';
 import { Button } from '@/shadcn/ui/button';
+import { Calendar } from '@/shadcn/ui/calendar';
 import { Input } from '@/shadcn/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shadcn/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/ui/select';
 import IngredientRegisterModal from '@/shared/components/IngredientRegisterModal';
 
@@ -29,6 +35,7 @@ const UNITS: OcrUnit[] = ['g', 'ml', '개'];
 interface OcrReviewStepProps {
   imageUrl: string;
   items: OcrInboundItem[];
+  metadata: OcrMetadata | null;
   onItemsChange: (items: OcrInboundItem[]) => void;
   onConfirm: () => void;
   onReset: () => void;
@@ -38,6 +45,7 @@ interface OcrReviewStepProps {
 const OcrReviewStep = ({
   imageUrl,
   items,
+  metadata,
   onItemsChange,
   onConfirm,
   onReset,
@@ -102,7 +110,7 @@ const OcrReviewStep = ({
     setPos({ x: 0, y: 0 });
   };
 
-  const handleChange = (id: string, field: keyof OcrInboundItem, value: string | number) => {
+  const handleChange = (id: string, field: keyof OcrInboundItem, value: string | number | null) => {
     onItemsChange(items.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
   };
 
@@ -119,6 +127,9 @@ const OcrReviewStep = ({
         quantity: 0,
         unit: 'g',
         unitPrice: null,
+        supplyPrice: null,
+        expiryDate: null,
+        memo: null,
         isMatched: false,
       },
     ]);
@@ -127,10 +138,40 @@ const OcrReviewStep = ({
   const matchedCount = items.filter((i) => i.isMatched).length;
   const newCount = items.length - matchedCount;
 
+  const metadataFields = metadata
+    ? (
+        [
+          { label: '거래일자', value: metadata.transactionDate },
+          {
+            label: '공급업체',
+            value: metadata.supplierName,
+            icon: <Building2 className="w-3 h-3" />,
+          },
+          {
+            label: '명세서 번호',
+            value: metadata.invoiceNumber,
+            icon: <Hash className="w-3 h-3" />,
+          },
+          {
+            label: '총 거래금액',
+            value:
+              metadata.totalAmount != null ? `${metadata.totalAmount.toLocaleString()}원` : null,
+          },
+          {
+            label: '공급가액 합계',
+            value:
+              metadata.totalSupplyAmount != null
+                ? `${metadata.totalSupplyAmount.toLocaleString()}원`
+                : null,
+          },
+        ] as { label: string; value: string | null; icon?: React.ReactNode }[]
+      ).filter((f) => f.value != null)
+    : [];
+
   return (
     <div className="flex h-full overflow-hidden">
       {/* 왼쪽: 이미지 뷰어 */}
-      <div className="w-[45%] border-r flex flex-col overflow-hidden">
+      <div className="w-[38%] border-r flex flex-col overflow-hidden">
         {/* 뷰어 툴바 */}
         <div className="h-11 px-4 border-b shrink-0 flex items-center justify-between">
           <p className="text-sm font-semibold">원본 거래명세서</p>
@@ -221,13 +262,32 @@ const OcrReviewStep = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-[24px_2fr_1.2fr_80px_1fr_1fr_36px] gap-3 px-4 py-2 bg-muted/40 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide shrink-0">
+        {/* 거래 메타데이터 카드 */}
+        {metadataFields.length > 0 && (
+          <div className="px-4 py-2.5 border-b bg-muted/20 shrink-0">
+            <div className="flex flex-wrap gap-x-5 gap-y-1">
+              {metadataFields.map((f) => (
+                <div
+                  key={f.label}
+                  className="flex items-center gap-1.5 text-xs text-muted-foreground"
+                >
+                  <span className="font-medium text-foreground/70">{f.label}</span>
+                  <span>{f.value}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <div className="grid grid-cols-[24px_2fr_1.2fr_80px_1fr_1.4fr_1fr_1.2fr_36px] gap-3 px-4 py-2 bg-muted/40 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide shrink-0">
           <span />
           <span>식자재명</span>
           <span>수량</span>
           <span>단위</span>
           <span>단가(원)</span>
+          <span>유통기한</span>
           <span className="text-center">상태</span>
+          <span>비고</span>
           <span />
         </div>
 
@@ -236,7 +296,7 @@ const OcrReviewStep = ({
             <div
               key={item.id}
               className={cn(
-                'grid grid-cols-[24px_2fr_1.2fr_80px_1fr_1fr_36px] gap-3 px-4 py-2.5 items-center border-b hover:bg-muted/10 transition-colors',
+                'grid grid-cols-[24px_2fr_1.2fr_80px_1fr_1.4fr_1fr_1.2fr_36px] gap-3 px-4 py-2.5 items-center border-b hover:bg-muted/10 transition-colors',
                 !item.isMatched && 'bg-green-50/20',
               )}
             >
@@ -292,6 +352,30 @@ const OcrReviewStep = ({
                 min={0}
                 placeholder="미입력"
               />
+              <Popover>
+                <PopoverTrigger
+                  className={cn(
+                    'h-8 w-full flex items-center gap-1.5 px-2.5 rounded-md border text-sm transition-colors hover:bg-muted/50',
+                    item.expiryDate ? 'text-foreground' : 'text-muted-foreground',
+                  )}
+                >
+                  <CalendarIcon className="w-3.5 h-3.5 shrink-0" />
+                  <span className="truncate">{item.expiryDate ?? '미입력'}</span>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={item.expiryDate ? new Date(item.expiryDate) : undefined}
+                    onSelect={(date) =>
+                      handleChange(
+                        item.id,
+                        'expiryDate',
+                        date ? date.toLocaleDateString('sv') : null,
+                      )
+                    }
+                  />
+                </PopoverContent>
+              </Popover>
               <div className="flex items-center gap-1 justify-center flex-wrap">
                 {item.isMatched ? (
                   <span className="inline-flex items-center gap-1 text-xs text-baro-blue bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/60 whitespace-nowrap">
@@ -324,6 +408,9 @@ const OcrReviewStep = ({
                   </>
                 )}
               </div>
+              <span className="text-xs text-muted-foreground truncate" title={item.memo ?? ''}>
+                {item.memo ?? '—'}
+              </span>
               <button
                 onClick={() => handleDelete(item.id)}
                 className="flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground hover:text-baro-red hover:bg-red-50 transition-colors"

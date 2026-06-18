@@ -1,3 +1,4 @@
+import type { OcrMetadata } from '@/features/ocr-inbound/types/ocrInbound.api.types';
 import axiosInstance from '@/shared/api/axiosInstance';
 
 export interface IngredientDto {
@@ -38,9 +39,20 @@ export async function createIngredient(
 
 export async function confirmInbound(
   storeId: string,
-  items: { ingredientId: string; amount: number; unitPrice?: number | null }[],
+  items: {
+    ingredientId: string;
+    amount: number;
+    unitPrice?: number | null;
+    supplyPrice?: number | null;
+    expiryDate?: string | null;
+    memo?: string | null;
+  }[],
+  metadata?: OcrMetadata,
 ): Promise<void> {
-  await axiosInstance.post(`/stores/${storeId}/ingredients/inbound`, { items });
+  await axiosInstance.post(`/stores/${storeId}/ingredients/inbound`, {
+    ...(metadata ? { metadata } : {}),
+    items,
+  });
 }
 
 export async function updateIngredient(
