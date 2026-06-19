@@ -1,5 +1,6 @@
-import { Store } from 'lucide-react';
+import { CalendarDays, Store } from 'lucide-react';
 
+import useClosingStore from '@/features/closing/store/closingStore';
 import { useOrders } from '@/features/dashboard/hooks/useOrders';
 import type { DashboardStats } from '@/features/dashboard/types/dashboard.types';
 
@@ -23,8 +24,16 @@ const StatTile = ({ label, value, comment, commentColor }: StatTileProps) => (
   </div>
 );
 
+const formatBusinessDate = (dateStr: string) => {
+  const [, month, day] = dateStr.split('-').map(Number);
+  const date = new Date(dateStr + 'T00:00:00');
+  const weekday = ['일', '월', '화', '수', '목', '금', '토'][date.getDay()];
+  return `${month}월 ${day}일 (${weekday})`;
+};
+
 const StoreStatusCard = ({ stats, storeId }: StoreStatusCardProps) => {
   const { data: orders = [] } = useOrders(storeId);
+  const businessDate = useClosingStore((s) => s.businessSession.businessDate);
 
   const today = new Date().toDateString();
   const todayRevenue = orders
@@ -36,11 +45,17 @@ const StoreStatusCard = ({ stats, storeId }: StoreStatusCardProps) => {
 
   return (
     <div className="rounded-xl bg-card ring-1 ring-foreground/10 overflow-hidden">
-      <div className="border-b px-4 py-2.5">
+      <div className="border-b px-4 py-2.5 flex items-center justify-between">
         <p className="text-sm font-medium flex items-center gap-2">
           <Store className="w-4 h-4 text-muted-foreground" />
           오늘의 가게 현황
         </p>
+        {businessDate && (
+          <span className="flex items-center gap-1 rounded-full bg-baro-blue/10 px-2.5 py-0.5 text-xs font-medium text-baro-blue">
+            <CalendarDays className="h-3 w-3" />
+            영업 기준일 {formatBusinessDate(businessDate)}
+          </span>
+        )}
       </div>
 
       <div className="flex gap-3 px-4 py-3">

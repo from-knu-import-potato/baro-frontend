@@ -4,7 +4,7 @@ import { Check, LogOut, Pencil, Trash2, UserCircle, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { withdrawUser } from '@/features/account-settings/api/accountSettings.api';
-import { MOCK_ACCOUNT_SETTINGS } from '@/features/account-settings/data/account-settings.mock';
+import { useUpdateUserName, useUserInfo } from '@/features/account-settings/hooks/useUserInfo';
 import { logout } from '@/features/auth/api/authApi';
 import useAuthStore from '@/features/auth/store/authStore';
 import { Button } from '@/shadcn/ui/button';
@@ -22,9 +22,11 @@ import SettingRow from '@/shared/components/SettingRow';
 import SettingsSection from '@/shared/components/SettingsSection';
 
 const AccountSection = () => {
+  const { data: userInfo } = useUserInfo();
+  const { mutate: updateName, isPending: isUpdatingName } = useUpdateUserName();
+
   const [isEditingName, setIsEditingName] = useState(false);
-  const [name, setName] = useState(MOCK_ACCOUNT_SETTINGS.name);
-  const [draftName, setDraftName] = useState(name);
+  const [draftName, setDraftName] = useState('');
   const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
@@ -33,17 +35,15 @@ const AccountSection = () => {
   const clearAuth = useAuthStore((s) => s.clearAuth);
 
   const handleEditStart = () => {
-    setDraftName(name);
+    setDraftName(userInfo?.name ?? '');
     setIsEditingName(true);
     setTimeout(() => inputRef.current?.focus(), 0);
   };
 
   const handleSave = () => {
     const trimmed = draftName.trim();
-    if (trimmed) {
-      setName(trimmed);
-    }
-    setIsEditingName(false);
+    if (!trimmed) return;
+    updateName(trimmed, { onSuccess: () => setIsEditingName(false) });
   };
 
   const handleCancel = () => {
@@ -102,6 +102,7 @@ const AccountSection = () => {
                   size="icon"
                   className="h-8 w-8 text-baro-green hover:bg-baro-green/10 hover:text-baro-green"
                   onClick={handleSave}
+                  disabled={isUpdatingName}
                   aria-label="저장"
                 >
                   <Check className="h-4 w-4" />
@@ -111,6 +112,7 @@ const AccountSection = () => {
                   size="icon"
                   className="h-8 w-8 text-muted-foreground hover:text-foreground"
                   onClick={handleCancel}
+                  disabled={isUpdatingName}
                   aria-label="취소"
                 >
                   <X className="h-4 w-4" />
@@ -118,7 +120,7 @@ const AccountSection = () => {
               </div>
             ) : (
               <div className="flex items-center gap-1.5">
-                <span className="text-sm text-muted-foreground">{name}</span>
+                <span className="text-sm text-muted-foreground">{userInfo?.name ?? ''}</span>
                 <Button
                   variant="ghost"
                   size="icon"
