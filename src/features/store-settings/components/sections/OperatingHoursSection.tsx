@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 import { Clock } from 'lucide-react';
 
-import { DAY_OF_WEEK_CONFIG } from '@/features/initial-setup/constants/initialSetup.constants';
 import StepOperatingHours from '@/features/initial-setup/components/steps/StepOperatingHours';
+import { DAY_OF_WEEK_CONFIG } from '@/features/initial-setup/constants/initialSetup.constants';
 import type { OperatingHour } from '@/features/initial-setup/types/initialSetup.types';
 import {
   useStoreSettings,
