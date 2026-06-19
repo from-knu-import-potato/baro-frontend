@@ -1,4 +1,5 @@
 import DataSection from '@/features/store-settings/components/sections/DataSection';
+import OperatingHoursSection from '@/features/store-settings/components/sections/OperatingHoursSection';
 import StoreInfoSection from '@/features/store-settings/components/sections/StoreInfoSection';
 import StoreOperationSection from '@/features/store-settings/components/sections/StoreOperationSection';
 
@@ -10,6 +11,7 @@ const StoreSettingsContent = () => {
         <p className="text-xs text-muted-foreground">가게 정보 및 운영 데이터를 관리합니다.</p>
       </div>
       <StoreInfoSection />
+      <OperatingHoursSection />
       <StoreOperationSection />
       <DataSection />
     </div>
