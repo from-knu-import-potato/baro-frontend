@@ -28,8 +28,8 @@ export interface StoreBasicInfo {
 export interface OperatingHour {
   dayOfWeek: DayOfWeek;
   isOpen: boolean;
-  openTime: string;
-  closeTime: string;
+  openTime: string | null;
+  closeTime: string | null;
 }
 
 export interface MenuItem {

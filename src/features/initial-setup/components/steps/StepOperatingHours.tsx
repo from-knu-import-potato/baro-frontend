@@ -72,12 +72,12 @@ const StepOperatingHours = ({ data, onChange }: StepOperatingHoursProps) => {
               {hour.isOpen ? (
                 <>
                   <TimeInput
-                    value={hour.openTime}
+                    value={hour.openTime ?? ''}
                     onChange={(v) => handleUpdate(index, { openTime: v })}
                   />
                   <span className="shrink-0 text-[10px] text-muted-foreground">~</span>
                   <TimeInput
-                    value={hour.closeTime}
+                    value={hour.closeTime ?? ''}
                     onChange={(v) => handleUpdate(index, { closeTime: v })}
                   />
                 </>

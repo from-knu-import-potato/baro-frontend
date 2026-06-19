@@ -1,9 +1,10 @@
-import { LayoutDashboard, Package, Truck, Store, Settings, Home } from 'lucide-react';
+import { LayoutDashboard, MonitorPlay, Package, Truck, Store, Settings, Home } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
 import useAuthStore from '@/features/auth/store/authStore';
 import { useClosingStatus } from '@/features/closing/hooks/useClosingStatus';
+import useClosingStore from '@/features/closing/store/closingStore';
 import {
   Sidebar,
   SidebarContent,
@@ -22,6 +23,7 @@ import BaroLogo from '@/shared/assets/images/baro-logo.png';
 
 const BOTTOM_NAV_ITEMS = [
   { label: '회원 설정', icon: Settings, to: routePaths.settings },
+  { label: '시스템 시작', icon: MonitorPlay, to: routePaths.systemStart },
   // { label: '지원', icon: HelpCircle, to: routePaths.support },
   { label: '랜딩 페이지', icon: Home, to: routePaths.landing },
 ];
@@ -48,6 +50,10 @@ const AppSidebar = ({
   const location = useLocation();
   const storeId = useAuthStore((s) => s.storeId);
   const { isCompleted } = useClosingStatus(storeId);
+  const { isOpen: isBusinessOpen } = useClosingStore((s) => s.businessSession);
+
+  // 영업 중이 아니거나 오늘 마감이 완료된 경우 대시보드 비활성화
+  const isDashboardDisabled = !isBusinessOpen || isCompleted;
 
   return (
     <Sidebar collapsible="icon">
@@ -71,10 +77,16 @@ const AppSidebar = ({
               <SidebarMenuItem>
                 <SidebarMenuButton
                   isActive={location.pathname === routePaths.dashboard}
-                  tooltip={isCompleted ? '오늘 마감이 완료되었습니다' : '대시보드'}
-                  disabled={isCompleted}
-                  render={isCompleted ? undefined : <NavLink to={routePaths.dashboard} />}
-                  className={isCompleted ? 'opacity-40 cursor-not-allowed' : undefined}
+                  tooltip={
+                    !isBusinessOpen
+                      ? '영업을 시작하면 접근할 수 있습니다'
+                      : isCompleted
+                        ? '오늘 마감이 완료되었습니다'
+                        : '대시보드'
+                  }
+                  disabled={isDashboardDisabled}
+                  render={isDashboardDisabled ? undefined : <NavLink to={routePaths.dashboard} />}
+                  className={isDashboardDisabled ? 'opacity-40 cursor-not-allowed' : undefined}
                 >
                   <LayoutDashboard />
                   <span>대시보드</span>

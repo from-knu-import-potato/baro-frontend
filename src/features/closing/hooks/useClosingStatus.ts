@@ -1,22 +1,18 @@
+import useAuthStore from '@/features/auth/store/authStore';
 import { useClosingHistory } from '@/features/closing/hooks/useClosingHistory';
-
-const getTodayDateString = () => {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, '0');
-  const day = String(now.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
+import { getBusinessDate } from '@/shared/utils/businessDate';
 
 export const useClosingStatus = (storeId: string | null) => {
+  const operatingHours = useAuthStore((s) => s.operatingHours);
   const { data: history, isLoading, refetch } = useClosingHistory(storeId);
-  const today = getTodayDateString();
 
-  const todayClosing = history?.closings.find((c) => c.date.startsWith(today)) ?? null;
+  const businessDate = getBusinessDate(operatingHours);
+  const todayClosing = history?.closings.find((c) => c.date.startsWith(businessDate)) ?? null;
 
   return {
     isCompleted: !!todayClosing,
     todayClosing,
+    businessDate,
     isLoading,
     refetch,
   };

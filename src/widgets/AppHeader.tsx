@@ -2,6 +2,7 @@ import { ChevronDown } from 'lucide-react';
 
 import useAuthStore from '@/features/auth/store/authStore';
 import { useClosingStatus } from '@/features/closing/hooks/useClosingStatus';
+import useClosingStore from '@/features/closing/store/closingStore';
 import { Button } from '@/shadcn/ui/button';
 import { Skeleton } from '@/shadcn/ui/skeleton';
 
@@ -15,6 +16,10 @@ interface AppHeaderProps {
 const AppHeader = ({ userName, userRole, isLoading = false, onClosingClick }: AppHeaderProps) => {
   const storeId = useAuthStore((s) => s.storeId);
   const { isCompleted } = useClosingStatus(storeId);
+  const { isOpen: isBusinessOpen } = useClosingStore((s) => s.businessSession);
+
+  // 영업 중이 아니거나 이미 마감한 경우 마감 버튼 비활성화
+  const isClosingDisabled = !isBusinessOpen || isCompleted;
 
   return (
     <header className="bg-background h-13 border-b flex items-center justify-end px-6 gap-4 sticky top-0 z-10">
@@ -22,8 +27,14 @@ const AppHeader = ({ userName, userRole, isLoading = false, onClosingClick }: Ap
       <Button
         size="sm"
         onClick={onClosingClick}
-        disabled={isCompleted}
-        title={isCompleted ? '오늘 마감이 완료되었습니다' : undefined}
+        disabled={isClosingDisabled}
+        title={
+          !isBusinessOpen
+            ? '영업을 시작하면 마감할 수 있습니다'
+            : isCompleted
+              ? '오늘 마감이 완료되었습니다'
+              : undefined
+        }
         className="bg-baro-blue text-xs rounded-full hover:bg-baro-blue/80 text-white disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {isCompleted ? '마감 완료' : '마감하기'}
