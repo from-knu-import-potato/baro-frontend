@@ -54,6 +54,21 @@ export interface ClosingStatus {
   closingId?: string;
 }
 
+export interface BusinessOpenRequest {
+  businessDate: string; // YYYY-MM-DD
+}
+
+export interface BusinessOpenResponse {
+  businessDate: string;
+  openedAt: string;
+}
+
+export interface BusinessOpenStatus {
+  isOpen: boolean;
+  businessDate: string | null;
+  openedAt: string | null;
+}
+
 export interface ClosingHistoryItem {
   id: string;
   date: string;

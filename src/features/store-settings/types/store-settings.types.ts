@@ -1,3 +1,5 @@
+import type { OperatingHour } from '@/features/initial-setup/types/initialSetup.types';
+
 export interface StoreOwner {
   id: string;
   name: string;
@@ -14,6 +16,7 @@ export interface StoreSettings {
   category: string;
   memo: string;
   safetyStockPct?: number | null;
+  operatingHours: OperatingHour[];
 }
 
 export interface StoreStaff {
