@@ -7,7 +7,7 @@ import { DAY_OF_WEEK_CONFIG } from '@/features/initial-setup/constants/initialSe
 import type { OperatingHour } from '@/features/initial-setup/types/initialSetup.types';
 import {
   useStoreSettings,
-  useUpdateStoreSettings,
+  useUpdateOperatingHours,
 } from '@/features/store-settings/hooks/useStoreSettings';
 import { Button } from '@/shadcn/ui/button';
 import { Skeleton } from '@/shadcn/ui/skeleton';
@@ -28,7 +28,7 @@ const HoursRow = ({ day, hour }: { day: string; hour: OperatingHour | undefined 
 
 const OperatingHoursSection = () => {
   const { data, isLoading } = useStoreSettings();
-  const { mutate: updateStore, isPending } = useUpdateStoreSettings();
+  const { mutate: updateStore, isPending } = useUpdateOperatingHours();
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState<OperatingHour[]>([]);
 
@@ -49,7 +49,7 @@ const OperatingHoursSection = () => {
   };
 
   const handleSave = () => {
-    updateStore({ operatingHours: form }, { onSuccess: () => setIsEditing(false) });
+    updateStore(form, { onSuccess: () => setIsEditing(false) });
   };
 
   const handleCancel = () => {
