@@ -1,7 +1,9 @@
 import { useState } from 'react';
 
-import { AlertTriangle, CalendarDays, CheckCircle, TrendingUp } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
+import { AlertTriangle, CalendarDays, CheckCircle, MoonStar, TrendingUp } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import useAuthStore from '@/features/auth/store/authStore';
 import AfterClosingModal from '@/features/closing/components/AfterClosingModal';
@@ -11,8 +13,17 @@ import ClosingInventoryDeductionSection, {
 import ClosingSoldMenusSection from '@/features/closing/components/ClosingSoldMenusSection';
 import { useClosing } from '@/features/closing/hooks/useClosing';
 import { useClosingPreview } from '@/features/closing/hooks/useClosingPreview';
+import useClosingStore from '@/features/closing/store/closingStore';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent } from '@/shadcn/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/shadcn/ui/dialog';
 import { Skeleton } from '@/shadcn/ui/skeleton';
 
 const formatCurrency = (amount: number) => `${amount.toLocaleString('ko-KR')}원`;
@@ -28,7 +39,10 @@ const formatDate = (dateStr: string) => {
 };
 
 const ClosingPage = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const storeId = useAuthStore((s) => s.storeId);
+  const clearBusinessSession = useClosingStore((s) => s.clearBusinessSession);
   const [searchParams] = useSearchParams();
   const dateParam = searchParams.get('date') ?? undefined;
   const isRetroactive = !!dateParam;
@@ -37,8 +51,10 @@ const ClosingPage = () => {
 
   const [deductionRows, setDeductionRows] = useState<DeductionRow[]>([]);
   const [afterModalOpen, setAfterModalOpen] = useState(false);
+  const [alreadyClosedModalOpen, setAlreadyClosedModalOpen] = useState(false);
   const [finalRevenue, setFinalRevenue] = useState(0);
   const [closingId, setClosingId] = useState('');
+  const [closingDate, setClosingDate] = useState('');
   const [isInitialized, setIsInitialized] = useState(false);
 
   const { mutate: submitClosing, isPending } = useClosing(storeId ?? '');
@@ -62,6 +78,11 @@ const ClosingPage = () => {
   const handleComplete = () => {
     if (!storeId || !preview) return;
 
+    if (preview.isClosed) {
+      setAlreadyClosedModalOpen(true);
+      return;
+    }
+
     submitClosing(
       {
         date: preview.date,
@@ -74,7 +95,13 @@ const ClosingPage = () => {
         onSuccess: (res) => {
           setFinalRevenue(res.totalRevenue);
           setClosingId(res.closingId);
+          setClosingDate(res.date);
+          clearBusinessSession();
+          void queryClient.invalidateQueries({ queryKey: ['closing', 'preview'] });
           setAfterModalOpen(true);
+        },
+        onError: () => {
+          toast.error('마감 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.');
         },
       },
     );
@@ -166,14 +193,24 @@ const ClosingPage = () => {
 
         {/* 고정 하단 버튼 */}
         <div className="fixed bottom-0 left-0 right-0 z-10 bg-background border-t px-6 py-4">
-          <Button
-            onClick={handleComplete}
-            disabled={isPending}
-            className="w-full h-12 text-base font-semibold bg-baro-blue hover:bg-baro-blue/90 text-white flex items-center gap-2"
-          >
-            <CheckCircle className="w-5 h-5" />
-            {isPending ? '마감 처리 중...' : '마감 완료'}
-          </Button>
+          {preview.isClosed ? (
+            <Button
+              onClick={handleComplete}
+              className="w-full h-12 text-base font-semibold bg-slate-200 hover:bg-slate-300 text-slate-500 flex items-center gap-2"
+            >
+              <MoonStar className="w-5 h-5" />
+              마감 완료됨
+            </Button>
+          ) : (
+            <Button
+              onClick={handleComplete}
+              disabled={isPending}
+              className="w-full h-12 text-base font-semibold bg-baro-blue hover:bg-baro-blue/90 text-white flex items-center gap-2"
+            >
+              <CheckCircle className="w-5 h-5" />
+              {isPending ? '마감 처리 중...' : '마감 완료'}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -181,10 +218,38 @@ const ClosingPage = () => {
         <AfterClosingModal
           open={afterModalOpen}
           totalRevenue={finalRevenue}
+          closingDate={closingDate}
           storeId={storeId}
           closingId={closingId}
         />
       )}
+
+      {/* 이미 마감된 날짜에 재시도할 때 안내 모달 */}
+      <Dialog open={alreadyClosedModalOpen} onOpenChange={setAlreadyClosedModalOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MoonStar className="w-4 h-4 text-slate-400" />
+              이미 마감이 완료된 날짜입니다
+            </DialogTitle>
+            <DialogDescription>
+              {preview && formatDate(preview.date)} 마감은 이미 처리되었습니다. 마감 취소가
+              필요하다면 시스템 시작 페이지에서 진행해 주세요.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setAlreadyClosedModalOpen(false)}>
+              닫기
+            </Button>
+            <Button
+              onClick={() => navigate('/system-start')}
+              className="bg-baro-blue hover:bg-baro-blue/90 text-white"
+            >
+              시스템 시작으로
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

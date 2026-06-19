@@ -20,6 +20,7 @@ import { Dialog, DialogContent } from '@/shadcn/ui/dialog';
 interface AfterClosingModalProps {
   open: boolean;
   totalRevenue: number;
+  closingDate: string; // YYYY-MM-DD
   storeId: string;
   closingId: string;
 }
@@ -52,15 +53,28 @@ const URGENCY_CONFIG: Record<
   },
 };
 
-const ClosingHero = ({ totalRevenue, subtitle }: { totalRevenue: number; subtitle?: string }) => (
+const formatShortDate = (dateStr: string) => {
+  const [, month, day] = dateStr.split('-').map(Number);
+  return `${month}월 ${day}일`;
+};
+
+const ClosingHero = ({
+  totalRevenue,
+  closingDate,
+  subtitle,
+}: {
+  totalRevenue: number;
+  closingDate: string;
+  subtitle?: string;
+}) => (
   <div className="px-6 pt-8 pb-5 text-center bg-baro-blue">
     <div className="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center mx-auto mb-4">
       <CheckCircle2 className="w-8 h-8 text-white" />
     </div>
-    <h2 className="text-xl font-bold text-white">오늘 마감 완료!</h2>
+    <h2 className="text-xl font-bold text-white">{formatShortDate(closingDate)} 마감 완료!</h2>
     {subtitle && <p className="text-sm text-white/70 mt-1">{subtitle}</p>}
     <div className="mt-4 bg-white/15 rounded-xl px-4 py-3">
-      <p className="text-xs text-white/70">오늘 총 매출</p>
+      <p className="text-xs text-white/70">{formatShortDate(closingDate)} 총 매출</p>
       <p className="text-3xl font-bold tabular-nums text-white mt-0.5">
         {formatCurrency(totalRevenue)}
       </p>
@@ -68,7 +82,13 @@ const ClosingHero = ({ totalRevenue, subtitle }: { totalRevenue: number; subtitl
   </div>
 );
 
-const AfterClosingModal = ({ open, totalRevenue, storeId, closingId }: AfterClosingModalProps) => {
+const AfterClosingModal = ({
+  open,
+  totalRevenue,
+  closingDate,
+  storeId,
+  closingId,
+}: AfterClosingModalProps) => {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>('generating');
   const [guideItems, setGuideItems] = useState<OrderGuideItem[]>([]);
@@ -102,7 +122,7 @@ const AfterClosingModal = ({ open, totalRevenue, storeId, closingId }: AfterClos
         {/* ── 생성 중 ── */}
         {step === 'generating' && (
           <>
-            <ClosingHero totalRevenue={totalRevenue} />
+            <ClosingHero totalRevenue={totalRevenue} closingDate={closingDate} />
             <div className="flex flex-col items-center gap-3 px-6 py-8">
               <div className="h-8 w-8 animate-spin rounded-full border-[3px] border-baro-blue border-t-transparent" />
               <div className="text-center">
@@ -118,7 +138,11 @@ const AfterClosingModal = ({ open, totalRevenue, storeId, closingId }: AfterClos
         {/* ── 발주 가이드 없음 ── */}
         {step === 'no-guide' && (
           <>
-            <ClosingHero totalRevenue={totalRevenue} subtitle="수고하셨습니다" />
+            <ClosingHero
+              totalRevenue={totalRevenue}
+              closingDate={closingDate}
+              subtitle="수고하셨습니다"
+            />
             <div className="px-6 pt-0 pb-5 space-y-4">
               <div className="flex items-start gap-3 rounded-xl bg-baro-green/10 border border-baro-green/25 p-4">
                 <div className="shrink-0 w-8 h-8 rounded-full bg-baro-green/20 flex items-center justify-center">
@@ -145,7 +169,11 @@ const AfterClosingModal = ({ open, totalRevenue, storeId, closingId }: AfterClos
         {/* ── 발주 가이드 있음: 선택 ── */}
         {step === 'choose' && (
           <>
-            <ClosingHero totalRevenue={totalRevenue} subtitle="재고 차감 완료" />
+            <ClosingHero
+              totalRevenue={totalRevenue}
+              closingDate={closingDate}
+              subtitle="재고 차감 완료"
+            />
             <div className="px-6 pt-0 pb-5 space-y-3">
               <p className="text-sm text-muted-foreground text-center pt-1 pb-2">
                 발주 가이드를 언제 확인할까요?
