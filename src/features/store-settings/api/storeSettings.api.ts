@@ -17,6 +17,7 @@ export async function fetchStoreSettings(storeId: string): Promise<StoreSettings
     category: d.category,
     memo: d.memo ?? '',
     safetyStockPct: d.safetyStockPct ?? null,
+    operatingHours: d.operatingHours ?? [],
   };
 }
 
