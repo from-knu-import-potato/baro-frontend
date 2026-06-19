@@ -1,3 +1,4 @@
+import type { OperatingHour } from '@/features/initial-setup/types/initialSetup.types';
 import type { StoreSettings } from '@/features/store-settings/types/store-settings.types';
 import axiosInstance from '@/shared/api/axiosInstance';
 
@@ -23,7 +24,17 @@ export async function fetchStoreSettings(storeId: string): Promise<StoreSettings
 
 export async function updateStoreSettings(
   storeId: string,
-  data: Partial<StoreSettings>,
+  data: Partial<Omit<StoreSettings, 'operatingHours'>>,
 ): Promise<void> {
   await axiosInstance.patch(`/stores/${storeId}`, data);
+}
+
+export async function updateOperatingHours(
+  storeId: string,
+  operatingHours: OperatingHour[],
+): Promise<OperatingHour[]> {
+  const response = await axiosInstance.patch(`/stores/${storeId}/operating-hours`, {
+    operatingHours,
+  });
+  return response.data.data.operatingHours;
 }
