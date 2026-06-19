@@ -10,6 +10,7 @@ import {
   LogIn,
   MoonStar,
   Settings,
+  Store,
   Trash2,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -54,18 +55,20 @@ const formatShortDate = (dateStr: string) => {
 };
 
 type BusinessCase =
-  | 'normal' // A: 정상 영업 시작 가능
-  | 'before-open-closed' // B: 개점 전, 전날 마감 완료
-  | 'before-open-not-closed' // C: 개점 전, 전날 마감 미완료
-  | 'today-closed' // D: 오늘 마감 완료
-  | 'holiday-closed' // E: 휴무일 + 임시 영업 마감 완료
-  | 'holiday'; // F: 휴무일, 임시 영업 가능
+  | 'already-open' // A: 이미 개점한 상태 (영업 중)
+  | 'normal' // B: 정상 영업 시작 가능
+  | 'before-open-closed' // C: 개점 전, 전날 마감 완료
+  | 'before-open-not-closed' // D: 개점 전, 전날 마감 미완료
+  | 'today-closed' // E: 오늘 마감 완료
+  | 'holiday-closed' // F: 휴무일 + 임시 영업 마감 완료
+  | 'holiday'; // G: 휴무일, 임시 영업 가능
 
 const SystemStartPage = () => {
   const navigate = useNavigate();
   const storeId = useAuthStore((s) => s.storeId);
   const operatingHours = useAuthStore((s) => s.operatingHours);
   const setBusinessSession = useClosingStore((s) => s.setBusinessSession);
+  const businessSession = useClosingStore((s) => s.businessSession);
 
   const businessDate = getBusinessDate(operatingHours);
   const todayKST = todayKSTString();
@@ -82,6 +85,8 @@ const SystemStartPage = () => {
   const [showHolidayModal, setShowHolidayModal] = useState(false);
 
   const getCase = (): BusinessCase => {
+    if (businessSession.isOpen && businessSession.businessDate === businessDate)
+      return 'already-open';
     if (isHoliday) return businessDateClosed ? 'holiday-closed' : 'holiday';
     if (isBeforeOpen) return businessDateClosed ? 'before-open-closed' : 'before-open-not-closed';
     return businessDateClosed ? 'today-closed' : 'normal';
@@ -105,6 +110,13 @@ const SystemStartPage = () => {
 
   const renderStatusBanner = () => {
     switch (currentCase) {
+      case 'already-open':
+        return (
+          <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+            <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-green-500 animate-pulse" />
+            <span>현재 영업이 진행 중입니다.</span>
+          </div>
+        );
       case 'before-open-closed':
         return (
           <div className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
@@ -155,6 +167,27 @@ const SystemStartPage = () => {
 
   const renderPrimaryButton = () => {
     switch (currentCase) {
+      case 'already-open':
+        return (
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="w-full bg-baro-blue hover:bg-baro-blue/90 text-white rounded-lg px-8 py-6 flex items-center justify-between transition-colors text-left group"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
+                <Store className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="font-bold text-xl">영업 중 · 대시보드로 이동</p>
+                <p className="text-sm text-white/70 mt-1">
+                  {formatShortDate(businessDate)} 영업이 진행 중입니다
+                </p>
+              </div>
+            </div>
+            <ChevronRight className="w-6 h-6 opacity-60 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+          </button>
+        );
+
       case 'normal':
         return (
           <button
