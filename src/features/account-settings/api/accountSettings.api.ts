@@ -12,6 +12,10 @@ export async function fetchUserInfo(): Promise<UserInfo> {
   };
 }
 
+export const updateUserName = (name: string): Promise<void> => {
+  return axiosInstance.patch('/users/me', { name }).then(() => undefined);
+};
+
 export const withdrawUser = (): Promise<void> => {
   return axiosInstance.delete('/users/me').then(() => undefined);
 };
