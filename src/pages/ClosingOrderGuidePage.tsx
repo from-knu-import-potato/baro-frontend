@@ -43,7 +43,7 @@ const ClosingOrderGuidePage = () => {
       </div>
 
       {/* 콘텐츠 */}
-      <div className="flex flex-col flex-1 p-6 min-h-0">
+      <div className="flex flex-col flex-1 p-4 min-h-0">
         {!stateItems && isLoading ? (
           <div className="flex flex-col gap-4">
             <Skeleton className="h-12 w-full rounded-xl" />

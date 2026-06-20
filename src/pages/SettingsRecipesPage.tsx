@@ -320,7 +320,7 @@ const SettingsRecipesPage = () => {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3">
         {isLoading ? (
           Array.from({ length: 2 }).map((_, i) => (
             <Skeleton key={i} className="h-24 w-full rounded-xl" />

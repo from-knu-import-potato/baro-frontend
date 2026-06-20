@@ -1,4 +1,4 @@
-import { ClipboardList, Package } from 'lucide-react';
+import { Package } from 'lucide-react';
 
 import useAuthStore from '@/features/auth/store/authStore';
 import OrderGuideList from '@/features/order-guide/components/OrderGuideList';
@@ -12,7 +12,7 @@ const OrderGuidePage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-4 p-6">
+      <div className="flex flex-col gap-4 p-4">
         <Skeleton className="h-12 w-full rounded-xl" />
         <Skeleton className="h-96 w-full rounded-xl" />
       </div>
@@ -21,7 +21,7 @@ const OrderGuidePage = () => {
 
   if (isError || !data) {
     return (
-      <div className="p-6">
+      <div className="p-4">
         <Card>
           <CardContent className="py-16 text-center">
             <Package className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
@@ -34,25 +34,9 @@ const OrderGuidePage = () => {
     );
   }
 
-  if (data.generatedAt === null) {
-    return (
-      <div className="p-6">
-        <Card>
-          <CardContent className="py-16 text-center">
-            <ClipboardList className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
-            <p className="text-sm font-medium text-foreground">아직 발주 가이드가 없어요</p>
-            <p className="text-xs text-muted-foreground mt-1">
-              마감을 완료하면 AI가 자동으로 발주 가이드를 생성해 드려요.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col h-full p-6">
-      <OrderGuideList items={data.items} />
+    <div className="flex flex-col h-full p-4">
+      <OrderGuideList items={data.items} generatedAt={data.generatedAt} />
     </div>
   );
 };

@@ -160,7 +160,7 @@ const SettingsIngredientsPage = () => {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto p-6 space-y-2">
+      <div className="flex-1 overflow-y-auto p-4 space-y-2">
         {isLoading ? (
           Array.from({ length: 3 }).map((_, i) => (
             <Skeleton key={i} className="h-14 w-full rounded-xl" />
