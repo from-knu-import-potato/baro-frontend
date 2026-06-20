@@ -23,6 +23,7 @@ interface AfterClosingModalProps {
   closingDate: string; // YYYY-MM-DD
   storeId: string;
   closingId: string;
+  isRetroactive?: boolean;
 }
 
 type Step = 'generating' | 'no-guide' | 'choose' | 'summary' | 'confirm-exit';
@@ -88,6 +89,7 @@ const AfterClosingModal = ({
   closingDate,
   storeId,
   closingId,
+  isRetroactive = false,
 }: AfterClosingModalProps) => {
   const navigate = useNavigate();
   const [step, setStep] = useState<Step>('generating');
@@ -109,7 +111,9 @@ const AfterClosingModal = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, step]);
 
-  const handleExit = () => navigate('/day-closed', { replace: true });
+  // 소급 마감은 오늘 영업이 계속되므로 대시보드로 복귀, 일반 마감은 영업 종료 페이지로
+  const handleExit = () =>
+    navigate(isRetroactive ? '/dashboard' : '/day-closed', { replace: true });
 
   const urgentItems = guideItems.filter((i) => i.urgency === 'critical' || i.urgency === 'warning');
   const displayItems = (urgentItems.length > 0 ? urgentItems : guideItems).slice(0, 5);
@@ -160,7 +164,7 @@ const AfterClosingModal = ({
                 className="w-full h-11 bg-baro-blue hover:bg-baro-blue/90 text-white flex items-center gap-2"
               >
                 <LogOut className="w-4 h-4" />
-                프로그램 종료
+                {isRetroactive ? '대시보드로 돌아가기' : '프로그램 종료'}
               </Button>
             </div>
           </>
@@ -294,9 +298,11 @@ const AfterClosingModal = ({
               <Moon className="w-8 h-8 text-slate-400" />
             </div>
             <div>
-              <h2 className="text-lg font-bold">프로그램을 종료할까요?</h2>
+              <h2 className="text-lg font-bold">
+                {isRetroactive ? '대시보드로 돌아갈까요?' : '프로그램을 종료할까요?'}
+              </h2>
               <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
-                발주 가이드는 내일 오픈 때<br />
+                발주 가이드는 {isRetroactive ? '나중에' : '내일 오픈 때'} <br />
                 발주 가이드 메뉴에서 확인할 수 있어요.
               </p>
             </div>
@@ -309,7 +315,7 @@ const AfterClosingModal = ({
                 onClick={handleExit}
               >
                 <LogOut className="w-4 h-4" />
-                종료
+                {isRetroactive ? '돌아가기' : '종료'}
               </Button>
             </div>
           </div>
