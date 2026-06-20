@@ -15,6 +15,10 @@
   <a href="https://qa-baro-web.vercel.app/">
     <img src="https://img.shields.io/badge/🧪 테스트 서비스-Click-679436?style=flat-square" />
   </a>
+    &nbsp;&nbsp;
+  <a href="https://github.com/from-knu-import-potato/baro-backend">
+    <img src="https://img.shields.io/badge/🗄️ 백엔드 레포-Click-E8A838?style=flat-square" />
+  </a>
 </div>
 
 <br/>
