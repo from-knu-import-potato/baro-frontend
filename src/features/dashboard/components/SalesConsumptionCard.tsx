@@ -9,10 +9,10 @@ interface SalesConsumptionCardProps {
 
 /* ── SVG 도넛 차트 ── */
 interface DonutChartProps {
-  salesRatio: number; // 매출 / (매출 + 소비), 0 ~ 1
+  consumptionRatio: number; // 0 ~ 1
 }
 
-const DonutChart = ({ salesRatio }: DonutChartProps) => {
+const DonutChart = ({ consumptionRatio }: DonutChartProps) => {
   const r = 52;
   const cx = 70;
   const cy = 70;
@@ -20,28 +20,17 @@ const DonutChart = ({ salesRatio }: DonutChartProps) => {
   const C = 2 * Math.PI * r;
   const GAP = C * 0.015;
 
-  const ratio = Math.min(1, Math.max(0, salesRatio));
+  const ratio = Math.min(1, Math.max(0, consumptionRatio));
   const hasBoth = ratio > 0 && ratio < 1;
-  // 초록 = 매출 아크
-  const salesArc = hasBoth ? C * ratio - GAP : C * ratio;
-  // 파랑 = 소비 아크
-  const consumptionArc = hasBoth ? C * (1 - ratio) - GAP : C * (1 - ratio);
-
-  // 데이터 없으면 회색 원만 표시
-  if (salesRatio === 0.5 && salesArc === 0 && consumptionArc === 0) {
-    return (
-      <svg viewBox="0 0 140 140" className="w-full h-full">
-        <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f3f4f6" strokeWidth={sw} />
-      </svg>
-    );
-  }
+  const consumptionArc = hasBoth ? C * ratio - GAP : C * ratio;
+  const profitArc = hasBoth ? C * (1 - ratio) - GAP : C * (1 - ratio);
 
   return (
-    <svg viewBox="0 0 140 140" className="w-full h-full drop-shadow-md">
+    <svg viewBox="0 0 140 140" className="w-full h-full">
       <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f3f4f6" strokeWidth={sw} />
 
       <g transform={`rotate(-90 ${cx} ${cy})`}>
-        {salesArc > 0 && (
+        {consumptionArc > 0 && (
           <circle
             cx={cx}
             cy={cy}
@@ -50,11 +39,11 @@ const DonutChart = ({ salesRatio }: DonutChartProps) => {
             stroke="#679436"
             strokeWidth={sw}
             strokeLinecap="butt"
-            strokeDasharray={`${salesArc} ${C}`}
+            strokeDasharray={`${consumptionArc} ${C}`}
             strokeDashoffset={0}
           />
         )}
-        {consumptionArc > 0 && (
+        {profitArc > 0 && (
           <circle
             cx={cx}
             cy={cy}
@@ -63,7 +52,7 @@ const DonutChart = ({ salesRatio }: DonutChartProps) => {
             stroke="#449CD4"
             strokeWidth={sw}
             strokeLinecap="butt"
-            strokeDasharray={`${consumptionArc} ${C}`}
+            strokeDasharray={`${profitArc} ${C}`}
             strokeDashoffset={hasBoth ? -(C * ratio) : 0}
           />
         )}
@@ -77,82 +66,57 @@ const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
   const latest = data[data.length - 1];
   const rawProfit = latest.sales - latest.consumption;
   const isDeficit = rawProfit < 0;
-  const total = latest.sales + latest.consumption;
-  const rawSalesRatio = total > 0 ? latest.sales / total : 0;
-  // 둘 다 값이 있을 때 최소 5% 아크 보장 (비율이 극단적이어도 양쪽 다 보이게)
-  const MIN_VISIBLE = 0.05;
-  const salesRatio =
-    rawSalesRatio === 0
-      ? 0
-      : rawSalesRatio === 1
-        ? 1
-        : Math.max(MIN_VISIBLE, Math.min(1 - MIN_VISIBLE, rawSalesRatio));
-  // 소비 비율은 (매출+소비) 합계 대비로 계산 (매출보다 소비가 크면 /매출 기준은 100% 초과)
-  const consumptionRatio = total > 0 ? latest.consumption / total : 0;
+  const profit = Math.max(0, rawProfit);
+  const consumptionRatio = latest.sales > 0 ? latest.consumption / latest.sales : 0;
+  const profitRatio = latest.sales > 0 ? profit / latest.sales : 0;
 
   return (
     <Card size="sm" className="h-full">
-      <CardHeader className="border-b px-4">
+      <CardHeader className="border-b px-4 ">
         <CardTitle className="text-sm flex items-center gap-2">
           <PieChart className="w-4 h-4 text-muted-foreground" />
           이번 달 현황
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="flex-1 flex items-center gap-5 px-4 py-3">
+      {/* 가로 배치: 도넛 차트 (좌) + 범례 (우) — 세로 중앙 정렬 */}
+      <CardContent className="flex-1 flex items-center gap-4 px-4 py-3">
         {/* 도넛 차트 */}
         <div className="relative w-28 h-28 shrink-0">
-          <DonutChart salesRatio={salesRatio} />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <p className="text-xs text-muted-foreground">{latest.month}</p>
+          <DonutChart consumptionRatio={consumptionRatio} />
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
+            <p className="text-[10px] text-muted-foreground">{latest.month} 매출</p>
+            <p className="text-sm font-bold leading-none">{(latest.sales / 10000).toFixed(1)}만</p>
           </div>
         </div>
 
-        {/* 수치 목록 */}
-        <div className="flex-1 flex flex-col justify-center gap-3">
-          {/* 매출 */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
+        {/* 범례 — 가로 배치 */}
+        <div className="flex-1 flex gap-2">
+          <div className="flex-1 rounded-lg bg-muted/40 px-3 py-2.5">
+            <div className="flex items-center gap-1.5 mb-0.5">
               <span className="size-2 rounded-full bg-baro-green shrink-0" />
-              <span className="text-xs text-muted-foreground">매출</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-muted-foreground">
-                {((1 - consumptionRatio) * 100).toFixed(1)}%
-              </span>
-              <span className="text-sm font-bold">{(latest.sales / 10000).toFixed(0)}만원</span>
-            </div>
-          </div>
-
-          {/* 소비 */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="size-2 rounded-full bg-baro-blue shrink-0" />
               <span className="text-xs text-muted-foreground">소비</span>
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs text-muted-foreground">
-                {(consumptionRatio * 100).toFixed(1)}%
-              </span>
-              <span className="text-sm font-bold">
-                {(latest.consumption / 10000).toFixed(0)}만원
-              </span>
-            </div>
+            <p className="text-sm font-bold ">{(latest.consumption / 10000).toFixed(0)}만원</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {(consumptionRatio * 100).toFixed(1)}%
+            </p>
           </div>
 
-          {/* 구분선 + 순이익 */}
-          <div className="border-t pt-2.5 flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">순이익</span>
-            <div className="flex items-center gap-1.5">
+          <div className="flex-1 rounded-lg bg-muted/40 px-3 py-2.5">
+            <div className="flex items-center gap-1.5 mb-0.5">
+              <span className="size-2 rounded-full bg-baro-blue shrink-0" />
+              <span className="text-xs text-muted-foreground">순이익</span>
               {isDeficit && (
                 <span className="text-[10px] text-baro-red bg-red-50 border border-red-200/60 px-1.5 py-0.5 rounded-full leading-none">
                   적자
                 </span>
               )}
-              <span className={`text-sm font-bold ${isDeficit ? 'text-baro-red' : ''}`}>
-                {(rawProfit / 10000).toFixed(0)}만원
-              </span>
             </div>
+            <p className="text-sm font-bold">{(profit / 10000).toFixed(0)}만원</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {(profitRatio * 100).toFixed(1)}%
+            </p>
           </div>
         </div>
       </CardContent>
