@@ -320,6 +320,7 @@ const SystemStartPage = () => {
             {/* 전날 마감 누락 알림 — already-open / normal 케이스 */}
             {!isLoading &&
               dashboardStats?.missedClosing &&
+              (history?.closings.length ?? 0) > 0 &&
               (currentCase === 'already-open' || currentCase === 'normal') && (
                 <Link
                   to={`/closing?date=${getYesterdayKST()}`}

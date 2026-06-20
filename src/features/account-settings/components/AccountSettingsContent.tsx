@@ -4,7 +4,7 @@ import ThemeSection from '@/features/account-settings/components/sections/ThemeS
 
 const AccountSettingsContent = () => {
   return (
-    <div className="space-y-5 p-6">
+    <div className="space-y-5 p-4">
       <div>
         <p className="text-sm font-semibold leading-tight">회원 설정</p>
         <p className="text-xs text-muted-foreground">계정 및 앱 환경을 관리합니다.</p>

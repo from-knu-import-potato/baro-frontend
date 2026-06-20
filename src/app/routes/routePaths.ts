@@ -1,6 +1,8 @@
 export const routePaths = {
   landing: '/',
   login: '/login',
+  credentialLogin: '/credential-login',
+  register: '/register',
   storeSelection: '/store-selection',
   initialSetup: '/initial-setup',
   systemStart: '/system-start',

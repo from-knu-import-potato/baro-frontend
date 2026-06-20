@@ -10,9 +10,10 @@ interface SalesConsumptionCardProps {
 /* ── SVG 도넛 차트 ── */
 interface DonutChartProps {
   salesRatio: number; // 매출 / (매출 + 소비), 0 ~ 1
+  hasData: boolean;
 }
 
-const DonutChart = ({ salesRatio }: DonutChartProps) => {
+const DonutChart = ({ salesRatio, hasData }: DonutChartProps) => {
   const r = 52;
   const cx = 70;
   const cy = 70;
@@ -20,21 +21,21 @@ const DonutChart = ({ salesRatio }: DonutChartProps) => {
   const C = 2 * Math.PI * r;
   const GAP = C * 0.015;
 
-  const ratio = Math.min(1, Math.max(0, salesRatio));
-  const hasBoth = ratio > 0 && ratio < 1;
-  // 초록 = 매출 아크
-  const salesArc = hasBoth ? C * ratio - GAP : C * ratio;
-  // 파랑 = 소비 아크
-  const consumptionArc = hasBoth ? C * (1 - ratio) - GAP : C * (1 - ratio);
-
   // 데이터 없으면 회색 원만 표시
-  if (salesRatio === 0.5 && salesArc === 0 && consumptionArc === 0) {
+  if (!hasData) {
     return (
       <svg viewBox="0 0 140 140" className="w-full h-full">
         <circle cx={cx} cy={cy} r={r} fill="none" stroke="#f3f4f6" strokeWidth={sw} />
       </svg>
     );
   }
+
+  const ratio = Math.min(1, Math.max(0, salesRatio));
+  const hasBoth = ratio > 0 && ratio < 1;
+  // 초록 = 매출 아크
+  const salesArc = hasBoth ? C * ratio - GAP : C * ratio;
+  // 파랑 = 소비 아크
+  const consumptionArc = hasBoth ? C * (1 - ratio) - GAP : C * (1 - ratio);
 
   return (
     <svg viewBox="0 0 140 140" className="w-full h-full drop-shadow-md">
@@ -102,7 +103,7 @@ const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
       <CardContent className="flex-1 flex items-center gap-5 px-4 py-3">
         {/* 도넛 차트 */}
         <div className="relative w-28 h-28 shrink-0">
-          <DonutChart salesRatio={salesRatio} />
+          <DonutChart salesRatio={salesRatio} hasData={total > 0} />
           <div className="absolute inset-0 flex items-center justify-center">
             <p className="text-xs text-muted-foreground">{latest.month}</p>
           </div>
@@ -118,7 +119,7 @@ const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
             </div>
             <div className="flex items-center gap-1.5">
               <span className="text-xs text-muted-foreground">
-                {((1 - consumptionRatio) * 100).toFixed(1)}%
+                {(total > 0 ? (1 - consumptionRatio) * 100 : 0).toFixed(1)}%
               </span>
               <span className="text-sm font-bold">{(latest.sales / 10000).toFixed(0)}만원</span>
             </div>

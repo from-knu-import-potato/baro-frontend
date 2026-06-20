@@ -6,6 +6,7 @@ import SettingsPage from '@/pages/AccountSettingsPage';
 import AuthCallbackPage from '@/pages/AuthCallbackPage';
 import ClosingOrderGuidePage from '@/pages/ClosingOrderGuidePage';
 import ClosingPage from '@/pages/ClosingPage';
+import CredentialLoginPage from '@/pages/CredentialLoginPage';
 import CustomerOrderPage from '@/pages/CustomerOrderPage';
 import DashboardPage from '@/pages/DashboardPage';
 import DayClosedPage from '@/pages/DayClosedPage';
@@ -16,6 +17,7 @@ import LoginPage from '@/pages/LoginPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import OcrInboundPage from '@/pages/OcrInboundPage';
 import OrderGuidePage from '@/pages/OrderGuidePage';
+import RegisterPage from '@/pages/RegisterPage';
 import SettingsIngredientsPage from '@/pages/SettingsIngredientsPage';
 import SettingsMenuBoardPage from '@/pages/SettingsMenuBoardPage';
 import SettingsMenusPage from '@/pages/SettingsMenusPage';
@@ -46,6 +48,14 @@ export default function Router() {
         element={<StandalonePageWrapper element={<AuthCallbackPage />} />}
       />
       <Route path={routePaths.login} element={<StandalonePageWrapper element={<LoginPage />} />} />
+      <Route
+        path={routePaths.credentialLogin}
+        element={<StandalonePageWrapper element={<CredentialLoginPage />} />}
+      />
+      <Route
+        path={routePaths.register}
+        element={<StandalonePageWrapper element={<RegisterPage />} />}
+      />
       <Route
         path={routePaths.storeSelection}
         element={<StandalonePageWrapper element={<StoreSelectionPage />} />}

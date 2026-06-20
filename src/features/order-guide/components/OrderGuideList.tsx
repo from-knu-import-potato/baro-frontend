@@ -1,12 +1,21 @@
 import { useState } from 'react';
 
-import { AlertTriangle, CalendarDays, Clock, Package, ShoppingCart, Siren } from 'lucide-react';
+import {
+  AlertTriangle,
+  CalendarDays,
+  Clock,
+  ClipboardList,
+  Package,
+  ShoppingCart,
+  Siren,
+} from 'lucide-react';
 
 import type { OrderGuideItem, UrgencyLevel } from '@/features/order-guide/types/orderGuide.types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
 
 interface OrderGuideListProps {
   items: OrderGuideItem[];
+  generatedAt?: string | null;
 }
 
 type FilterTab = 'all' | UrgencyLevel;
@@ -47,7 +56,7 @@ const URGENCY_CONFIG: Record<
 
 const formatStock = (qty: number, unit: string) => `${qty.toLocaleString()} ${unit}`;
 
-const OrderGuideList = ({ items }: OrderGuideListProps) => {
+const OrderGuideList = ({ items, generatedAt }: OrderGuideListProps) => {
   const [activeTab, setActiveTab] = useState<FilterTab>('all');
 
   const filteredItems =
@@ -112,8 +121,18 @@ const OrderGuideList = ({ items }: OrderGuideListProps) => {
       {/* 스크롤 영역 */}
       <CardContent className="p-0 flex-1 min-h-0 overflow-y-auto flex flex-col">
         {filteredItems.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center py-16 text-sm text-muted-foreground">
-            해당 조건의 발주 항목이 없어요.
+          <div className="flex-1 flex flex-col items-center justify-center py-16 text-center">
+            {generatedAt === null ? (
+              <>
+                <ClipboardList className="w-8 h-8 text-muted-foreground mb-3" />
+                <p className="text-sm font-medium text-foreground">아직 발주 가이드가 없어요</p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  마감을 완료하면 AI가 자동으로 발주 가이드를 생성해 드려요.
+                </p>
+              </>
+            ) : (
+              <span className="text-sm text-muted-foreground">해당 조건의 발주 항목이 없어요.</span>
+            )}
           </div>
         ) : (
           <>

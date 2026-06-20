@@ -110,7 +110,7 @@ const ClosingPage = () => {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6 p-6">
+      <div className="flex flex-col gap-4 p-4">
         <Skeleton className="h-10 w-64" />
         <Skeleton className="h-24 w-full rounded-xl" />
         <Skeleton className="h-64 w-full rounded-xl" />
@@ -121,7 +121,7 @@ const ClosingPage = () => {
 
   if (isError || !preview) {
     return (
-      <div className="flex flex-col gap-6 p-6">
+      <div className="flex flex-col gap-4 p-4">
         <Card>
           <CardContent className="py-16 text-center">
             <p className="text-sm text-muted-foreground">
@@ -159,7 +159,7 @@ const ClosingPage = () => {
         )}
 
         {/* 스크롤 영역 */}
-        <div className="flex-1 overflow-y-auto flex flex-col gap-6 p-6">
+        <div className="flex-1 overflow-y-auto flex flex-col gap-4 p-4">
           {/* 총 매출 카드 */}
           <Card>
             <CardContent className="px-6 flex items-center justify-between">
