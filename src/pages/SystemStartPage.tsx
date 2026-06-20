@@ -13,7 +13,7 @@ import {
   Store,
   Trash2,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import useAuthStore from '@/features/auth/store/authStore';
@@ -21,6 +21,7 @@ import { openBusiness } from '@/features/closing/api/closing.api';
 import ClosingCancelModal from '@/features/closing/components/ClosingCancelModal';
 import { useClosingHistory } from '@/features/closing/hooks/useClosingHistory';
 import useClosingStore from '@/features/closing/store/closingStore';
+import { useDashboardStats } from '@/features/dashboard/hooks/useDashboardStats';
 import { Button } from '@/shadcn/ui/button';
 import {
   Dialog,
@@ -38,6 +39,12 @@ import {
   isTodayBusinessDay,
   todayKSTString,
 } from '@/shared/utils/businessDate';
+
+const getYesterdayKST = () => {
+  const kstNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  kstNow.setDate(kstNow.getDate() - 1);
+  return kstNow.toISOString().slice(0, 10);
+};
 
 const formatCalendarDate = () =>
   new Date().toLocaleDateString('ko-KR', {
@@ -79,6 +86,11 @@ const SystemStartPage = () => {
   const { data: history, isLoading } = useClosingHistory(storeId);
   const businessDateClosed =
     history?.closings.some((c) => c.date.startsWith(businessDate)) ?? false;
+
+  // 개점 시간 이후(휴무일 제외)에만 전날 마감 누락 여부 조회
+  const { data: dashboardStats } = useDashboardStats(
+    !isLoading && !isBeforeOpen && !isHoliday ? storeId : null,
+  );
 
   const [isStarting, setIsStarting] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -305,6 +317,18 @@ const SystemStartPage = () => {
                 {formatShortDate(businessDate)} 마감 완료
               </span>
             )}
+            {/* 전날 마감 누락 알림 — already-open / normal 케이스 */}
+            {!isLoading &&
+              dashboardStats?.missedClosing &&
+              (currentCase === 'already-open' || currentCase === 'normal') && (
+                <Link
+                  to={`/closing?date=${getYesterdayKST()}`}
+                  className="inline-flex items-center gap-1 mt-1 text-xs font-medium text-amber-700 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full hover:bg-amber-200 transition-colors"
+                >
+                  <AlertTriangle className="h-3 w-3 shrink-0" />
+                  전날 마감 누락
+                </Link>
+              )}
           </div>
         </div>
 

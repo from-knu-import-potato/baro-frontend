@@ -1,4 +1,5 @@
-import { ChevronDown } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import useAuthStore from '@/features/auth/store/authStore';
 import { useClosingStatus } from '@/features/closing/hooks/useClosingStatus';
@@ -11,9 +12,22 @@ interface AppHeaderProps {
   userRole: string;
   isLoading?: boolean;
   onClosingClick?: () => void;
+  missedClosing?: boolean;
 }
 
-const AppHeader = ({ userName, userRole, isLoading = false, onClosingClick }: AppHeaderProps) => {
+const getYesterdayKST = () => {
+  const kstNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  kstNow.setDate(kstNow.getDate() - 1);
+  return kstNow.toISOString().slice(0, 10);
+};
+
+const AppHeader = ({
+  userName,
+  userRole,
+  isLoading = false,
+  onClosingClick,
+  missedClosing = false,
+}: AppHeaderProps) => {
   const storeId = useAuthStore((s) => s.storeId);
   const { isCompleted } = useClosingStatus(storeId);
   const { isOpen: isBusinessOpen } = useClosingStore((s) => s.businessSession);
@@ -22,7 +36,18 @@ const AppHeader = ({ userName, userRole, isLoading = false, onClosingClick }: Ap
   const isClosingDisabled = !isBusinessOpen || isCompleted;
 
   return (
-    <header className="bg-background h-13 border-b flex items-center justify-end px-6 gap-4 sticky top-0 z-10">
+    <header className="bg-background h-13 border-b flex items-center justify-end px-6 gap-3 sticky top-0 z-10">
+      {/* 전날 마감 누락 알림 */}
+      {missedClosing && (
+        <Link
+          to={`/closing?date=${getYesterdayKST()}`}
+          className="flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100 transition-colors"
+        >
+          <AlertTriangle className="h-3 w-3 shrink-0" />
+          전날 마감 누락
+        </Link>
+      )}
+
       {/* 마감하기 */}
       <Button
         size="sm"
@@ -51,10 +76,9 @@ const AppHeader = ({ userName, userRole, isLoading = false, onClosingClick }: Ap
             <Skeleton className="h-3 w-16" />
             <Skeleton className="h-3 w-8" />
           </div>
-          <ChevronDown className="w-4 h-4 text-gray-400" />
         </div>
       ) : (
-        <div className="flex items-center gap-4 cursor-pointer rounded-lg transition-colors">
+        <div className="flex items-center gap-4 rounded-lg">
           <div className="w-7 h-7 rounded-full bg-baro-blue flex items-center justify-center">
             <span className="text-xs font-semibold text-white">{userName.charAt(0)}</span>
           </div>
@@ -62,7 +86,6 @@ const AppHeader = ({ userName, userRole, isLoading = false, onClosingClick }: Ap
             <span className="text-xs font-semibold leading-tight">{userName}</span>
             <span className="text-xs leading-tight text-muted-foreground">{userRole}</span>
           </div>
-          <ChevronDown className="w-4 h-4 text-gray-400" />
         </div>
       )}
     </header>
