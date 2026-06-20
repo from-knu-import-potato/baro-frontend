@@ -13,11 +13,16 @@
   </a>
   &nbsp;&nbsp;
   <a href="https://qa-baro-web.vercel.app/">
-    <img src="https://img.shields.io/badge/🧪 테스트 서버-Click-679436?style=flat-square" />
+    <img src="https://img.shields.io/badge/🧪 테스트 서비스-Click-679436?style=flat-square" />
   </a>
 </div>
 
 <br/>
+
+**BARO(바로)** 는 소규모 카페·식당 사장님을 위한 OCR·AI 기반 통합 가게 운영 SaaS입니다. QR 주문부터 재고 관리, AI 발주 가이드, 마감 정산까지 하나의 플랫폼에서 처리할 수 있습니다. 이 레포지토리는 BARO의 백엔드 API 서버입니다.
+
+<br/>
+
 
 ### 시작하기 (Getting Started)
 
