@@ -104,13 +104,13 @@ const HeroSection = () => {
             )}
           >
             {/* Main Decorative Card */}
-            <div className="relative w-full z-10 p-7 rounded-[3rem] border border-baro-ivory-dark/30 dark:border-baro-black shadow-md backdrop-blur-sm group">
+            <div className="relative w-full z-10 p-7 rounded-[3rem] dark:bg-baro-black/20 border border-baro-ivory-dark/30 dark:border-baro-black shadow-md backdrop-blur-sm group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-baro-blue/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
 
               {/* Floating Items Container */}
               <div className="space-y-6 relative z-20">
                 {/* Visual Item 1 */}
-                <div className="p-5 rounded-2xl shadow-md border border-baro-ivory-dark dark:border-baro-black flex items-center gap-4 transform transition-transform hover:-translate-y-2 relative z-10">
+                <div className="p-5 rounded-2xl shadow-md dark:bg-baro-black-muted/10 border border-baro-ivory-dark dark:border-baro-black flex items-center gap-4 transform transition-transform hover:-translate-y-2 relative z-10">
                   <div className="w-12 h-12 bg-baro-blue/10 rounded-xl flex items-center justify-center text-baro-blue font-black text-[10px] uppercase">
                     OCR
                   </div>
@@ -136,8 +136,8 @@ const HeroSection = () => {
                 </div>
 
                 {/* Visual Item 3 */}
-                <div className="p-5 rounded-2xl shadow-md border border-baro-ivory-dark dark:border-baro-black flex items-center gap-4 transform transition-transform hover:-translate-y-2 relative z-10">
-                  <div className="w-12 h-12 bg-baro-ivory rounded-xl flex items-center justify-center text-baro-black">
+                <div className="p-5 rounded-2xl dark:bg-baro-black-muted/10 shadow-md border border-baro-ivory-dark dark:border-baro-black flex items-center gap-4 transform transition-transform hover:-translate-y-2 relative z-10">
+                  <div className="w-12 h-12 bg-baro-blue/10 rounded-xl flex items-center justify-center text-baro-blue">
                     <ClipboardCheck size={22} />
                   </div>
                   <div>
