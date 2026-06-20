@@ -97,7 +97,7 @@ const MenuOcrModal = ({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{titleMap[step]}</DialogTitle>
         </DialogHeader>
