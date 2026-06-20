@@ -5,6 +5,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { routePaths } from '@/app/routes/routePaths';
 import { useUserInfo } from '@/features/account-settings/hooks/useUserInfo';
 import useAuthStore from '@/features/auth/store/authStore';
+import { useClosingHistory } from '@/features/closing/hooks/useClosingHistory';
 import useClosingStore from '@/features/closing/store/closingStore';
 import { useDashboardStats } from '@/features/dashboard/hooks/useDashboardStats';
 import { useStoreSettings } from '@/features/store-settings/hooks/useStoreSettings';
@@ -35,6 +36,7 @@ const AppLayout = () => {
   const { data: storeData, isLoading: isStoreLoading } = useStoreSettings();
   const { data: userData, isLoading: isUserLoading } = useUserInfo();
   const { data: dashboardStats } = useDashboardStats(isOpen ? storeId : null);
+  const { data: closingHistory } = useClosingHistory(isOpen ? storeId : null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo(0, 0);
@@ -54,7 +56,9 @@ const AppLayout = () => {
           userRole={ROLE_LABEL[storeData?.myRole ?? ''] ?? ''}
           isLoading={isUserLoading || isStoreLoading}
           onClosingClick={() => navigate('/closing')}
-          missedClosing={dashboardStats?.missedClosing ?? false}
+          missedClosing={
+            (dashboardStats?.missedClosing ?? false) && (closingHistory?.closings.length ?? 0) > 0
+          }
         />
         <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto flex flex-col">
           <div key={pathname} className="animate-page-fade-in flex-1 flex flex-col min-h-0">
