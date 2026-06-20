@@ -85,12 +85,7 @@ const MenuOcrReviewStep = ({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-semibold">인식 결과 확인</p>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            내용을 확인하고 수정한 후 등록해주세요
-          </p>
-        </div>
+        <p className="text-xs text-muted-foreground">내용을 확인하고 수정한 후 등록해주세요</p>
         <button
           type="button"
           onClick={onReset}
