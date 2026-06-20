@@ -16,9 +16,7 @@ const FeatureSection = () => {
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10',
           )}
         >
-          <h2 className="text-3xl lg:text-5xl font-black text-baro-black mb-6">
-            스마트한 가게 운영의 시작
-          </h2>
+          <h2 className="text-3xl lg:text-5xl mb-6">스마트한 가게 운영의 시작</h2>
           <p className="text-baro-black-muted max-w-2xl text-lg">
             매일 반복되는 지루한 재고 관리 업무, <br className="block sm:hidden" />
             이제 BARO에게 맡기고 장사에만 집중하세요.
