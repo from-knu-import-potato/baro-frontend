@@ -96,7 +96,8 @@ const ClosingPage = () => {
           setFinalRevenue(res.totalRevenue);
           setClosingId(res.closingId);
           setClosingDate(res.date);
-          clearBusinessSession();
+          // 소급 마감은 오늘 영업 세션과 무관하므로 세션을 유지
+          if (!isRetroactive) clearBusinessSession();
           void queryClient.invalidateQueries({ queryKey: ['closing', 'preview'] });
           setAfterModalOpen(true);
         },
@@ -134,9 +135,9 @@ const ClosingPage = () => {
 
   return (
     <>
-      <div className="flex flex-col min-h-full">
-        {/* 고정 헤더 */}
-        <div className="sticky top-0 z-10 bg-background border-b px-6 py-4 flex items-center justify-between shrink-0">
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* 헤더 */}
+        <div className="shrink-0 bg-background border-b px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-lg font-bold">마감하기</h1>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
@@ -158,7 +159,7 @@ const ClosingPage = () => {
         )}
 
         {/* 스크롤 영역 */}
-        <div className="flex-1 flex flex-col gap-6 p-6 pb-28">
+        <div className="flex-1 overflow-y-auto flex flex-col gap-6 p-6">
           {/* 총 매출 카드 */}
           <Card>
             <CardContent className="px-6 flex items-center justify-between">
@@ -191,8 +192,8 @@ const ClosingPage = () => {
           <ClosingInventoryDeductionSection rows={deductionRows} onChange={handleDeductionChange} />
         </div>
 
-        {/* 고정 하단 버튼 */}
-        <div className="fixed bottom-0 left-0 right-0 z-10 bg-background border-t px-6 py-4">
+        {/* 하단 버튼 */}
+        <div className="shrink-0 bg-background border-t px-6 py-4">
           {preview.isClosed ? (
             <Button
               onClick={handleComplete}
@@ -221,6 +222,7 @@ const ClosingPage = () => {
           closingDate={closingDate}
           storeId={storeId}
           closingId={closingId}
+          isRetroactive={isRetroactive}
         />
       )}
 

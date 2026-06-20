@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 
 import AppLayout from '@/app/layouts/AppLayout';
 import { routePaths } from '@/app/routes/routePaths';
@@ -24,21 +24,60 @@ import StoreSelectionPage from '@/pages/StoreSelectionPage';
 import StoreSettingsPage from '@/pages/StoreSettingsPage';
 import SystemStartPage from '@/pages/SystemStartPage';
 
+const StandalonePageWrapper = ({ element }: { element: React.ReactElement }) => {
+  const { key } = useLocation();
+  return (
+    <div key={key} className="animate-page-fade-in">
+      {element}
+    </div>
+  );
+};
+
 export default function Router() {
   return (
     <Routes>
       {/* 레이아웃 없는 페이지 */}
-      <Route path={routePaths.landing} element={<LandingPage />} />
-      <Route path={routePaths.authCallback} element={<AuthCallbackPage />} />
-      <Route path={routePaths.login} element={<LoginPage />} />
-      <Route path={routePaths.storeSelection} element={<StoreSelectionPage />} />
-      <Route path={routePaths.initialSetup} element={<InitialSetupPage />} />
-      <Route path={routePaths.systemStart} element={<SystemStartPage />} />
-      <Route path={routePaths.dayClosed} element={<DayClosedPage />} />
-      <Route path={routePaths.closingOrderGuideDetail} element={<ClosingOrderGuidePage />} />
-      <Route path={routePaths.ocrInbound} element={<OcrInboundPage />} />
-      <Route path={routePaths.customerOrder} element={<CustomerOrderPage />} />
-      <Route path={routePaths.notFound} element={<NotFoundPage />} />
+      <Route
+        path={routePaths.landing}
+        element={<StandalonePageWrapper element={<LandingPage />} />}
+      />
+      <Route
+        path={routePaths.authCallback}
+        element={<StandalonePageWrapper element={<AuthCallbackPage />} />}
+      />
+      <Route path={routePaths.login} element={<StandalonePageWrapper element={<LoginPage />} />} />
+      <Route
+        path={routePaths.storeSelection}
+        element={<StandalonePageWrapper element={<StoreSelectionPage />} />}
+      />
+      <Route
+        path={routePaths.initialSetup}
+        element={<StandalonePageWrapper element={<InitialSetupPage />} />}
+      />
+      <Route
+        path={routePaths.systemStart}
+        element={<StandalonePageWrapper element={<SystemStartPage />} />}
+      />
+      <Route
+        path={routePaths.dayClosed}
+        element={<StandalonePageWrapper element={<DayClosedPage />} />}
+      />
+      <Route
+        path={routePaths.closingOrderGuideDetail}
+        element={<StandalonePageWrapper element={<ClosingOrderGuidePage />} />}
+      />
+      <Route
+        path={routePaths.ocrInbound}
+        element={<StandalonePageWrapper element={<OcrInboundPage />} />}
+      />
+      <Route
+        path={routePaths.customerOrder}
+        element={<StandalonePageWrapper element={<CustomerOrderPage />} />}
+      />
+      <Route
+        path={routePaths.notFound}
+        element={<StandalonePageWrapper element={<NotFoundPage />} />}
+      />
 
       {/* 사이드바 + 상단바 공통 레이아웃 */}
       <Route element={<AppLayout />}>

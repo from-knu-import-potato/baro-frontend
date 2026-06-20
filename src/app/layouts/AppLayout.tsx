@@ -4,7 +4,9 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
 import { useUserInfo } from '@/features/account-settings/hooks/useUserInfo';
+import useAuthStore from '@/features/auth/store/authStore';
 import useClosingStore from '@/features/closing/store/closingStore';
+import { useDashboardStats } from '@/features/dashboard/hooks/useDashboardStats';
 import { useStoreSettings } from '@/features/store-settings/hooks/useStoreSettings';
 import { SidebarInset, SidebarProvider } from '@/shadcn/ui/sidebar';
 import AppHeader from '@/widgets/AppHeader';
@@ -29,8 +31,10 @@ const AppLayout = () => {
     }
   }, [isOpen, pathname, navigate]);
 
+  const storeId = useAuthStore((s) => s.storeId);
   const { data: storeData, isLoading: isStoreLoading } = useStoreSettings();
   const { data: userData, isLoading: isUserLoading } = useUserInfo();
+  const { data: dashboardStats } = useDashboardStats(isOpen ? storeId : null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo(0, 0);
@@ -50,9 +54,12 @@ const AppLayout = () => {
           userRole={ROLE_LABEL[storeData?.myRole ?? ''] ?? ''}
           isLoading={isUserLoading || isStoreLoading}
           onClosingClick={() => navigate('/closing')}
+          missedClosing={dashboardStats?.missedClosing ?? false}
         />
         <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto flex flex-col">
-          <Outlet />
+          <div key={pathname} className="animate-page-fade-in flex-1 flex flex-col min-h-0">
+            <Outlet />
+          </div>
         </div>
       </SidebarInset>
     </SidebarProvider>

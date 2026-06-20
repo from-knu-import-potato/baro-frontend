@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { Clock, ShoppingBag } from 'lucide-react';
 
+import useClosingStore from '@/features/closing/store/closingStore';
 import OrderStatusBadge from '@/features/customer-order/components/CustomerOrderStatusBadge';
 import type { ApiOrder } from '@/features/customer-order/types/customerOrder.api.types';
 import { useOrders, useUpdateOrderStatus } from '@/features/dashboard/hooks/useOrders';
@@ -111,9 +112,15 @@ interface OrderStatusCardProps {
 
 const OrderStatusCard = ({ storeId }: OrderStatusCardProps) => {
   const [activeTab, setActiveTab] = useState<TabKey>('pending');
-  const { data: orders = [], isLoading } = useOrders(storeId);
+  const { data: rawOrders = [], isLoading } = useOrders(storeId);
+  const businessDate = useClosingStore((s) => s.businessSession.businessDate);
 
   useOrderSSE(storeId);
+
+  // 당일 개점 이후 접수된 주문만 표시
+  const orders = businessDate
+    ? rawOrders.filter((o) => o.createdAt.slice(0, 10) === businessDate)
+    : rawOrders;
 
   const pendingCount = orders.filter((o) => o.status === 'pending').length;
   const filteredOrders = orders.filter((o) => o.status === activeTab);
