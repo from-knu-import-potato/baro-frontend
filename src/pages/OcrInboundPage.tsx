@@ -9,8 +9,17 @@ import { toast } from 'sonner';
 import { routePaths } from '@/app/routes/routePaths';
 import useAuthStore from '@/features/auth/store/authStore';
 import { uploadOcrImage } from '@/features/ocr-inbound/api/ocr.api';
+import {
+  saveUnitConversions,
+  type UnitConversionSaveDto,
+} from '@/features/ocr-inbound/api/unitConversions.api';
 import OcrReviewStep from '@/features/ocr-inbound/components/OcrReviewStep';
 import OcrUploadStep from '@/features/ocr-inbound/components/OcrUploadStep';
+import {
+  makeConversionKey,
+  useUnitConversions,
+  type UnitConversionMap,
+} from '@/features/ocr-inbound/hooks/useUnitConversions';
 import type { OcrMetadata } from '@/features/ocr-inbound/types/ocrInbound.api.types';
 import type { OcrInboundItem } from '@/features/ocr-inbound/types/ocrInbound.types';
 import { confirmInbound } from '@/features/store-settings/api/ingredients.api';
@@ -54,18 +63,35 @@ const loadDraft = (): SessionDraft | null => {
   }
 };
 
+// 저장된 변환 계수를 items에 적용 (이미 계수가 있는 항목은 스킵)
+function applyStoredConversions(items: OcrInboundItem[], map: UnitConversionMap): OcrInboundItem[] {
+  return items.map((item) => {
+    if (!item.purchaseUnit || item.conversionFactor !== undefined || !item.matchedInventoryId)
+      return item;
+    const conv = map.get(makeConversionKey(item.matchedInventoryId, item.purchaseUnit));
+    if (!conv) return item;
+    return {
+      ...item,
+      unit: conv.baseUnit,
+      quantity: (item.purchaseQuantity ?? 0) * conv.factor,
+      conversionFactor: conv.factor,
+    };
+  });
+}
+
 const OcrInboundPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const storeId = useAuthStore((s) => s.storeId);
   const qc = useQueryClient();
   const { data: storeSettings } = useStoreSettings();
+  const { data: conversionData } = useUnitConversions();
+  const conversionMap = conversionData?.map;
   const safetyStockPct = storeSettings?.safetyStockPct ?? 0;
 
   const locationState = location.state as { file?: File } | null;
   const hasNewFile = !!locationState?.file;
 
-  // 새 파일이 없는 경우에만 sessionStorage에서 초기 상태 복원 (lazy 초기화로 setState-in-effect 회피)
   const [{ initialImageBase64, initialStep, initialItems, initialMetadata }] = useState(() => {
     if (hasNewFile) {
       return {
@@ -99,12 +125,32 @@ const OcrInboundPage = () => {
   const [metadata, setMetadata] = useState<OcrMetadata | null>(initialMetadata);
   const [isConfirming, setIsConfirming] = useState(false);
   const handledInitialFile = useRef(false);
+  const conversionApplied = useRef(false);
 
   // 검수 중 아이템·메타데이터 변경 시 sessionStorage 동기화
   useEffect(() => {
     if (step !== 'review' || !imageBase64) return;
     saveDraft({ imageBase64, metadata, items });
   }, [items, metadata, step, imageBase64]);
+
+  // 변환 계수 맵이 로드되면 비표준 단위 항목에 자동 채움 (1회만 실행)
+  useEffect(() => {
+    if (conversionApplied.current || !conversionMap || step !== 'review') return;
+    conversionApplied.current = true;
+    setItems((prev) => applyStoredConversions(prev, conversionMap));
+  }, [conversionMap, step]);
+
+  // onItemsChange: items 변경 시 연결된 항목에 저장된 변환 계수 자동 채움
+  const handleItemsChange = useCallback(
+    (newItems: OcrInboundItem[]) => {
+      if (!conversionMap) {
+        setItems(newItems);
+        return;
+      }
+      setItems(applyStoredConversions(newItems, conversionMap));
+    },
+    [conversionMap],
+  );
 
   const handleFileSelect = useCallback(
     async (file: File) => {
@@ -120,11 +166,15 @@ const OcrInboundPage = () => {
           uploadOcrImage(storeId, file),
           fileToBase64(file),
         ]);
+        const processedItems = conversionMap
+          ? applyStoredConversions(result.items, conversionMap)
+          : result.items;
+        conversionApplied.current = true;
         setImageBase64(base64);
         setMetadata(result.metadata);
-        setItems(result.items);
+        setItems(processedItems);
         setStep('review');
-        saveDraft({ imageBase64: base64, metadata: result.metadata, items: result.items });
+        saveDraft({ imageBase64: base64, metadata: result.metadata, items: processedItems });
       } catch (err) {
         const message =
           axios.isAxiosError(err) && err.response?.data?.error?.message
@@ -136,7 +186,7 @@ const OcrInboundPage = () => {
         setImageUrl(null);
       }
     },
-    [storeId],
+    [storeId, conversionMap],
   );
 
   useEffect(() => {
@@ -149,6 +199,7 @@ const OcrInboundPage = () => {
   const handleReset = () => {
     if (imageUrl?.startsWith('blob:')) URL.revokeObjectURL(imageUrl);
     clearDraft();
+    conversionApplied.current = false;
     setStep('upload');
     setImageUrl(null);
     setImageBase64(null);
@@ -164,23 +215,56 @@ const OcrInboundPage = () => {
       );
       return;
     }
+
+    const noFactor = items.filter(
+      (item) => item.purchaseUnit && item.conversionFactor === undefined,
+    );
+    if (noFactor.length > 0) {
+      toast.warning(
+        `단위 변환 계수가 입력되지 않은 항목이 ${noFactor.length}개 있습니다. 변환 계수를 입력해 주세요.`,
+      );
+      return;
+    }
+
     if (!storeId) return;
 
-    const inboundItems = items.map((item) => ({
-      ingredientId: (item.matchedInventoryId ?? item.newIngredientId)!,
-      amount: item.quantity,
-      unitPrice: item.unitPrice ?? null,
-      supplyPrice: item.supplyPrice ?? null,
-      expiryDate: item.expiryDate ?? null,
-      memo: item.memo ?? null,
-    }));
+    const inboundItems = items.map((item) => {
+      const effectiveUnitPrice =
+        item.purchaseUnit &&
+        item.conversionFactor !== undefined &&
+        item.conversionFactor > 0 &&
+        item.purchaseUnitPrice !== undefined
+          ? Math.round((item.purchaseUnitPrice / item.conversionFactor) * 10) / 10
+          : item.unitPrice;
+      return {
+        ingredientId: (item.matchedInventoryId ?? item.newIngredientId)!,
+        amount: item.quantity,
+        unitPrice: effectiveUnitPrice ?? null,
+        supplyPrice: item.supplyPrice ?? null,
+        expiryDate: item.expiryDate ?? null,
+        memo: item.memo ?? null,
+      };
+    });
+
+    // 새로 입력/수정된 변환 계수 수집
+    const conversionsToSave: UnitConversionSaveDto[] = items
+      .filter((item) => item.purchaseUnit && item.conversionFactor !== undefined)
+      .map((item) => ({
+        ingredientId: (item.matchedInventoryId ?? item.newIngredientId)!,
+        purchaseUnit: item.purchaseUnit!,
+        baseUnit: item.unit,
+        factor: item.conversionFactor!,
+      }));
 
     setIsConfirming(true);
     try {
+      if (conversionsToSave.length > 0) {
+        await saveUnitConversions(storeId, conversionsToSave);
+        qc.invalidateQueries({ queryKey: ['unitConversions', storeId] });
+      }
+
       await confirmInbound(storeId, inboundItems, metadata ?? undefined);
 
-      // 입고 완료 후 PATCH /stores/:storeId { safetyStockPct } 한 번으로
-      // 백엔드가 전체 식자재 안전재고를 현재 재고 기준으로 일괄 재계산
       if (safetyStockPct > 0) {
         try {
           await updateStoreSettings(storeId, { safetyStockPct });
@@ -194,7 +278,7 @@ const OcrInboundPage = () => {
       qc.invalidateQueries({ queryKey: ['ingredients', storeId] });
       qc.invalidateQueries({ queryKey: ['storeSettings', storeId] });
       toast.success('재고 등록이 완료되었습니다.');
-      navigate(routePaths.storeSettings);
+      navigate(routePaths.inventory);
     } catch {
       toast.error('입고 확정에 실패했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
@@ -251,7 +335,7 @@ const OcrInboundPage = () => {
             imageUrl={imageUrl}
             items={items}
             metadata={metadata}
-            onItemsChange={setItems}
+            onItemsChange={handleItemsChange}
             onConfirm={handleConfirm}
             onReset={handleReset}
             isConfirming={isConfirming}
