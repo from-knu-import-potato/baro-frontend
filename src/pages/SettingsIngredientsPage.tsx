@@ -10,6 +10,7 @@ import {
   Search,
   ShieldCheck,
   Trash2,
+  TriangleAlert,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -290,7 +291,10 @@ const SettingsIngredientsPage = () => {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>식자재를 삭제하시겠습니까?</AlertDialogTitle>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="size-4 text-baro-red" />
+              식자재를 삭제하시겠습니까?
+            </AlertDialogTitle>
             <AlertDialogDescription>
               <span className="font-medium text-foreground">{deleteTarget?.name}</span>을(를)
               삭제하면 되돌릴 수 없습니다.
@@ -313,7 +317,10 @@ const SettingsIngredientsPage = () => {
       <AlertDialog open={!!conflictDetail} onOpenChange={(open) => !open && handleCancelDelete()}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>관련 기록도 함께 삭제됩니다</AlertDialogTitle>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <TriangleAlert className="size-4 text-baro-red" />
+              관련 기록도 함께 삭제됩니다
+            </AlertDialogTitle>
             <AlertDialogDescription>
               <span className="font-medium text-foreground">{deleteTarget?.name}</span>에 연결된
               입고 기록 {conflictDetail?.inboundCount ?? 0}건, 마감 기록{' '}
@@ -337,7 +344,10 @@ const SettingsIngredientsPage = () => {
       <Dialog open={safetyOpen} onOpenChange={setSafetyOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>안전 재고 기준 설정</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <ShieldCheck className="size-4 text-muted-foreground" />
+              안전 재고 기준 설정
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <p className="text-sm text-muted-foreground">
@@ -347,11 +357,11 @@ const SettingsIngredientsPage = () => {
                 OCR 입고 후에는 자동으로 반영됩니다. 지금 즉시 적용하려면 '전체 적용'을 눌러주세요.
               </span>
             </p>
-            <div className="flex justify-center">
+            <div className="flex justify-center py-4">
               <SafetyStockDial value={safetyPct} onChange={setSafetyPct} step={5} />
             </div>
             <Button
-              className="w-full bg-baro-blue hover:bg-baro-blue/80 text-white"
+              className="w-full bg-baro-blue hover:bg-baro-blue/80 text-white h-10"
               onClick={handleApplySafety}
               disabled={isSavingPct}
             >

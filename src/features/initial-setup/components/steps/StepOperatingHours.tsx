@@ -1,6 +1,7 @@
 import { DAY_OF_WEEK_CONFIG } from '@/features/initial-setup/constants/initialSetup.constants';
 import type { OperatingHour } from '@/features/initial-setup/types/initialSetup.types';
 import { cn } from '@/lib/utils';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/ui/select';
 import { Switch } from '@/shadcn/ui/switch';
 
 interface StepOperatingHoursProps {
@@ -8,19 +9,47 @@ interface StepOperatingHoursProps {
   onChange: (data: OperatingHour[]) => void;
 }
 
-interface TimeInputProps {
+interface TimeSelectProps {
   value: string;
   onChange: (value: string) => void;
 }
 
-const TimeInput = ({ value, onChange }: TimeInputProps) => (
-  <input
-    type="time"
-    value={value}
-    onChange={(e) => onChange(e.target.value)}
-    className="h-5 min-w-0 flex-1 rounded border border-input px-1 text-xs outline-none transition-colors focus:border-baro-blue focus:ring-1 focus:ring-baro-blue/20"
-  />
-);
+const HOURS = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, '0'));
+const MINUTES = ['00', '10', '20', '30', '40', '50'];
+
+const TimePicker = ({ value, onChange }: TimeSelectProps) => {
+  const [h, m] = value ? value.split(':') : ['', ''];
+
+  return (
+    <div className="flex flex-1 items-center gap-1">
+      <Select value={h || undefined} onValueChange={(v) => onChange(`${v}:${m || '00'}`)}>
+        <SelectTrigger size="sm" className="h-6 flex-1 text-xs">
+          <SelectValue placeholder="시" />
+        </SelectTrigger>
+        <SelectContent className="max-h-48">
+          {HOURS.map((hour) => (
+            <SelectItem key={hour} value={hour} className="text-xs">
+              {hour}시
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <span className="shrink-0 text-[10px] text-muted-foreground">:</span>
+      <Select value={m || undefined} onValueChange={(v) => onChange(`${h || '00'}:${v}`)}>
+        <SelectTrigger size="sm" className="h-6 flex-1 text-xs">
+          <SelectValue placeholder="분" />
+        </SelectTrigger>
+        <SelectContent>
+          {MINUTES.map((min) => (
+            <SelectItem key={min} value={min} className="text-xs">
+              {min}분
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  );
+};
 
 const StepOperatingHours = ({ data, onChange }: StepOperatingHoursProps) => {
   const handleUpdate = (index: number, updated: Partial<OperatingHour>) => {
@@ -68,15 +97,15 @@ const StepOperatingHours = ({ data, onChange }: StepOperatingHoursProps) => {
               />
             </div>
 
-            <div className="flex h-5 items-center gap-1">
+            <div className="flex items-center gap-1">
               {hour.isOpen ? (
                 <>
-                  <TimeInput
+                  <TimePicker
                     value={hour.openTime ?? ''}
                     onChange={(v) => handleUpdate(index, { openTime: v })}
                   />
                   <span className="shrink-0 text-[10px] text-muted-foreground">~</span>
-                  <TimeInput
+                  <TimePicker
                     value={hour.closeTime ?? ''}
                     onChange={(v) => handleUpdate(index, { closeTime: v })}
                   />

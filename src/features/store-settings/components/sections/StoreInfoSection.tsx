@@ -120,7 +120,7 @@ const StoreInfoSection = () => {
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue />
+                <SelectValue>{labelOf(BUSINESS_TYPE_OPTIONS, form.businessType)}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {BUSINESS_TYPE_OPTIONS.map((o) => (
@@ -138,7 +138,7 @@ const StoreInfoSection = () => {
               onValueChange={(val) => setForm((f) => f && { ...f, category: val ?? f.category })}
             >
               <SelectTrigger className="w-full">
-                <SelectValue />
+                <SelectValue>{labelOf(CATEGORY_OPTIONS, form.category)}</SelectValue>
               </SelectTrigger>
               <SelectContent>
                 {CATEGORY_OPTIONS.map((o) => (

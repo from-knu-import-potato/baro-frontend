@@ -182,15 +182,15 @@ const MenuOcrReviewStep = ({
               <button
                 type="button"
                 onClick={() => handleChange(item.id, 'isFeatured', !item.isFeatured)}
-                className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-yellow-50 transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-md hover:bg-baro-yellow/10 transition-colors"
                 title={item.isFeatured ? '대표 메뉴 해제' : '대표 메뉴 설정'}
               >
                 <Star
                   className={cn(
                     'w-4 h-4',
                     item.isFeatured
-                      ? 'fill-yellow-400 text-yellow-400'
-                      : 'text-gray-300 hover:text-yellow-300',
+                      ? 'fill-baro-yellow text-baro-yellow'
+                      : 'text-gray-300 hover:text-baro-yellow/50',
                   )}
                 />
               </button>

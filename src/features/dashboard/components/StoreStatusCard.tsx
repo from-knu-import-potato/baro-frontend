@@ -67,7 +67,9 @@ const StoreStatusCard = ({ stats, storeId }: StoreStatusCardProps) => {
               ? `발주 추천 ${stats.aiOrderRecommendations}개 있어요`
               : '발주 추천 없어요'
           }
-          commentColor={stats.aiOrderRecommendations > 0 ? 'text-amber-500' : 'text-baro-green'}
+          commentColor={
+            stats.aiOrderRecommendations > 0 ? 'text-baro-yellow-text' : 'text-baro-green'
+          }
         />
         <StatTile
           label="유통기한 임박"

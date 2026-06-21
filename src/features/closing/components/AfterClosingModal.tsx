@@ -6,7 +6,7 @@ import {
   ChevronRight,
   ClipboardList,
   LogOut,
-  Moon,
+  CalendarCheck,
   ShoppingCart,
   Siren,
 } from 'lucide-react';
@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGenerateOrderGuide } from '@/features/order-guide/hooks/useGenerateOrderGuide';
 import type { OrderGuideItem, UrgencyLevel } from '@/features/order-guide/types/orderGuide.types';
 import { Button } from '@/shadcn/ui/button';
-import { Dialog, DialogContent } from '@/shadcn/ui/dialog';
+import { Dialog, DialogContent, DialogFooter } from '@/shadcn/ui/dialog';
 
 interface AfterClosingModalProps {
   open: boolean;
@@ -204,12 +204,16 @@ const AfterClosingModal = ({
                 className="w-full flex items-center gap-3 p-4 rounded-xl border border-border hover:bg-muted/50 transition-colors text-left"
               >
                 <div className="shrink-0 w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
-                  <Moon className="w-5 h-5 text-muted-foreground" />
+                  <CalendarCheck className="w-5 h-5 text-muted-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-foreground">오픈 때 볼게요</p>
+                  <p className="text-sm font-semibold text-foreground">
+                    {isRetroactive ? '나중에 볼게요' : '오픈 때 볼게요'}
+                  </p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    내일 오픈 전 발주 가이드 메뉴에서 확인
+                    {isRetroactive
+                      ? '발주 가이드 메뉴에서 나중에 확인'
+                      : '내일 오픈 전 발주 가이드 메뉴에서 확인'}
                   </p>
                 </div>
                 <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -222,11 +226,11 @@ const AfterClosingModal = ({
         {step === 'summary' && (
           <>
             <div className="flex items-center gap-3 px-6 pt-6 pb-4 border-b">
-              <div className="w-9 h-9 rounded-xl bg-baro-blue/10 flex items-center justify-center shrink-0">
-                <ClipboardList className="w-4 h-4 text-baro-blue" />
-              </div>
               <div>
-                <h2 className="text-base font-bold">발주 가이드 요약</h2>
+                <h2 className="flex items-center gap-2 text-base font-bold">
+                  <ClipboardList className="size-4 text-muted-foreground" />
+                  발주 가이드 요약
+                </h2>
                 <p className="text-xs text-muted-foreground">
                   {urgentItems.length > 0
                     ? `긴급·주의 ${urgentItems.length}건 포함`
@@ -269,36 +273,40 @@ const AfterClosingModal = ({
               )}
             </div>
 
-            <div className="flex gap-2 px-6 py-4 border-t">
+            <div className="flex flex-col gap-2 px-6 py-4 border-t">
               <Button
                 variant="outline"
-                className="flex-1"
+                className="w-full h-10"
                 onClick={() =>
                   navigate('/closing/order-guide-detail', { state: { items: guideItems } })
                 }
               >
                 <ClipboardList className="w-4 h-4 mr-1.5" />
-                전체 보기
+                자세히 보기
               </Button>
-              <Button
-                className="flex-1 bg-baro-blue hover:bg-baro-blue/90 text-white"
-                onClick={handleExit}
-              >
-                <LogOut className="w-4 h-4 mr-1.5" />
-                종료
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1 h-10" onClick={() => setStep('choose')}>
+                  이전 페이지로
+                </Button>
+                <Button
+                  className="flex-1 bg-baro-blue hover:bg-baro-blue/90 text-white h-10"
+                  onClick={handleExit}
+                >
+                  프로그램 종료
+                </Button>
+              </div>
             </div>
           </>
         )}
 
         {/* ── 오픈 때 보기: 종료 확인 ── */}
         {step === 'confirm-exit' && (
-          <div className="px-6 py-8 text-center space-y-4">
+          <div className="p-5 text-center space-y-4">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800">
-              <Moon className="w-8 h-8 text-slate-400" />
+              <CalendarCheck className="w-8 h-8 text-slate-400" />
             </div>
             <div>
-              <h2 className="text-lg font-bold">
+              <h2 className="text-lg font-bold pb-3">
                 {isRetroactive ? '대시보드로 돌아갈까요?' : '프로그램을 종료할까요?'}
               </h2>
               <p className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
@@ -306,18 +314,18 @@ const AfterClosingModal = ({
                 발주 가이드 메뉴에서 확인할 수 있어요.
               </p>
             </div>
-            <div className="flex gap-2 pt-1">
-              <Button variant="outline" className="flex-1" onClick={() => setStep('choose')}>
+            <DialogFooter className="flex gap-2">
+              <Button variant="outline" className="flex-1 h-10" onClick={() => setStep('choose')}>
                 취소
               </Button>
               <Button
-                className="flex-1 bg-baro-blue hover:bg-baro-blue/90 text-white flex items-center gap-1.5"
+                className="flex-1 h-10 bg-baro-blue hover:bg-baro-blue/90 text-white flex items-center gap-1.5"
                 onClick={handleExit}
               >
                 <LogOut className="w-4 h-4" />
                 {isRetroactive ? '돌아가기' : '종료'}
               </Button>
-            </div>
+            </DialogFooter>
           </div>
         )}
       </DialogContent>

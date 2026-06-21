@@ -46,9 +46,7 @@ const IngredientLinkModal = ({
       <DialogContent className="max-w-sm">
         <DialogHeader className="gap-0">
           <DialogTitle className="text-lg! leading-none! flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-baro-blue/10 flex items-center justify-center shrink-0">
-              <Link className="w-4 h-4 text-baro-blue" />
-            </div>
+            <Link className="size-4 text-muted-foreground" />
             기존 식자재 연결
           </DialogTitle>
           <p className="text-xs text-muted-foreground">

@@ -4,6 +4,7 @@ import useAuthStore from '@/features/auth/store/authStore';
 import type { OperatingHour } from '@/features/initial-setup/types/initialSetup.types';
 import {
   fetchStoreSettings,
+  resetStoreData,
   updateStoreSettings,
   updateOperatingHours,
 } from '@/features/store-settings/api/storeSettings.api';
@@ -32,6 +33,21 @@ export function useUpdateStoreSettings() {
       if (variables.safetyStockPct !== undefined) {
         queryClient.invalidateQueries({ queryKey: ['ingredients', storeId] });
       }
+    },
+  });
+}
+
+export function useResetStoreData() {
+  const storeId = useAuthStore((s) => s.storeId);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => resetStoreData(storeId!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['storeSettings', storeId] });
+      queryClient.invalidateQueries({ queryKey: ['ingredients', storeId] });
+      queryClient.invalidateQueries({ queryKey: ['menus', storeId] });
+      queryClient.invalidateQueries({ queryKey: ['recipes', storeId] });
     },
   });
 }

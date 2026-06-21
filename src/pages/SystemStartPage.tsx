@@ -141,11 +141,11 @@ const SystemStartPage = () => {
         );
       case 'before-open-not-closed':
         return (
-          <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
+          <div className="flex items-start gap-3 rounded-lg border border-baro-yellow/30 bg-baro-yellow/10 px-4 py-3 text-sm text-baro-yellow-text">
+            <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-baro-yellow-dark" />
             <div>
               <p className="font-semibold">전날 마감이 완료되지 않았습니다.</p>
-              <p className="mt-0.5 text-xs text-amber-700">
+              <p className="mt-0.5 text-xs text-baro-yellow-text">
                 {formatShortDate(businessDate)} 소급 마감 후 영업을 시작할 수 있습니다.
               </p>
             </div>
@@ -160,8 +160,8 @@ const SystemStartPage = () => {
         );
       case 'holiday':
         return (
-          <div className="flex items-center gap-3 rounded-lg border border-purple-200 bg-purple-50 px-4 py-3 text-sm text-purple-800">
-            <MoonStar className="h-4 w-4 shrink-0 text-purple-400" />
+          <div className="flex items-center gap-3 rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-600">
+            <MoonStar className="h-4 w-4 shrink-0 text-slate-400" />
             <span>오늘은 설정된 휴무일입니다.</span>
           </div>
         );
@@ -183,20 +183,20 @@ const SystemStartPage = () => {
         return (
           <button
             onClick={() => navigate('/dashboard')}
-            className="w-full bg-baro-blue hover:bg-baro-blue/90 text-white rounded-lg px-8 py-6 flex items-center justify-between transition-colors text-left group"
+            className="w-full bg-white dark:bg-card border border-border hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg px-8 py-6 flex items-center justify-between transition-colors text-left group cursor-pointer"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
-                <Store className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                <Store className="w-6 h-6 text-slate-500" />
               </div>
               <div>
-                <p className="font-bold text-xl">영업 중 · 대시보드로 이동</p>
-                <p className="text-sm text-white/70 mt-1">
+                <p className="font-bold text-xl text-foreground">영업 중 · 대시보드로 이동</p>
+                <p className="text-sm text-muted-foreground mt-1">
                   {formatShortDate(businessDate)} 영업이 진행 중입니다
                 </p>
               </div>
             </div>
-            <ChevronRight className="w-6 h-6 opacity-60 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight className="w-6 h-6 text-slate-400 shrink-0" />
           </button>
         );
 
@@ -205,20 +205,22 @@ const SystemStartPage = () => {
           <button
             onClick={() => handleStartBusiness()}
             disabled={isStarting}
-            className="w-full bg-baro-blue hover:bg-baro-blue/90 disabled:opacity-60 text-white rounded-lg px-8 py-6 flex items-center justify-between transition-colors text-left group"
+            className="w-full bg-white dark:bg-card border border-border hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 disabled:opacity-60 rounded-lg px-8 py-6 flex items-center justify-between transition-colors text-left group cursor-pointer"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
-                <LogIn className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                <LogIn className="w-6 h-6 text-slate-500" />
               </div>
               <div>
-                <p className="font-bold text-xl">{isStarting ? '시작 중...' : '영업 시작하기'}</p>
-                <p className="text-sm text-white/70 mt-1">
+                <p className="font-bold text-xl text-foreground">
+                  {isStarting ? '시작 중...' : '영업 시작하기'}
+                </p>
+                <p className="text-sm text-muted-foreground mt-1">
                   오늘 영업을 시작하고 대시보드로 이동합니다
                 </p>
               </div>
             </div>
-            <ChevronRight className="w-6 h-6 opacity-60 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight className="w-6 h-6 text-slate-400 shrink-0" />
           </button>
         );
 
@@ -239,20 +241,20 @@ const SystemStartPage = () => {
         return (
           <button
             onClick={() => navigate(`/closing?date=${businessDate}`)}
-            className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-lg px-8 py-6 flex items-center justify-between transition-colors text-left group"
+            className="w-full bg-white dark:bg-card border border-border hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg px-8 py-6 flex items-center justify-between transition-colors text-left group cursor-pointer"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
-                <AlertTriangle className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-6 h-6 text-slate-500" />
               </div>
               <div>
-                <p className="font-bold text-xl">전날 마감하러 가기</p>
-                <p className="text-sm text-white/80 mt-1">
+                <p className="font-bold text-xl text-foreground">전날 마감하러 가기</p>
+                <p className="text-sm text-muted-foreground mt-1">
                   {formatShortDate(businessDate)} 소급 마감을 진행합니다
                 </p>
               </div>
             </div>
-            <ChevronRight className="w-6 h-6 opacity-60 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight className="w-6 h-6 text-slate-400 shrink-0" />
           </button>
         );
 
@@ -275,18 +277,20 @@ const SystemStartPage = () => {
           <button
             onClick={() => setShowHolidayModal(true)}
             disabled={isStarting}
-            className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-60 text-white rounded-lg px-8 py-6 flex items-center justify-between transition-colors text-left group"
+            className="w-full bg-white dark:bg-card border border-border hover:border-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 disabled:opacity-60 rounded-lg px-8 py-6 flex items-center justify-between transition-colors text-left group cursor-pointer"
           >
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-lg bg-white/15 flex items-center justify-center shrink-0">
-                <LogIn className="w-6 h-6" />
+              <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                <LogIn className="w-6 h-6 text-slate-500" />
               </div>
               <div>
-                <p className="font-bold text-xl">임시 영업 시작하기</p>
-                <p className="text-sm text-white/70 mt-1">휴무일에 임시로 영업을 시작합니다</p>
+                <p className="font-bold text-xl text-foreground">임시 영업 시작하기</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  휴무일에 임시로 영업을 시작합니다
+                </p>
               </div>
             </div>
-            <ChevronRight className="w-6 h-6 opacity-60 shrink-0 group-hover:translate-x-0.5 transition-transform" />
+            <ChevronRight className="w-6 h-6 text-slate-400 shrink-0" />
           </button>
         );
     }
@@ -313,7 +317,7 @@ const SystemStartPage = () => {
               </p>
             )}
             {!isLoading && businessDateClosed && (
-              <span className="inline-block mt-1 text-xs font-medium text-amber-700 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-full">
+              <span className="inline-block mt-1 text-xs font-medium text-baro-yellow-text bg-baro-yellow/20 border border-baro-yellow/30 px-2 py-0.5 rounded-full">
                 {formatShortDate(businessDate)} 마감 완료
               </span>
             )}
@@ -324,9 +328,9 @@ const SystemStartPage = () => {
               (currentCase === 'already-open' || currentCase === 'normal') && (
                 <Link
                   to={`/closing?date=${getYesterdayKST()}`}
-                  className="inline-flex items-center gap-1 mt-1 text-xs font-medium text-amber-700 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full hover:bg-amber-200 transition-colors"
+                  className="inline-flex items-center gap-1 mt-1 text-xs font-medium text-baro-yellow-text bg-baro-yellow/20 border border-baro-yellow/50 px-2 py-0.5 rounded-full hover:bg-baro-yellow/30 transition-colors"
                 >
-                  <AlertTriangle className="h-3 w-3 shrink-0" />
+                  <AlertTriangle className="h-3 w-3 shrink-0 text-baro-yellow-dark" />
                   전날 마감 누락
                 </Link>
               )}
@@ -360,7 +364,7 @@ const SystemStartPage = () => {
             <div className="grid grid-cols-3 gap-4">
               <button
                 onClick={() => navigate('/inventory')}
-                className="bg-white dark:bg-card border border-border hover:border-baro-green/40 hover:bg-baro-green/5 rounded-lg p-5 flex flex-col gap-4 transition-colors text-left"
+                className="bg-white dark:bg-card border border-border hover:border-baro-green/40 hover:bg-baro-green/5 rounded-lg p-5 flex flex-col gap-4 transition-colors text-left cursor-pointer"
               >
                 <div className="w-10 h-10 rounded-lg bg-baro-green/10 flex items-center justify-center">
                   <Archive className="w-5 h-5 text-baro-green" />
@@ -373,10 +377,10 @@ const SystemStartPage = () => {
 
               <button
                 onClick={() => navigate('/order-guide')}
-                className="bg-white dark:bg-card border border-border hover:border-purple-300/50 hover:bg-purple-50/60 dark:hover:bg-purple-950/20 rounded-lg p-5 flex flex-col gap-4 transition-colors text-left"
+                className="bg-white dark:bg-card border border-border hover:border-baro-yellow/50 hover:bg-baro-yellow/10 dark:hover:bg-baro-yellow/10 rounded-lg p-5 flex flex-col gap-4 transition-colors text-left cursor-pointer"
               >
-                <div className="w-10 h-10 rounded-lg bg-purple-100/70 dark:bg-purple-950/30 flex items-center justify-center">
-                  <ClipboardList className="w-5 h-5 text-purple-400" />
+                <div className="w-10 h-10 rounded-lg bg-baro-yellow/20 dark:bg-baro-yellow/20 flex items-center justify-center">
+                  <ClipboardList className="w-5 h-5 text-baro-yellow-dark" />
                 </div>
                 <div>
                   <p className="font-semibold text-foreground">발주 가이드</p>
@@ -386,7 +390,7 @@ const SystemStartPage = () => {
 
               <button
                 onClick={() => toast.info('이전 마감 현황 기능은 준비 중이에요.')}
-                className="bg-white dark:bg-card border border-border hover:border-baro-blue/40 hover:bg-baro-blue/5 rounded-lg p-5 flex flex-col gap-4 transition-colors text-left"
+                className="bg-white dark:bg-card border border-border hover:border-baro-blue/40 hover:bg-baro-blue/5 rounded-lg p-5 flex flex-col gap-4 transition-colors text-left cursor-pointer"
               >
                 <div className="w-10 h-10 rounded-lg bg-baro-blue/10 flex items-center justify-center">
                   <History className="w-5 h-5 text-baro-blue" />
@@ -402,7 +406,7 @@ const SystemStartPage = () => {
             <div className="grid grid-cols-2 gap-4">
               <button
                 onClick={() => setShowCancelModal(true)}
-                className="bg-white dark:bg-card border border-border hover:border-baro-red/40 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg p-5 flex flex-col gap-4 transition-colors text-left"
+                className="bg-white dark:bg-card border border-border hover:border-baro-red/40 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-lg p-5 flex flex-col gap-4 transition-colors text-left cursor-pointer"
               >
                 <div className="w-10 h-10 rounded-lg bg-baro-red/10 flex items-center justify-center">
                   <Trash2 className="w-5 h-5 text-baro-red" />
@@ -415,7 +419,7 @@ const SystemStartPage = () => {
 
               <button
                 onClick={() => navigate('/store-settings')}
-                className="bg-white dark:bg-card border border-border hover:bg-muted/50 rounded-lg p-5 flex flex-col gap-4 transition-colors text-left"
+                className="bg-white dark:bg-card border border-border hover:bg-muted/50 rounded-lg p-5 flex flex-col gap-4 transition-colors text-left cursor-pointer"
               >
                 <div className="w-10 h-10 rounded-lg bg-muted flex items-center justify-center">
                   <Settings className="w-5 h-5 text-muted-foreground" />
@@ -443,7 +447,10 @@ const SystemStartPage = () => {
       <Dialog open={showHolidayModal} onOpenChange={setShowHolidayModal}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle>임시 영업 시작</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Store className="size-4 text-muted-foreground" />
+              임시 영업 시작
+            </DialogTitle>
             <DialogDescription>
               오늘은 휴무일로 설정되어 있습니다. 그래도 영업을 시작하시겠습니까?
             </DialogDescription>
@@ -462,7 +469,7 @@ const SystemStartPage = () => {
                 handleStartBusiness(todayKST);
               }}
               disabled={isStarting}
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+              className="bg-slate-100 hover:bg-slate-200 text-slate-700"
             >
               {isStarting ? '시작 중...' : '임시 영업 시작'}
             </Button>

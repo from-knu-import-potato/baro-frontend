@@ -278,7 +278,7 @@ const OcrReviewStep = ({
               </span>
             )}
             {needsFactorCount > 0 && (
-              <span className="text-xs bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full border border-amber-200/60">
+              <span className="text-xs bg-baro-yellow/10 text-baro-yellow-text px-2 py-0.5 rounded-full border border-baro-yellow/30">
                 변환 필요 {needsFactorCount}개
               </span>
             )}
@@ -338,7 +338,7 @@ const OcrReviewStep = ({
                     !item.isWarning &&
                       item.purchaseUnit &&
                       !item.conversionFactor &&
-                      'bg-amber-50/20',
+                      'bg-baro-yellow/10',
                   )}
                 >
                   <div className="flex items-center justify-center">
@@ -501,8 +501,8 @@ const OcrReviewStep = ({
 
                 {/* 비표준 단위 변환 계수 입력 행 */}
                 {item.purchaseUnit && (
-                  <div className="flex items-center gap-2 px-4 py-2 bg-amber-50/60 text-xs">
-                    <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                  <div className="flex items-center gap-2 px-4 py-2 bg-baro-yellow/10 text-xs">
+                    <AlertCircle className="w-3.5 h-3.5 text-baro-yellow-dark shrink-0" />
                     <span className="text-muted-foreground">명세서 원본:</span>
                     <span className="font-medium text-foreground">
                       {item.purchaseQuantity} {item.purchaseUnit}
@@ -520,7 +520,7 @@ const OcrReviewStep = ({
                     <span className="text-muted-foreground">{item.unit}</span>
                     {item.conversionFactor !== undefined && item.purchaseQuantity !== undefined && (
                       <>
-                        <span className="text-amber-700 font-medium">
+                        <span className="text-baro-yellow-text font-medium">
                           → 합계 {(item.purchaseQuantity * item.conversionFactor).toLocaleString()}{' '}
                           {item.unit}
                         </span>

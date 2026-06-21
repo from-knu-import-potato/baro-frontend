@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { ImagePlus, Star, X } from 'lucide-react';
+import { ImagePlus, Star, UtensilsCrossed, X } from 'lucide-react';
 
 import type { MenuItem } from '@/features/initial-setup/types/initialSetup.types';
 import { Button } from '@/shadcn/ui/button';
@@ -104,12 +104,15 @@ const MenuRegistrationModal = ({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent>
+      <DialogContent showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>{editingMenu ? '메뉴 수정' : '메뉴 등록'}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <UtensilsCrossed className="size-4 text-muted-foreground" />
+            {editingMenu ? '메뉴 수정' : '메뉴 등록'}
+          </DialogTitle>
         </DialogHeader>
 
-        <div>
+        <div className="flex flex-col gap-4">
           {/* 사진 업로드 */}
           <div className="space-y-1.5">
             <Label>메뉴 사진</Label>
@@ -199,12 +202,12 @@ const MenuRegistrationModal = ({
             <button
               type="button"
               onClick={() => setForm((prev) => ({ ...prev, isFeatured: !prev.isFeatured }))}
-              className="mb-0.5 flex h-10 items-center gap-1.5 rounded-lg border px-3 transition-colors hover:bg-yellow-50"
+              className="mb-0.5 flex h-10 items-center gap-1.5 rounded-lg border px-3 transition-colors hover:bg-baro-yellow/10"
             >
               <Star
                 className={
                   form.isFeatured
-                    ? 'size-4 fill-yellow-400 text-yellow-400'
+                    ? 'size-4 fill-baro-yellow text-baro-yellow'
                     : 'size-4 text-gray-300'
                 }
               />
@@ -213,16 +216,11 @@ const MenuRegistrationModal = ({
           </div>
         </div>
 
-        <DialogFooter className="mx-0 mb-0 border-t p-4">
-          <Button type="button" variant="outline" size="sm" onClick={onClose}>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={onClose}>
             취소
           </Button>
-          <Button
-            type="button"
-            size="sm"
-            onClick={handleSave}
-            className="bg-baro-blue text-white hover:bg-baro-blue-dark"
-          >
+          <Button type="button" onClick={handleSave} className="bg-baro-blue hover:bg-baro-blue/80">
             {editingMenu ? '수정 완료' : '등록하기'}
           </Button>
         </DialogFooter>

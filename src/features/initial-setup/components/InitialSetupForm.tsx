@@ -196,7 +196,7 @@ const InitialSetupForm = () => {
               </div>
               <CardDescription className="mt-0.5">{currentStepConfig.description}</CardDescription>
             </CardHeader>
-            <CardContent className="flex flex-1 min-h-0 flex-col p-4">
+            <CardContent className="flex flex-1 min-h-0 flex-col px-4 py-2">
               <div className="flex flex-1 min-h-0 flex-col">{renderStep()}</div>
             </CardContent>
           </Card>

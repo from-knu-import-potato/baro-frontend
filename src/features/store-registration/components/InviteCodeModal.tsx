@@ -1,5 +1,6 @@
 import { useState } from 'react';
 
+import { KeyRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
@@ -37,7 +38,10 @@ const InviteCodeModal = ({ open, onOpenChange }: InviteCodeModalProps) => {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-sm p-5">
         <DialogHeader>
-          <DialogTitle className="text-xl! mb-1!">초대코드 입력</DialogTitle>
+          <DialogTitle className="text-xl! mb-1! flex items-center gap-2">
+            <KeyRound className="size-4 text-muted-foreground" />
+            초대코드 입력
+          </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
             사장님께 받은 초대코드를 입력해 주세요. 코드가 맞으면 가게에 직원으로 등록됩니다.
           </DialogDescription>

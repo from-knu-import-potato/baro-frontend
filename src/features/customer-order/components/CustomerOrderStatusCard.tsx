@@ -132,7 +132,7 @@ const OrderStatusCard = ({ storeId }: OrderStatusCardProps) => {
           <ShoppingBag className="size-4 text-muted-foreground" />
           오늘 주문 현황
           {pendingCount > 0 && (
-            <span className="flex size-5 items-center justify-center rounded-full bg-amber-400/80 text-xs font-bold text-white">
+            <span className="flex size-5 items-center justify-center rounded-full bg-baro-yellow text-xs font-bold text-white">
               {pendingCount}
             </span>
           )}

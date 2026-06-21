@@ -155,7 +155,7 @@ const RecipePanel = ({ menu, recipe, ingredients, onRecipeChange }: RecipePanelP
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold">{menu.name || '(이름 없음)'}</span>
           {menu.isFeatured && (
-            <span className="rounded-full bg-yellow-100 px-2 py-0.5 text-[10px] font-medium text-yellow-700">
+            <span className="rounded-full bg-baro-yellow/20 px-2 py-0.5 text-[10px] font-medium text-baro-yellow-text">
               대표
             </span>
           )}

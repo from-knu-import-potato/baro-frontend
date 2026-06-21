@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Loader2 } from 'lucide-react';
+import { Loader2, ScanLine } from 'lucide-react';
 
 import useAuthStore from '@/features/auth/store/authStore';
 import { uploadMenuOcrScan } from '@/features/store-settings/api/menus.api';
@@ -99,7 +99,10 @@ const MenuOcrModal = ({
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
       <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{titleMap[step]}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <ScanLine className="size-4 text-muted-foreground" />
+            {titleMap[step]}
+          </DialogTitle>
         </DialogHeader>
 
         {step === 'upload' && (

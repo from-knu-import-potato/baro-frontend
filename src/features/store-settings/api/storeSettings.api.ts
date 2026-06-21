@@ -29,6 +29,10 @@ export async function updateStoreSettings(
   await axiosInstance.patch(`/stores/${storeId}`, data);
 }
 
+export async function resetStoreData(storeId: string): Promise<void> {
+  await axiosInstance.post(`/stores/${storeId}/reset`);
+}
+
 export async function updateOperatingHours(
   storeId: string,
   operatingHours: OperatingHour[],
