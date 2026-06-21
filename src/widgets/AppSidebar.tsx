@@ -1,4 +1,4 @@
-import { LayoutDashboard, MonitorPlay, Package, Truck, Store, Settings, Home } from 'lucide-react';
+import { LayoutDashboard, Package, Truck, Store, Settings, Home, Globe, User } from 'lucide-react';
 import { NavLink, useLocation } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
@@ -23,9 +23,9 @@ import BaroLogo from '@/shared/assets/images/baro-logo.png';
 
 const BOTTOM_NAV_ITEMS = [
   { label: '회원 설정', icon: Settings, to: routePaths.settings },
-  { label: '시스템 시작', icon: MonitorPlay, to: routePaths.systemStart },
-  // { label: '지원', icon: HelpCircle, to: routePaths.support },
-  { label: '랜딩 페이지', icon: Home, to: routePaths.landing },
+  { label: '계정 홈', icon: User, to: routePaths.myStores },
+  { label: '가게 홈', icon: Home, to: routePaths.storeHome },
+  { label: '서비스 소개', icon: Globe, to: routePaths.landing },
 ];
 
 const BUSINESS_TYPE_LABEL: Record<string, string> = {

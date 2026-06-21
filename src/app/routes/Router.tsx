@@ -14,6 +14,7 @@ import InitialSetupPage from '@/pages/InitialSetupPage';
 import InventoryPage from '@/pages/InventoryPage';
 import LandingPage from '@/pages/LandingPage';
 import LoginPage from '@/pages/LoginPage';
+import MyStoresPage from '@/pages/MyStoresPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 import NoticesPage from '@/pages/NoticesPage';
 import OcrInboundPage from '@/pages/OcrInboundPage';
@@ -24,9 +25,9 @@ import SettingsIngredientsPage from '@/pages/SettingsIngredientsPage';
 import SettingsMenuBoardPage from '@/pages/SettingsMenuBoardPage';
 import SettingsMenusPage from '@/pages/SettingsMenusPage';
 import SettingsRecipesPage from '@/pages/SettingsRecipesPage';
+import StoreHomePage from '@/pages/StoreHomePage';
 import StoreSelectionPage from '@/pages/StoreSelectionPage';
 import StoreSettingsPage from '@/pages/StoreSettingsPage';
-import SystemStartPage from '@/pages/SystemStartPage';
 import TermsOfServicePage from '@/pages/TermsOfServicePage';
 
 const StandalonePageWrapper = ({ element }: { element: React.ReactElement }) => {
@@ -64,12 +65,16 @@ export default function Router() {
         element={<StandalonePageWrapper element={<StoreSelectionPage />} />}
       />
       <Route
+        path={routePaths.myStores}
+        element={<StandalonePageWrapper element={<MyStoresPage />} />}
+      />
+      <Route
         path={routePaths.initialSetup}
         element={<StandalonePageWrapper element={<InitialSetupPage />} />}
       />
       <Route
-        path={routePaths.systemStart}
-        element={<StandalonePageWrapper element={<SystemStartPage />} />}
+        path={routePaths.storeHome}
+        element={<StandalonePageWrapper element={<StoreHomePage />} />}
       />
       <Route
         path={routePaths.dayClosed}

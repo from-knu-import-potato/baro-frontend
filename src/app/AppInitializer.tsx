@@ -31,8 +31,9 @@ const AppInitializer = ({ children }: { children: React.ReactNode }) => {
       let resolvedStoreId = storeId;
 
       if (!resolvedStoreId) {
-        const res = await axiosInstance.get('/users/me/store').catch(() => null);
-        resolvedStoreId = res?.data?.data?.storeId ?? null;
+        const res = await axiosInstance.get('/users/me/stores').catch(() => null);
+        const stores: { storeId: string }[] = res?.data?.data ?? [];
+        resolvedStoreId = stores[0]?.storeId ?? null;
         if (resolvedStoreId) setStoreId(resolvedStoreId);
       }
 

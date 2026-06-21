@@ -57,7 +57,7 @@ const RegisterForm = () => {
           }
         })
         .catch(() => {})
-        .finally(() => navigate(routePaths.systemStart, { replace: true }));
+        .finally(() => navigate(routePaths.storeHome, { replace: true }));
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response?.status;
       if (status === 403) {

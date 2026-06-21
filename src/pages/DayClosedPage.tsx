@@ -44,7 +44,7 @@ const DayClosedPage = () => {
             발주 가이드 확인
           </Button>
           <Button
-            onClick={() => navigate('/system-start')}
+            onClick={() => navigate('/store-home')}
             className="h-12 bg-transparent border border-white/20 text-white hover:bg-white/10 font-medium flex items-center gap-2"
           >
             <MonitorPlay className="w-4 h-4" />

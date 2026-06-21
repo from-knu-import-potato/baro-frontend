@@ -10,10 +10,10 @@ import { z } from 'zod';
 import { routePaths } from '@/app/routes/routePaths';
 import { credentialLogin } from '@/features/auth/api/authApi';
 import useAuthStore from '@/features/auth/store/authStore';
+import { fetchMyStores } from '@/features/store-registration/api/storeRegistration.api';
 import { Button } from '@/shadcn/ui/button';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
-import axiosInstance from '@/shared/api/axiosInstance';
 
 const schema = z.object({
   username: z.string().min(1, '아이디를 입력해주세요.'),
@@ -35,23 +35,21 @@ const CredentialLoginForm = () => {
 
   const onSubmit = async (values: FormValues) => {
     try {
-      const { accessToken, refreshToken, isNewUser } = await credentialLogin(values);
+      const { accessToken, refreshToken } = await credentialLogin(values);
       setTokens(accessToken, refreshToken);
 
-      if (isNewUser) {
-        navigate(routePaths.initialSetup, { replace: true });
+      const stores = await fetchMyStores().catch(() => []);
+
+      if (stores.length === 0) {
+        navigate(routePaths.storeSelection, { replace: true });
         return;
       }
 
-      axiosInstance
-        .get('/users/me/store')
-        .then((res) => {
-          if (res.data.data?.storeId) {
-            setStoreId(res.data.data.storeId);
-          }
-        })
-        .catch(() => {})
-        .finally(() => navigate(routePaths.systemStart, { replace: true }));
+      const saved = useAuthStore.getState().storeId;
+      const match = stores.find((s) => s.storeId === saved);
+      const target = match ?? stores[0];
+      setStoreId(target.storeId);
+      navigate(routePaths.myStores, { replace: true });
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response?.status;
       if (status === 401) {
