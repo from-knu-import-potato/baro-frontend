@@ -15,11 +15,15 @@ axiosInstance.interceptors.request.use((config) => {
   return config;
 });
 
+const AUTH_REQUEST_URLS = ['/auth/login', '/auth/register'];
+
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    const isRefreshRequest = error.config?.url?.includes('/auth/refresh');
-    if (error.response?.status === 401 && !isRefreshRequest) {
+    const requestUrl: string = error.config?.url ?? '';
+    const isRefreshRequest = requestUrl.includes('/auth/refresh');
+    const isAuthRequest = AUTH_REQUEST_URLS.some((url) => requestUrl.includes(url));
+    if (error.response?.status === 401 && !isRefreshRequest && !isAuthRequest) {
       useAuthStore.getState().clearAuth();
       window.location.href = '/login';
     }
