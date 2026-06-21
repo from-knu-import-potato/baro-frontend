@@ -103,7 +103,7 @@ const ClosingCancelModal = ({ open, onClose, storeId }: ClosingCancelModalProps)
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-2 max-h-64 overflow-y-auto">
+          <div className="space-y-2 max-h-64 overflow-y-auto pr-2">
             {isLoading ? (
               <>
                 <Skeleton className="h-14 w-full rounded-lg" />
@@ -139,12 +139,17 @@ const ClosingCancelModal = ({ open, onClose, storeId }: ClosingCancelModalProps)
           </div>
 
           <div className="flex gap-2 pt-1">
-            <Button variant="outline" className="flex-1" onClick={handleClose} disabled={isPending}>
+            <Button
+              variant="outline"
+              className="flex-1 h-10"
+              onClick={handleClose}
+              disabled={isPending}
+            >
               닫기
             </Button>
             <Button
               variant="destructive"
-              className="flex-1 flex items-center gap-1.5"
+              className="flex-1 flex items-center gap-1.5 h-10 border-baro-red bg-baro-red/10 hover:bg-baro-red/20 text-baro-red"
               onClick={handleCancelRequest}
               disabled={!selectedId || isPending}
             >
@@ -170,22 +175,24 @@ const ClosingCancelModal = ({ open, onClose, storeId }: ClosingCancelModalProps)
             <AlertDialogDescription className="sr-only">마감 취소 경고</AlertDialogDescription>
             <div className="space-y-3 text-sm">
               {confirmingItem && (
-                <p className="text-foreground font-medium">
-                  선택한 마감은{' '}
+                <p className="text-foreground font-medium pb-2">
                   <span className="text-baro-red font-semibold">
                     현재 날짜로부터 {daysAgo}일 전
                   </span>{' '}
-                  ({formatDate(confirmingItem.date)})입니다.
+                  마감({formatDate(confirmingItem.date)})입니다.
                 </p>
               )}
-              <div className="rounded-lg border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900 px-4 py-3 text-amber-800 dark:text-amber-300">
-                <p className="font-semibold mb-1">⚠️ 복구 불가능한 작업입니다</p>
+              <div className="rounded-lg border border-baro-yellow/30 bg-baro-yellow/10 dark:bg-baro-yellow/10 dark:border-baro-yellow/30 px-4 py-3 text-baro-yellow-text dark:text-baro-yellow-text">
+                <div className="flex flex-row gap-2 items-center mb-2">
+                  <AlertTriangle className="w-4 h-4 text-baro-yellow-dark" />
+                  <p className="font-semibold mb-1 ">복구 불가능한 작업입니다</p>
+                </div>
                 <p className="text-xs leading-relaxed">
                   마감을 취소하면 해당 날짜의 재고 차감이 원상 복구되지만, 이미 개점이 이루어진
-                  이후이므로 <strong>마감 재진행 및 재고 재차감이 불가능합니다.</strong>
+                  이후이므로 <strong>마감 재진행 및 재고 재차감이 불가능합니다.</strong> 그래도
+                  마감을 취소하시겠습니까?
                 </p>
               </div>
-              <p className="text-muted-foreground text-xs">그래도 마감을 취소하시겠습니까?</p>
             </div>
           </AlertDialogHeader>
           <AlertDialogFooter>

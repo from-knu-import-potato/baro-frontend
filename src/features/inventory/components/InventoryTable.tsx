@@ -74,9 +74,9 @@ const STATUS_CONFIG: Record<
   },
   warning: {
     label: '주의',
-    badgeClass: 'bg-yellow-50 text-yellow-600/80 border border-yellow-200/60',
-    rowClass: 'border-l-4 border-l-yellow-300',
-    icon: <AlertTriangle className="w-3 h-3" />,
+    badgeClass: 'bg-baro-yellow/10 text-baro-yellow-text border border-baro-yellow/30',
+    rowClass: 'border-l-4 border-l-baro-yellow/50',
+    icon: <AlertTriangle className="w-3 h-3 text-baro-yellow-dark" />,
   },
   normal: {
     label: '정상',
@@ -112,7 +112,7 @@ const getDday = (expiryDate?: string) => {
   if (diff < 0) return { text: '만료됨', chipClass: 'bg-zinc-100 text-zinc-400' };
   if (diff === 0) return { text: 'D-Day', chipClass: 'bg-red-50 text-red-400 font-bold' };
   if (diff <= 3) return { text: `D-${diff}`, chipClass: 'bg-red-50 text-red-400 font-semibold' };
-  if (diff <= 7) return { text: `D-${diff}`, chipClass: 'bg-yellow-50 text-yellow-600/80' };
+  if (diff <= 7) return { text: `D-${diff}`, chipClass: 'bg-baro-yellow/10 text-baro-yellow-text' };
   return { text: `D-${diff}`, chipClass: 'bg-slate-100 text-slate-400' };
 };
 
@@ -149,8 +149,8 @@ const InventoryRow = ({ item, onToggleFavorite, onEdit }: InventoryRowProps) => 
           className={cn(
             'w-4 h-4 transition-colors',
             item.isFavorite
-              ? 'fill-yellow-400 text-yellow-400'
-              : 'text-muted-foreground/30 hover:text-yellow-400',
+              ? 'fill-baro-yellow text-baro-yellow'
+              : 'text-muted-foreground/30 hover:text-baro-yellow',
           )}
         />
       </button>
@@ -301,10 +301,10 @@ const InventoryTable = () => {
 
   return (
     <>
-      <Card className="flex flex-col flex-1 min-h-0 overflow-hidden">
+      <Card className="flex flex-col flex-1 min-h-0 overflow-hidden gap-0 pb-0">
         {/* 카드 헤더 */}
-        <CardHeader className="border-b pb-0">
-          <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+        <CardHeader className="border-b pb-0 shrink-0">
+          <div className="flex items-center justify-between mb-3">
             <CardTitle className="text-sm flex items-center gap-2">
               <Package2 className="w-4 h-4 text-muted-foreground" />
               전체 재고
@@ -312,8 +312,46 @@ const InventoryTable = () => {
                 — 총 {items.length}개 품목
               </span>
             </CardTitle>
+          </div>
 
-            <div className="flex items-center gap-2 ml-auto">
+          {/* 상태 필터 탭 + 액션 버튼 */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex gap-1">
+              {FILTER_TABS.map((tab) => {
+                const count =
+                  tab.key === 'all' ? items.length : countByStatus(tab.key as InventoryStatus);
+                const isActive = activeTab === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => setActiveTab(tab.key)}
+                    className={cn(
+                      'px-3 py-2 text-xs font-medium rounded-t-md border-b-2 transition-colors',
+                      isActive
+                        ? 'border-b-baro-blue text-baro-blue-dark bg-blue-50/50 dark:bg-blue-950/20'
+                        : 'border-b-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                    )}
+                  >
+                    {tab.label}
+                    <span
+                      className={cn(
+                        'ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold',
+                        isActive
+                          ? 'bg-baro-blue text-white'
+                          : tab.key === 'critical' && count > 0
+                            ? 'bg-red-50 text-red-400'
+                            : 'bg-muted text-muted-foreground',
+                      )}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* 액션 버튼 */}
+            <div className="flex items-center gap-2 shrink-0">
               <button
                 onClick={() => navigate(routePaths.ocrInbound)}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-baro-blue text-white hover:bg-baro-blue/90 transition-colors"
@@ -333,31 +371,28 @@ const InventoryTable = () => {
                   </span>
                 )}
               </button>
-              {/* 즐겨찾기 필터 버튼 */}
               <button
                 onClick={() => setShowFavoritesOnly((prev) => !prev)}
                 className={cn(
                   'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors',
                   showFavoritesOnly
-                    ? 'bg-yellow-50 border-yellow-300 text-yellow-600'
+                    ? 'bg-baro-yellow/10 border-baro-yellow/50 text-baro-yellow-text'
                     : 'border-input text-muted-foreground hover:bg-muted/50',
                 )}
               >
                 <Star
                   className={cn(
                     'w-3.5 h-3.5',
-                    showFavoritesOnly && 'fill-yellow-400 text-yellow-400',
+                    showFavoritesOnly && 'fill-baro-yellow text-baro-yellow',
                   )}
                 />
                 즐겨찾기만
                 {favoriteCount > 0 && (
-                  <span className="ml-0.5 bg-yellow-400 text-white rounded-full w-4 h-4 inline-flex items-center justify-center text-[10px] font-bold">
+                  <span className="ml-0.5 bg-baro-yellow text-white rounded-full w-4 h-4 inline-flex items-center justify-center text-[10px] font-bold">
                     {favoriteCount}
                   </span>
                 )}
               </button>
-
-              {/* 정렬 버튼 */}
               <div className="flex items-center gap-0.5 border rounded-md px-1.5 py-0.5">
                 <ArrowUpDown className="w-3 h-3 text-muted-foreground mr-0.5 shrink-0" />
                 {(
@@ -373,9 +408,7 @@ const InventoryTable = () => {
                       onClick={() => handleSortClick(key)}
                       className={cn(
                         'px-2 py-1 rounded text-xs font-medium transition-colors',
-                        isActive
-                          ? 'bg-baro-blue text-white'
-                          : 'text-muted-foreground hover:bg-muted/60',
+                        isActive ? 'text-baro-blue' : 'text-muted-foreground hover:bg-muted/60',
                       )}
                     >
                       {label}
@@ -384,15 +417,13 @@ const InventoryTable = () => {
                   );
                 })}
               </div>
-
-              {/* 검색 */}
               <div className="relative w-52">
                 <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                 <Input
                   placeholder="식자재 검색..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-8 h-8 text-xs"
+                  className="pl-8 h-8 text-xs placeholder:text-xs"
                 />
                 {search && (
                   <button
@@ -404,41 +435,6 @@ const InventoryTable = () => {
                 )}
               </div>
             </div>
-          </div>
-
-          {/* 상태 필터 탭 */}
-          <div className="flex gap-1">
-            {FILTER_TABS.map((tab) => {
-              const count =
-                tab.key === 'all' ? items.length : countByStatus(tab.key as InventoryStatus);
-              const isActive = activeTab === tab.key;
-              return (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={cn(
-                    'px-3 py-2 text-xs font-medium rounded-t-md border-b-2 transition-colors',
-                    isActive
-                      ? 'border-b-baro-blue text-baro-blue-dark bg-blue-50/50 dark:bg-blue-950/20'
-                      : 'border-b-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50',
-                  )}
-                >
-                  {tab.label}
-                  <span
-                    className={cn(
-                      'ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold',
-                      isActive
-                        ? 'bg-baro-blue text-white'
-                        : tab.key === 'critical' && count > 0
-                          ? 'bg-red-50 text-red-400'
-                          : 'bg-muted text-muted-foreground',
-                    )}
-                  >
-                    {count}
-                  </span>
-                </button>
-              );
-            })}
           </div>
         </CardHeader>
 

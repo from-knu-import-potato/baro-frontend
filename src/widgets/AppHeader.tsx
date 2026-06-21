@@ -41,9 +41,9 @@ const AppHeader = ({
       {missedClosing && (
         <Link
           to={`/closing?date=${getYesterdayKST()}`}
-          className="flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 hover:bg-amber-100 transition-colors"
+          className="flex items-center gap-1.5 rounded-full border border-baro-yellow/50 bg-baro-yellow/10 px-3 py-1 text-xs font-medium text-baro-yellow-text hover:bg-baro-yellow/20 transition-colors"
         >
-          <AlertTriangle className="h-3 w-3 shrink-0" />
+          <AlertTriangle className="h-3 w-3 shrink-0 text-baro-yellow-dark" />
           전날 마감 누락
         </Link>
       )}

@@ -196,7 +196,7 @@ const StepMenuRegistration = ({ data, onChange }: StepMenuRegistrationProps) => 
                     )}
 
                     {menu.isFeatured && (
-                      <div className="absolute left-2 top-2 flex items-center gap-0.5 rounded-full bg-yellow-400 px-1.5 py-0.5">
+                      <div className="absolute left-2 top-2 flex items-center gap-0.5 rounded-full bg-baro-yellow px-1.5 py-0.5">
                         <Star className="size-2.5 fill-white text-white" />
                         <span className="text-[10px] font-bold text-white">대표</span>
                       </div>
@@ -243,7 +243,7 @@ const StepMenuRegistration = ({ data, onChange }: StepMenuRegistrationProps) => 
               variant="outline"
               size="sm"
               onClick={() => setOcrStep('upload')}
-              className="flex-1 gap-1.5 border-dashed"
+              className="flex-1 gap-1.5 border-dashed h-10"
             >
               <ScanLine className="size-4" />
               메뉴판으로 등록
@@ -253,7 +253,7 @@ const StepMenuRegistration = ({ data, onChange }: StepMenuRegistrationProps) => 
               variant="outline"
               size="sm"
               onClick={handleOpenNew}
-              className="flex-1 gap-1.5 border-dashed"
+              className="flex-1 gap-1.5 border-dashed h-10"
             >
               <Plus className="size-4" />
               직접 입력하기

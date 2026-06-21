@@ -149,8 +149,8 @@ const ClosingPage = () => {
 
         {/* 소급 마감 안내 배너 */}
         {isRetroactive && (
-          <div className="mx-6 mt-4 flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
+          <div className="mx-6 mt-4 flex items-start gap-2.5 rounded-lg border border-baro-yellow/30 bg-baro-yellow/10 px-4 py-3 text-sm text-baro-yellow-text">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-baro-yellow-dark" />
             <p>
               전날 마감을 소급 처리합니다. 오늘 이미 발생한 매출과 재고 차감 순서가 실제와 다를 수
               있습니다.
