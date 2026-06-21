@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle, CalendarDays, CheckCircle, MoonStar, TrendingUp } from 'lucide-react';
+import { AlertTriangle, CalendarDays, CheckCircle, MoonStar } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -164,9 +164,6 @@ const ClosingPage = () => {
           <Card>
             <CardContent className="px-6 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-baro-blue/10 flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-baro-blue" />
-                </div>
                 <div>
                   <p className="text-xs text-muted-foreground">
                     {isRetroactive ? '해당일 총 매출' : '오늘 총 매출'}
@@ -244,7 +241,7 @@ const ClosingPage = () => {
               닫기
             </Button>
             <Button
-              onClick={() => navigate('/system-start')}
+              onClick={() => navigate('/store-home')}
               className="bg-baro-blue hover:bg-baro-blue/90 text-white"
             >
               시스템 시작으로

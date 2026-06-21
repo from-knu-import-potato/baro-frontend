@@ -1,4 +1,6 @@
 import DataSection from '@/features/store-settings/components/sections/DataSection';
+import InviteCodeSection from '@/features/store-settings/components/sections/InviteCodeSection';
+import MembersSection from '@/features/store-settings/components/sections/MembersSection';
 import OperatingHoursSection from '@/features/store-settings/components/sections/OperatingHoursSection';
 import StoreInfoSection from '@/features/store-settings/components/sections/StoreInfoSection';
 import StoreOperationSection from '@/features/store-settings/components/sections/StoreOperationSection';
@@ -12,6 +14,8 @@ const StoreSettingsContent = () => {
       </div>
       <StoreInfoSection />
       <OperatingHoursSection />
+      <InviteCodeSection />
+      <MembersSection />
       <StoreOperationSection />
       <DataSection />
     </div>

@@ -28,7 +28,7 @@ const AppLayout = () => {
   // 대시보드만 영업 세션 필수 — 재고·발주·설정 등은 세션 없이 접근 가능
   useEffect(() => {
     if (!isOpen && pathname === routePaths.dashboard) {
-      navigate('/system-start', { replace: true });
+      navigate('/store-home', { replace: true });
     }
   }, [isOpen, pathname, navigate]);
 

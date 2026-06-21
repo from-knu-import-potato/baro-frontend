@@ -20,7 +20,7 @@ const ClosingOrderGuidePage = () => {
   const items = stateItems ?? data?.items;
 
   const handleExit = () => {
-    navigate('/system-start', { replace: true });
+    navigate('/store-home', { replace: true });
   };
 
   return (

@@ -7,6 +7,7 @@ import { routePaths } from '@/app/routes/routePaths';
 import InviteCodeModal from '@/features/store-registration/components/InviteCodeModal';
 import { cn } from '@/lib/utils';
 import baroLogo from '@/shared/assets/images/baro-logo.png';
+import BackButton from '@/shared/components/BackButton';
 
 const StoreSelectionCards = () => {
   const navigate = useNavigate();
@@ -22,7 +23,8 @@ const StoreSelectionCards = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="relative flex min-h-screen flex-col bg-background">
+      <BackButton onClick={() => navigate(-1)} />
       {/* Header */}
       <div className="flex flex-col items-center gap-2 px-4 pt-8 mt-8 text-center">
         <img src={baroLogo} alt="BARO Logo" className="h-9 w-auto" />

@@ -22,7 +22,7 @@ import { updateStoreSettings } from '@/features/store-settings/api/storeSettings
 import { cn } from '@/lib/utils';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/ui/card';
-import baroLogo from '@/shared/assets/images/baro-logo.png';
+import BackButton from '@/shared/components/BackButton';
 
 type BasicInfoErrors = Partial<Record<keyof StoreBasicInfo, string>>;
 
@@ -107,10 +107,6 @@ const InitialSetupForm = () => {
     }
   };
 
-  const handleSkip = () => {
-    navigate(routePaths.dashboard);
-  };
-
   const renderStep = () => {
     switch (currentStep) {
       case 1:
@@ -156,37 +152,20 @@ const InitialSetupForm = () => {
   };
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
-      {/* Header */}
-      <header className="flex shrink-0 items-center justify-between border-b border-gray-100 bg-background px-6 py-3.5 dark:border-gray-800">
-        <div className="flex items-center gap-2.5">
-          <img src={baroLogo} alt="BARO" className="h-7 w-auto" />
-          <span className="text-sm font-semibold text-foreground">초기 설정</span>
-        </div>
-        <button
-          type="button"
-          onClick={handleSkip}
-          className="text-sm text-muted-foreground underline underline-offset-2 transition-colors hover:text-foreground"
-        >
-          건너뛰기
-        </button>
-      </header>
-
+    <div className="relative flex h-screen flex-col overflow-hidden">
+      <BackButton onClick={() => navigate(-1)} />
       {/* Main content */}
-      <main className="flex flex-1 min-h-0 flex-col items-center overflow-hidden px-4 py-4">
+      <main className="flex flex-1 min-h-0 flex-col items-center justify-center overflow-hidden px-4 py-8">
         <div
-          className={cn(
-            'flex w-full flex-1 min-h-0 flex-col gap-4',
-            currentStep === 4 ? 'max-w-3xl' : 'max-w-xl',
-          )}
+          className={cn('flex w-full flex-col gap-4', currentStep === 4 ? 'max-w-3xl' : 'max-w-xl')}
         >
           {/* Progress bar */}
-          <div className="mb-4 w-full max-w-xl shrink-0 self-center">
+          <div className="mb-2 w-full max-w-xl shrink-0 self-center">
             <SetupProgressBar currentStep={currentStep} />
           </div>
 
           {/* Step card */}
-          <Card className="flex flex-1 min-h-0 flex-col shadow-sm">
+          <Card className="flex flex-col shadow-sm max-h-[calc(100vh-14rem)] overflow-hidden">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <span className="flex size-6 items-center justify-center rounded-full bg-baro-blue text-xs font-bold text-white">
@@ -202,7 +181,7 @@ const InitialSetupForm = () => {
           </Card>
 
           {/* Navigation */}
-          <div className="flex shrink-0 items-center justify-between mb-16 mt-2">
+          <div className="flex shrink-0 items-center justify-between mt-2">
             <Button
               type="button"
               variant="outline"
