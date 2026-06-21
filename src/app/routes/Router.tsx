@@ -15,8 +15,10 @@ import InventoryPage from '@/pages/InventoryPage';
 import LandingPage from '@/pages/LandingPage';
 import LoginPage from '@/pages/LoginPage';
 import NotFoundPage from '@/pages/NotFoundPage';
+import NoticesPage from '@/pages/NoticesPage';
 import OcrInboundPage from '@/pages/OcrInboundPage';
 import OrderGuidePage from '@/pages/OrderGuidePage';
+import PrivacyPolicyPage from '@/pages/PrivacyPolicyPage';
 import RegisterPage from '@/pages/RegisterPage';
 import SettingsIngredientsPage from '@/pages/SettingsIngredientsPage';
 import SettingsMenuBoardPage from '@/pages/SettingsMenuBoardPage';
@@ -25,6 +27,7 @@ import SettingsRecipesPage from '@/pages/SettingsRecipesPage';
 import StoreSelectionPage from '@/pages/StoreSelectionPage';
 import StoreSettingsPage from '@/pages/StoreSettingsPage';
 import SystemStartPage from '@/pages/SystemStartPage';
+import TermsOfServicePage from '@/pages/TermsOfServicePage';
 
 const StandalonePageWrapper = ({ element }: { element: React.ReactElement }) => {
   const { key } = useLocation();
@@ -83,6 +86,18 @@ export default function Router() {
       <Route
         path={routePaths.customerOrder}
         element={<StandalonePageWrapper element={<CustomerOrderPage />} />}
+      />
+      <Route
+        path={routePaths.notices}
+        element={<StandalonePageWrapper element={<NoticesPage />} />}
+      />
+      <Route
+        path={routePaths.terms}
+        element={<StandalonePageWrapper element={<TermsOfServicePage />} />}
+      />
+      <Route
+        path={routePaths.privacy}
+        element={<StandalonePageWrapper element={<PrivacyPolicyPage />} />}
       />
       <Route
         path={routePaths.notFound}
