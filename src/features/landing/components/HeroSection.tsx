@@ -1,4 +1,4 @@
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, ClipboardCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
@@ -40,7 +40,7 @@ const HeroSection = () => {
             )}
           >
             <div className="mb-2 inline-flex items-center rounded-full border border-baro-blue/10 bg-baro-blue/5 px-4 py-2 text-sm font-semibold text-baro-blue self-center lg:self-start backdrop-blur-sm">
-              누구나 무료로 시작하는 스마트 재고 관리
+              소규모 카페·식당을 위한 올인원 가게 운영 플랫폼
             </div>
             <div className="flex flex-col sm:flex-row gap-5 items-center mb-3">
               <img
@@ -58,7 +58,7 @@ const HeroSection = () => {
             <p className="mb-12 max-w-2xl text-sm leading-relaxed text-baro-black-muted lg:text-md">
               거래명세서 촬영만으로 재고를 자동 등록하고,
               <br />
-              AI 기반 발주 추천과 식자재 시세 분석까지 한 번에 관리하세요.
+              QR 주문 접수부터 AI 발주, 마감까지 한 번에 관리하세요.
             </p>
 
             <div className="mt-4 lg:mt-10 mb-10 w-full flex flex-col items-center gap-4 sm:flex-row justify-center lg:justify-start">
@@ -104,13 +104,13 @@ const HeroSection = () => {
             )}
           >
             {/* Main Decorative Card */}
-            <div className="relative w-full z-10 p-7 rounded-[3rem] border border-baro-ivory-dark/30 dark:border-baro-black shadow-md backdrop-blur-sm group">
+            <div className="relative w-full z-10 p-7 rounded-[3rem] dark:bg-baro-black/20 border border-baro-ivory-dark/30 dark:border-baro-black shadow-md backdrop-blur-sm group">
               <div className="absolute top-0 right-0 w-32 h-32 bg-baro-blue/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700" />
 
               {/* Floating Items Container */}
               <div className="space-y-6 relative z-20">
                 {/* Visual Item 1 */}
-                <div className="p-5 rounded-2xl shadow-md border border-baro-ivory-dark dark:border-baro-black flex items-center gap-4 transform transition-transform hover:-translate-y-2 relative z-10">
+                <div className="p-5 rounded-2xl shadow-md dark:bg-baro-black-muted/10 border border-baro-ivory-dark dark:border-baro-black flex items-center gap-4 transform transition-transform hover:-translate-y-2 relative z-10">
                   <div className="w-12 h-12 bg-baro-blue/10 rounded-xl flex items-center justify-center text-baro-blue font-black text-[10px] uppercase">
                     OCR
                   </div>
@@ -136,15 +136,15 @@ const HeroSection = () => {
                 </div>
 
                 {/* Visual Item 3 */}
-                <div className="p-5 rounded-2xl shadow-md border border-baro-ivory-dark dark:border-baro-black flex items-center gap-4 transform transition-transform hover:-translate-y-2  relative z-10">
-                  <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center text-amber-600 font-black text-[10px] uppercase">
-                    KRW
+                <div className="p-5 rounded-2xl dark:bg-baro-black-muted/10 shadow-md border border-baro-ivory-dark dark:border-baro-black flex items-center gap-4 transform transition-transform hover:-translate-y-2 relative z-10">
+                  <div className="w-12 h-12 bg-baro-blue/10 rounded-xl flex items-center justify-center text-baro-blue">
+                    <ClipboardCheck size={22} />
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-amber-600 tracking-tighter uppercase mb-0.5">
-                      Analysis
+                    <p className="text-[10px] font-black text-baro-black-muted tracking-tighter uppercase mb-0.5">
+                      Closing
                     </p>
-                    <p className="text-sm font-bold leading-none">시세 대비 12% 저렴해요</p>
+                    <p className="text-sm font-bold leading-none">오늘 마감 완료, 재고 자동 차감</p>
                   </div>
                 </div>
               </div>

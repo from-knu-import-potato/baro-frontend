@@ -1,9 +1,18 @@
-import { Plus, Star, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
+import { ImageOff, Loader2, Pencil, Plus, ScanLine, Star, Trash2 } from 'lucide-react';
+
+import useAuthStore from '@/features/auth/store/authStore';
+import MenuRegistrationModal from '@/features/initial-setup/components/MenuRegistrationModal';
 import type { MenuItem } from '@/features/initial-setup/types/initialSetup.types';
+import { uploadMenuOcrScan } from '@/features/store-settings/api/menus.api';
+import MenuOcrReviewStep, {
+  type OcrMenuReviewItem,
+} from '@/features/store-settings/components/MenuOcrReviewStep';
+import MenuOcrUploadStep from '@/features/store-settings/components/MenuOcrUploadStep';
 import { Button } from '@/shadcn/ui/button';
-import { Input } from '@/shadcn/ui/input';
-import { Label } from '@/shadcn/ui/label';
+
+type OcrStep = 'upload' | 'analyzing' | 'review';
 
 interface StepMenuRegistrationProps {
   data: MenuItem[];
@@ -13,89 +22,253 @@ interface StepMenuRegistrationProps {
 const generateId = () => Math.random().toString(36).slice(2, 9);
 
 const StepMenuRegistration = ({ data, onChange }: StepMenuRegistrationProps) => {
-  const addMenu = () => {
-    onChange([...data, { id: generateId(), name: '', price: 0, isFeatured: false }]);
+  const storeId = useAuthStore((s) => s.storeId);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingMenu, setEditingMenu] = useState<MenuItem | null>(null);
+  const [ocrStep, setOcrStep] = useState<OcrStep | null>(null);
+  const [ocrItems, setOcrItems] = useState<OcrMenuReviewItem[]>([]);
+  const [ocrError, setOcrError] = useState<string | null>(null);
+
+  const handleOpenNew = () => {
+    setEditingMenu(null);
+    setIsModalOpen(true);
   };
 
-  const removeMenu = (id: string) => {
+  const handleOpenEdit = (menu: MenuItem) => {
+    setEditingMenu(menu);
+    setIsModalOpen(true);
+  };
+
+  const handleSave = (menu: MenuItem) => {
+    if (editingMenu) {
+      onChange(data.map((item) => (item.id === menu.id ? menu : item)));
+    } else {
+      onChange([...data, menu]);
+    }
+    setIsModalOpen(false);
+  };
+
+  const handleDelete = (id: string) => {
     onChange(data.filter((item) => item.id !== id));
   };
 
-  const updateMenu = (id: string, updated: Partial<MenuItem>) => {
-    onChange(data.map((item) => (item.id === id ? { ...item, ...updated } : item)));
+  const handleOcrFileSelect = async (file: File) => {
+    setOcrStep('analyzing');
+    setOcrError(null);
+    try {
+      const items = await uploadMenuOcrScan(storeId ?? 'temp', file);
+      setOcrItems(
+        items.map((item, i) => ({
+          id: `ocr-${Date.now()}-${i}`,
+          name: item.name,
+          price: String(item.price),
+          description: item.description ?? '',
+          isFeatured: false,
+        })),
+      );
+      setOcrStep('review');
+    } catch {
+      setOcrError('메뉴 인식에 실패했습니다. 다시 시도해주세요.');
+      setOcrStep('upload');
+    }
   };
 
+  const handleOcrConfirm = () => {
+    const existingNamesLower = new Set(data.map((m) => m.name.trim().toLowerCase()));
+    const unique: MenuItem[] = ocrItems
+      .filter((item) => item.name.trim() && !existingNamesLower.has(item.name.trim().toLowerCase()))
+      .map((item) => ({
+        id: generateId(),
+        name: item.name.trim(),
+        description: item.description.trim(),
+        price: Number(item.price) || 0,
+        isFeatured: item.isFeatured,
+        imageUrl: item.imageUrl,
+        imageFile: item.imageFile,
+      }));
+
+    onChange([...data, ...unique]);
+    setOcrStep(null);
+    setOcrItems([]);
+  };
+
+  /* OCR 플로우 활성 중 */
+  if (ocrStep !== null) {
+    return (
+      <div className="flex flex-1 min-h-0 flex-col overflow-y-auto py-2">
+        {ocrStep === 'upload' && (
+          <>
+            {ocrError && (
+              <p className="text-xs text-destructive bg-red-50 rounded-lg px-3 py-2 mb-4">
+                {ocrError}
+              </p>
+            )}
+            <MenuOcrUploadStep
+              onFileSelect={handleOcrFileSelect}
+              onBack={() => {
+                setOcrStep(null);
+                setOcrError(null);
+              }}
+            />
+          </>
+        )}
+
+        {ocrStep === 'analyzing' && (
+          <div className="flex flex-col items-center justify-center gap-4 py-16">
+            <Loader2 className="w-10 h-10 animate-spin text-baro-blue" />
+            <div className="text-center">
+              <p className="text-sm font-semibold">메뉴를 인식하는 중입니다</p>
+              <p className="text-xs text-muted-foreground mt-1">잠시만 기다려주세요...</p>
+            </div>
+          </div>
+        )}
+
+        {ocrStep === 'review' && (
+          <MenuOcrReviewStep
+            items={ocrItems}
+            existingNames={data.map((m) => m.name)}
+            onItemsChange={setOcrItems}
+            onConfirm={handleOcrConfirm}
+            onReset={() => setOcrStep('upload')}
+          />
+        )}
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4">
+    <div className="flex flex-1 min-h-0 flex-col">
       {data.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 rounded-lg border-2 border-dashed border-gray-200 py-10 text-center">
-          <p className="text-sm text-muted-foreground">등록된 메뉴가 없습니다</p>
-          <p className="text-xs text-muted-foreground">아래 버튼으로 메뉴를 추가해주세요</p>
+        /* 빈 상태 — 방법 선택 */
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-gray-200 text-center">
+          <div className="flex size-12 items-center justify-center rounded-full bg-gray-100">
+            <Plus className="size-6 text-gray-400" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">등록된 메뉴가 없습니다</p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              메뉴를 등록하는 방법을 선택해주세요
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setOcrStep('upload')}
+              className="gap-1.5"
+            >
+              <ScanLine className="size-4" />
+              메뉴판으로 등록
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              onClick={handleOpenNew}
+              className="gap-1.5 bg-baro-blue text-white hover:bg-baro-blue-dark"
+            >
+              <Plus className="size-4" />
+              직접 입력하기
+            </Button>
+          </div>
         </div>
       ) : (
-        <div className="space-y-2">
-          <div className="grid grid-cols-[1fr_110px_36px_36px] items-center gap-2 px-2">
-            <Label className="text-xs text-muted-foreground">메뉴 이름</Label>
-            <Label className="text-xs text-muted-foreground">가격 (원)</Label>
-            <Label className="text-center text-xs text-muted-foreground">대표</Label>
-            <span />
+        <>
+          {/* 메뉴 카드 그리드 — 스크롤 영역 */}
+          <div className="flex-1 min-h-0 overflow-y-auto">
+            <div className="grid grid-cols-2 gap-3">
+              {data.map((menu) => (
+                <div
+                  key={menu.id}
+                  className="group overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-md"
+                >
+                  <div className="relative h-28 bg-gray-100 dark:bg-gray-800">
+                    {menu.imageUrl ? (
+                      <img
+                        src={menu.imageUrl}
+                        alt={menu.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full items-center justify-center">
+                        <ImageOff className="size-8 text-gray-300" />
+                      </div>
+                    )}
+
+                    {menu.isFeatured && (
+                      <div className="absolute left-2 top-2 flex items-center gap-0.5 rounded-full bg-baro-yellow px-1.5 py-0.5">
+                        <Star className="size-2.5 fill-white text-white" />
+                        <span className="text-[10px] font-bold text-white">대표</span>
+                      </div>
+                    )}
+
+                    <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(menu)}
+                        className="flex size-6 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-sm transition-colors hover:text-baro-blue"
+                      >
+                        <Pencil className="size-3" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(menu.id)}
+                        className="flex size-6 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-sm transition-colors hover:text-red-500"
+                      >
+                        <Trash2 className="size-3" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="px-3 py-2.5">
+                    <p className="truncate text-sm font-semibold">{menu.name}</p>
+                    {menu.description && (
+                      <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
+                        {menu.description}
+                      </p>
+                    )}
+                    <p className="mt-1 text-xs font-medium text-baro-blue">
+                      {menu.price.toLocaleString()}원
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {data.map((item) => (
-            <div
-              key={item.id}
-              className="grid grid-cols-[1fr_110px_36px_36px] items-center gap-2 rounded-lg border px-2 py-1.5"
+          {/* 하단 버튼 — 고정 */}
+          <div className="flex shrink-0 gap-2 pt-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setOcrStep('upload')}
+              className="flex-1 gap-1.5 border-dashed h-10"
             >
-              <Input
-                placeholder="메뉴 이름"
-                value={item.name}
-                onChange={(e) => updateMenu(item.id, { name: e.target.value })}
-                className="h-8 bg-white"
-              />
-              <Input
-                type="number"
-                placeholder="0"
-                min={0}
-                value={item.price === 0 ? '' : item.price}
-                onChange={(e) => updateMenu(item.id, { price: parseInt(e.target.value) || 0 })}
-                className="h-8 bg-white"
-              />
-              <button
-                type="button"
-                onClick={() => updateMenu(item.id, { isFeatured: !item.isFeatured })}
-                title={item.isFeatured ? '대표 메뉴 해제' : '대표 메뉴 설정'}
-                className="flex items-center justify-center"
-              >
-                <Star
-                  className={
-                    item.isFeatured
-                      ? 'size-5 fill-yellow-400 text-yellow-400'
-                      : 'size-5 text-gray-300 transition-colors hover:text-yellow-300'
-                  }
-                />
-              </button>
-              <button
-                type="button"
-                onClick={() => removeMenu(item.id)}
-                className="flex items-center justify-center rounded p-1 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-500"
-              >
-                <Trash2 className="size-4" />
-              </button>
-            </div>
-          ))}
-        </div>
+              <ScanLine className="size-4" />
+              메뉴판으로 등록
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleOpenNew}
+              className="flex-1 gap-1.5 border-dashed h-10"
+            >
+              <Plus className="size-4" />
+              직접 입력하기
+            </Button>
+          </div>
+        </>
       )}
 
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={addMenu}
-        className="w-full gap-1.5 border-dashed"
-      >
-        <Plus className="size-4" />
-        메뉴 추가
-      </Button>
+      <MenuRegistrationModal
+        open={isModalOpen}
+        editingMenu={editingMenu}
+        existingNames={data.map((m) => m.name)}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSave}
+      />
     </div>
   );
 };

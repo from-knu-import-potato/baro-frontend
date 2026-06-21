@@ -19,8 +19,6 @@ export type DayOfWeek =
   | 'saturday'
   | 'sunday';
 
-export type IngredientUnit = '개' | '봉' | '팩' | '병' | '캔' | '박스' | '묶음';
-
 export interface StoreBasicInfo {
   storeName: string;
   businessType: BusinessType;
@@ -30,22 +28,33 @@ export interface StoreBasicInfo {
 export interface OperatingHour {
   dayOfWeek: DayOfWeek;
   isOpen: boolean;
-  openTime: string;
-  closeTime: string;
+  openTime: string | null;
+  closeTime: string | null;
 }
 
 export interface MenuItem {
   id: string;
   name: string;
+  description: string;
   price: number;
   isFeatured: boolean;
+  imageUrl?: string;
+  /** 초기 세팅 중 선택된 이미지 파일 (서버 미전송, setup 완료 후 업로드) */
+  imageFile?: File;
 }
 
+/** 태그 형태로 등록되는 식자재 종류 (재고 수량이 아닌 종류 등록) */
+export interface Ingredient {
+  id: string;
+  name: string;
+  unit: string;
+}
+
+/** 레시피에 사용되는 식자재 항목 (Ingredient 참조) */
 export interface RecipeIngredient {
   id: string;
-  ingredientName: string;
+  ingredientId: string;
   amount: number;
-  unit: IngredientUnit;
 }
 
 export interface Recipe {
@@ -53,33 +62,11 @@ export interface Recipe {
   ingredients: RecipeIngredient[];
 }
 
-export interface KeyIngredient {
-  id: string;
-  name: string;
-  minStockAmount: number;
-  unit: IngredientUnit;
-}
-
-export interface NotificationSettings {
-  lowStockAlert: boolean;
-  expiryAlert: boolean;
-  orderRecommendationAlert: boolean;
-  alertChannels: {
-    email: boolean;
-    kakao: boolean;
-    push: boolean;
-  };
-}
-
-export type AlertKey = 'lowStockAlert' | 'expiryAlert' | 'orderRecommendationAlert';
-
-export type ChannelKey = keyof NotificationSettings['alertChannels'];
-
 export interface InitialSetupData {
   basicInfo: StoreBasicInfo;
   operatingHours: OperatingHour[];
   menuItems: MenuItem[];
+  ingredients: Ingredient[];
   recipes: Recipe[];
-  keyIngredients: KeyIngredient[];
-  notificationSettings: NotificationSettings;
+  safetyStockPct: number;
 }

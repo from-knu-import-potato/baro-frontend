@@ -82,6 +82,9 @@
   --baro-black-muted: #6a6a6a;
   --baro-ivory: #f2e9e1;
   --baro-ivory-dark: #d8d0c4;
+  --baro-yellow: #ffd94d;
+  --baro-yellow-dark: #ffca1a;
+  --baro-yellow-text: #a07830;
 }
 
 #root {
@@ -96,36 +99,6 @@
 
 body {
   margin: 0;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--heading);
-  font-weight: 700;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 32px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 16px;
-  @media (max-width: 1024px) {
-    font-size: 24px;
-  }
 }
 
 p {
@@ -163,6 +136,9 @@ code {
   --color-baro-black-muted: var(--baro-black-muted);
   --color-baro-ivory: var(--baro-ivory);
   --color-baro-ivory-dark: var(--baro-ivory-dark);
+  --color-baro-yellow: var(--baro-yellow);
+  --color-baro-yellow-dark: var(--baro-yellow-dark);
+  --color-baro-yellow-text: var(--baro-yellow-text);
 
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -248,6 +224,20 @@ code {
   html {
     @apply font-sans;
   }
+}
+
+/* 페이지 전환 애니메이션 */
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-page-fade-in {
+  animation: page-fade-in 0.2s ease-out both;
 }
 
 /* 스크롤바 디자인 */

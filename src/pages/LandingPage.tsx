@@ -1,7 +1,10 @@
+import CTASection from '@/features/landing/components/CTASection';
 import FeatureSection from '@/features/landing/components/FeatureSection';
 import Footer from '@/features/landing/components/Footer';
 import HeroSection from '@/features/landing/components/HeroSection';
+import HowItWorksSection from '@/features/landing/components/HowItWorksSection';
 import Navbar from '@/features/landing/components/Navbar';
+import ProblemSection from '@/features/landing/components/ProblemSection';
 
 const LandingPage = () => {
   return (
@@ -9,8 +12,10 @@ const LandingPage = () => {
       <Navbar />
       <main>
         <HeroSection />
+        <ProblemSection />
+        <HowItWorksSection />
         <FeatureSection />
-        {/* Additional sections like Analytics or Testimonials can be added here */}
+        <CTASection />
       </main>
       <Footer />
     </div>

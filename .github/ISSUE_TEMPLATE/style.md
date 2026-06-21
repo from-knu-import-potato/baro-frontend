@@ -1,9 +1,9 @@
 ---
 name: 🎨 Style
 about: UI, 디자인, CSS, 마크업 관련 변경
-title: "🎨 [STYLE] "
+title: '🎨 [STYLE] '
 labels: 🎨 UI/UX
-assignees: ""
+assignees: ''
 ---
 
 ## 🎨 어떤 스타일 변경인가요?
@@ -32,7 +32,8 @@ assignees: ""
 
 <!-- 변경 내용 설명 또는 스크린샷 -->
 
--
+- 변경 후는 예상 UI 이미지를 첨부하거나,
+- 없을 시에는 PR에 포함합니다.
 
 <br/>
 

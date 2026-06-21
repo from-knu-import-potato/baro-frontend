@@ -2,35 +2,42 @@
 
 ## 서비스 개요
 
-**BARO(바로)** — OCR·AI 기반 식자재 재고관리 SaaS.
-소규모 카페·식당 사장님이 거래명세서를 촬영하면 입고 데이터를 자동 등록하고 재고를 관리할 수 있도록 설계된 웹 서비스.
+**BARO(바로)** — OCR·AI 기반 통합 가게 운영 SaaS.
+소규모 카페·식당 사장님을 위한 주문부터 재고, 발주, 마감까지 관리하는 올인원 플랫폼.
+
+사용자:
+
+- **사장님 (Owner)**: 서비스 주 사용자. 주문 수락, 재고 관리, 발주, 마감 수행
+- **손님 (Guest)**: QR 스캔으로 접근하는 비회원. 별도 로그인 없이 주문만 가능
 
 핵심 기능:
-1. OCR 기반 입고 데이터 자동화 (거래명세서 촬영 → 자동 디지털화)
-2. AI 기반 보관·발주 가이드 (소비 패턴 분석 → 적정 발주량 추천)
-3. 식자재 가격 변동 분석 및 시세 정보 제공
-4. 마감하기 — 판매 메뉴 입력 시 레시피 기반 이론 사용량 자동 계산
+
+1. QR 기반 비대면 주문 시스템 (테이블 QR → 손님 주문 → 사장님 실시간 수신)
+2. OCR 기반 입고 데이터 자동화 (거래명세서 촬영 → 자동 디지털화)
+3. AI 기반 발주 가이드 (재고 데이터 분석 → 적정 발주량 + 서술형 추천 이유)
+4. 마감하기 (판매 메뉴 + 레시피 기반 재고 자동 차감)
+5. 통합 대시보드 (실시간 주문·재고·매출 현황 한 화면)
 
 ## 기술 스택
 
-| 분류 | 기술 |
-|---|---|
-| 프레임워크 | React 19 |
-| 언어 | TypeScript |
-| 스타일링 | Tailwind CSS, Shadcn/UI |
-| 상태 관리 | Zustand (클라이언트), React Query (서버) |
-| API 통신 | Axios |
-| 폼 관리 | React Hook Form + Zod |
-| 빌드 | Vite |
-| 패키지 매니저 | pnpm (`pnpm dev` / `pnpm build`) |
-| 테스트 | Vitest |
+| 분류          | 기술                                     |
+| ------------- | ---------------------------------------- |
+| 프레임워크    | React 19                                 |
+| 언어          | TypeScript                               |
+| 스타일링      | Tailwind CSS, Shadcn/UI                  |
+| 상태 관리     | Zustand (클라이언트), React Query (서버) |
+| API 통신      | Axios                                    |
+| 폼 관리       | React Hook Form + Zod                    |
+| 빌드          | Vite                                     |
+| 패키지 매니저 | pnpm (`pnpm dev` / `pnpm build`)         |
+| 테스트        | Vitest                                   |
 
 ## 프로젝트 구조
 
 ```
 src/
 ├─ app/         # 레이아웃, 라우팅, 전역 스타일, AppInitializer
-├─ features/    # 도메인별 기능 모듈 (auth, dashboard, invoice, inventory, order, analytics, settings)
+├─ features/    # 도메인별 기능 모듈 (auth, dashboard, order, inventory, ocr-inbound, order-guide, closing, settings, account-settings)
 │  └─ [domain]/ # components/, hooks/, api/, store/, types/
 ├─ pages/       # 라우팅 페이지 — UI·로직 없이 features 조합만 담당
 ├─ widgets/     # 2개 이상 페이지에서 쓰는 조합형 UI
@@ -46,23 +53,28 @@ src/
 
 ## 페이지 목록
 
-| 경로 | 페이지 |
-|---|---|
-| `/` | 랜딩 페이지 |
-| `/login`, `/signup` | 로그인·회원가입 |
-| `/initial-setup` | 초기 세팅 (가게 정보 입력) |
-| `/dashboard` | 대시보드 |
-| `/inventory/current`, `/inventory/depleted` | 전체 재고 현황 |
-| `/order-guide` | 발주 가이드·수요 예측 |
-| `/ingredient-price-analysis` | 가격 변동 분석 |
-| `/settings` | 설정 |
+| 경로               | 페이지               | 접근 주체         |
+| ------------------ | -------------------- | ----------------- |
+| `/`                | 랜딩 페이지          | 전체              |
+| `/login`           | 로그인 (카카오 소셜) | 비회원            |
+| `/initial-setup`   | 가게 초기 세팅       | 사장님 (최초 1회) |
+| `/dashboard`       | 메인 대시보드        | 사장님            |
+| `/inventory`       | 전체 재고 현황       | 사장님            |
+| `/ocr-inbound`     | OCR 재고 입고 처리   | 사장님            |
+| `/order-guide`     | 발주 가이드          | 사장님            |
+| `/closing`         | 마감하기             | 사장님            |
+| `/settings`        | 가게 설정            | 사장님            |
+| `/my-account`      | 회원 설정            | 사장님            |
+| `/order?table={n}` | 손님 주문 메뉴판     | 손님 (비회원)     |
 
 ## API 연동
 
 - Base URL: `https://api.baro.com/v1` (임시)
+- 로그인: 카카오 OAuth 소셜 로그인 → JWT 발급 (이메일/일반 회원가입 없음)
 - 인증: JWT Bearer Token (Authorization 헤더)
 - 토큰 갱신: refresh token → `/auth/refresh`
 - 401 감지 시 Axios interceptor에서 자동 로그아웃
+- 실시간 주문 수신: WebSocket 또는 SSE (Server-Sent Events)
 
 ## 상태 관리 전략
 
@@ -73,13 +85,13 @@ src/
 
 ## 디자인 토큰
 
-| 토큰 | Primary | 용도 |
-|---|---|---|
-| `baro-blue` | #449CD4 | 주요 액션 버튼, 링크 |
-| `baro-red` | #BD5535 | 삭제, 경고 |
+| 토큰         | Primary | 용도                 |
+| ------------ | ------- | -------------------- |
+| `baro-blue`  | #449CD4 | 주요 액션 버튼, 링크 |
+| `baro-red`   | #BD5535 | 삭제, 경고           |
 | `baro-green` | #679436 | 입고 완료, 정상 상태 |
-| `baro-black` | #111111 | 텍스트 |
-| `baro-ivory` | #F2E9E1 | 배경 포인트 |
+| `baro-black` | #111111 | 텍스트               |
+| `baro-ivory` | #F2E9E1 | 배경 포인트          |
 
 ## UI/UX 지침
 
@@ -91,6 +103,7 @@ src/
 ## 개발 컨벤션
 
 ### 네이밍
+
 - 컴포넌트: PascalCase (`InventoryTable.tsx`)
 - 훅: `use` 접두사 camelCase (`useInventory.ts`)
 - 유틸: camelCase (`formatDate.ts`)
@@ -98,6 +111,7 @@ src/
 - API 함수: 동사 + camelCase (`fetchInventory`, `createOrder`)
 
 ### 컴포넌트 작성 순서
+
 1. import: React → 외부 라이브러리 → 내부 모듈 → 타입
 2. Props 타입/interface 정의
 3. `const 컴포넌트명 = () => {}` 함수형 컴포넌트
@@ -105,9 +119,11 @@ src/
 5. 스타일은 Tailwind CSS 클래스
 
 ### Git 커밋 컨벤션
+
 형식: `[gitmoji] [태그]: [제목]`
 
 주요 gitmoji:
+
 - ✨ `feat`: 새 기능
 - 🐛 `fix`: 버그 수정
 - 💄 `ui`: UI·스타일 수정
@@ -130,11 +146,82 @@ src/
 - `console.log` 프로덕션 코드에 잔류 금지
 - 클래스 컴포넌트 금지
 - OCR 결과 자동 확정 로직 추가 금지 (반드시 수동 검수 단계 유지)
+- 마감하기 이론 사용량 자동 차감 금지 (사용자가 검토·수정 후 최종 확정)
 
 ## 알려진 제약
 
 - 이미지 업로드 최대 10MB
-- 시세 API: 평일 오전 9시 이후만 데이터 갱신 (주말/공휴일 예외 처리 필요)
+- 식자재 단위: `g`, `ml`, `개` 세 가지만 사용
+- OCR 단위 환산: `kg→g` (×1000), `L→ml` (×1000) — 프론트엔드에서 처리 후 서버에 표준 단위로 전송
+- 재고 미등록 시 재고 관련 기능 비활성화(disabled) 처리 + 안내 문구 표시
+- 회원 탈퇴: 가게 데이터(재고·메뉴·레시피 등) 초기화 선행 필수
+
+## 이슈 & PR 규칙
+
+### 브랜치 전략
+
+- **기능 브랜치 → `develop`**: 모든 기능/버그/리팩토링 브랜치는 PR 대상을 `develop`으로 설정
+- **`develop` → `main`**: `develop`에서 `main`으로의 PR만 프로덕션 반영
+
+### 이슈 생성
+
+이슈 생성 시 `.github/ISSUE_TEMPLATE/` 내 적절한 템플릿을 반드시 사용한다.
+
+| 템플릿 파일   | 용도                                        |
+| ------------- | ------------------------------------------- |
+| `feature.md`  | ✨ 새로운 기능 제안                         |
+| `bug.md`      | 🐛 버그 신고                                |
+| `refactor.md` | ♻️ 코드 개선·리팩토링                       |
+| `style.md`    | 🎨 UI/디자인/CSS 변경                       |
+| `config.md`   | 🔧 설정·빌드·의존성·문서·인프라 작업(Chore) |
+| `deploy.md`   | 🚀 배포 관련 작업                           |
+| `thinking.md` | 💭 기술 결정 고민·구현 방향 논의            |
+
+### PR 생성
+
+- PR 생성 시 `.github/PULL_REQUEST_TEMPLATE.md` 템플릿을 반드시 사용한다.
+- PR 제목은 연관 이슈 번호를 포함한다 (예: `✨ (#55) feat: 카카오 로그인 구현`).
+- 이슈와 연결할 때는 PR 본문에 `Closes #이슈번호`를 명시한다.
+
+---
+
+## 작업 규칙
+
+1. **브랜치 필수**: 모든 작업은 작업 브랜치를 생성한 후 진행. 형식: `작업유형/이슈번호-작업이름` (예: `feature/15-menu-ocr-scan`)
+2. **이슈 먼저**: 작업 시작 전 반드시 GitHub 이슈를 먼저 생성하고 이슈 번호를 브랜치명에 포함할 것. 이슈 생성 시 `.github/ISSUE_TEMPLATE/` 의 템플릿을 반드시 사용할 것.
+3. **PR 템플릿 사용**: PR 생성 시 `.github/PULL_REQUEST_TEMPLATE.md` 템플릿을 반드시 사용할 것.
+4. **커밋·머지·푸시 금지**: "커밋해줘", "푸시해줘" 등 명시적인 명령이 없는 이상 커밋, 머지, 푸시 단독으로 진행하지 않음. 사용자가 직접 테스트 후 명령할 때까지 대기.
+5. **담당자 설정 필수**: 이슈·PR 생성 시 `gh api user --jq .login` 으로 현재 GitHub 사용자를 확인해 `--assignee` 옵션으로 설정할 것.
+6. **커밋 전 린트·타입 검사 필수**: 커밋 전 반드시 `pnpm build` → `pnpm lint --fix` → `pnpm tsc --noEmit` 순서로 실행하여 린트 오류와 타입 오류를 모두 해결한 후 커밋할 것.
+
+## 배포 규칙
+
+### 버전 관리 (Semantic Versioning)
+
+`Major.Minor.Patch` 형식을 사용한다.
+
+| 구분 | 올리는 시점 | 예시 |
+|---|---|---|
+| **Major** | 하위 호환되지 않는 큰 변경 (UI 전면 개편, 서비스 구조 변경) | `1.0.0` → `2.0.0` |
+| **Minor** | 하위 호환되는 기능 추가 (새 페이지, 새 기능 컴포넌트) | `0.1.0` → `0.2.0` |
+| **Patch** | 하위 호환되는 버그 수정, 소규모 개선 | `0.1.0` → `0.1.1` |
+
+### 배포 흐름
+
+```
+develop → release/vX.Y.Z → main
+```
+
+1. **배포 이슈 생성**: `.github/ISSUE_TEMPLATE/deploy.md` 템플릿 사용
+2. **릴리즈 브랜치 생성**: `develop`에서 `release/vX.Y.Z` 브랜치 생성
+3. **PR 생성**: `release/vX.Y.Z` → `main` PR 작성 (배포 이슈 연결)
+   - PR 제목 형식: `🚀 (#배포이슈번호) deploy: 배포 버전과 배포 제목` (예: `🚀 (#56) deploy: v0.1.1 랜딩 페이지 개편 배포`)
+4. **태그·릴리즈**: main 머지 후 GitHub Release 및 태그(`vX.Y.Z`) 생성
+
+### 브랜치 네이밍
+
+- 릴리즈 브랜치: `release/vX.Y.Z` (예: `release/v0.2.0`)
+- 일반 작업 브랜치: `작업유형/이슈번호-작업이름` (예: `feature/15-menu-ocr-scan`)
 
 ## 프롬프트 단축키
 

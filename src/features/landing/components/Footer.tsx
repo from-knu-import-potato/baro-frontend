@@ -15,9 +15,9 @@ const Footer = () => {
               <span className="text-xl font-bold tracking-tight">BARO</span>
             </Link>
             <p className="text-baro-black-muted text-sm leading-relaxed mb-6">
-              사장님들의 가장 든든한 AI 재고 관리 파트너.
+              주문부터 재고, 발주, 마감까지 관리하는
               <br />
-              찍으면 바로, 분석과 예측도 바로!
+              소규모 카페·식당을 위한 올인원 가게 운영 플랫폼.
             </p>
           </div>
 
@@ -39,13 +39,13 @@ const Footer = () => {
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  성공 사례
-                </a>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  자주 묻는 질문
+                <a
+                  href="https://www.youtube.com/@"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors"
+                >
+                  서비스 시연 영상
                 </a>
               </li>
             </ul>
@@ -55,24 +55,29 @@ const Footer = () => {
             <h4 className="font-bold mb-6 text-white!">고객 지원</h4>
             <ul className="space-y-4 text-sm text-baro-black-muted">
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link to={routePaths.notices} className="hover:text-white transition-colors">
                   공지사항
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <a
+                  href="https://naver.me/xM5slAyu"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors"
+                >
                   1:1 문의
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link to={routePaths.terms} className="hover:text-white transition-colors">
                   이용 약관
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link to={routePaths.privacy} className="hover:text-white transition-colors">
                   개인정보 처리방침
-                </a>
+                </Link>
               </li>
             </ul>
           </div>

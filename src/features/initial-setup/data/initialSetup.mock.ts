@@ -21,16 +21,7 @@ export const DEFAULT_SETUP_DATA: InitialSetupData = {
   },
   operatingHours: DEFAULT_OPERATING_HOURS,
   menuItems: [],
+  ingredients: [],
   recipes: [],
-  keyIngredients: [],
-  notificationSettings: {
-    lowStockAlert: true,
-    expiryAlert: true,
-    orderRecommendationAlert: true,
-    alertChannels: {
-      email: false,
-      kakao: true,
-      push: true,
-    },
-  },
+  safetyStockPct: 20,
 };

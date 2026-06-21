@@ -4,6 +4,7 @@ export interface DashboardStats {
   aiOrderRecommendations: number;
   monthlyConsumption: number;
   monthlyConsumptionChange: number;
+  missedClosing: boolean;
   lastUpdated: string;
 }
 

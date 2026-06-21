@@ -33,7 +33,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b border-baro-ivory-dark dark:border-baro-black">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white dark:bg-neutral-900 border-b border-baro-ivory-dark dark:border-baro-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -45,25 +45,25 @@ const Navbar = () => {
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-8">
             <a
+              href="#problem"
+              onClick={(e) => handleNavLinkClick(e, 'problem')}
+              className="text-sm font-medium text-baro-black-muted hover:text-baro-blue transition-colors"
+            >
+              서비스 배경
+            </a>
+            <a
+              href="#how-it-works"
+              onClick={(e) => handleNavLinkClick(e, 'how-it-works')}
+              className="text-sm font-medium text-baro-black-muted hover:text-baro-blue transition-colors"
+            >
+              사용흐름
+            </a>
+            <a
               href="#features"
               onClick={(e) => handleNavLinkClick(e, 'features')}
               className="text-sm font-medium text-baro-black-muted hover:text-baro-blue transition-colors"
             >
               기능소개
-            </a>
-            <a
-              href="#analytics"
-              onClick={(e) => handleNavLinkClick(e, 'analytics')}
-              className="text-sm font-medium text-baro-black-muted hover:text-baro-blue transition-colors"
-            >
-              데이터분석
-            </a>
-            <a
-              href="#guide"
-              onClick={(e) => handleNavLinkClick(e, 'guide')}
-              className="text-sm font-medium text-baro-black-muted hover:text-baro-blue transition-colors"
-            >
-              이용가이드
             </a>
             <div className="flex items-center gap-3 ml-4">
               <Button
@@ -90,25 +90,25 @@ const Navbar = () => {
         <div className="md:hidden border-b border-baro-ivory-dark dark:border-baro-black animate-in slide-in-from-top duration-300">
           <div className="px-4 pt-2 pb-6 space-y-2 text-center">
             <a
+              href="#problem"
+              onClick={(e) => handleNavLinkClick(e, 'problem')}
+              className="block px-3 py-2 text-base font-medium text-baro-black-muted"
+            >
+              서비스 배경
+            </a>
+            <a
+              href="#how-it-works"
+              onClick={(e) => handleNavLinkClick(e, 'how-it-works')}
+              className="block px-3 py-2 text-base font-medium text-baro-black-muted"
+            >
+              사용흐름
+            </a>
+            <a
               href="#features"
               onClick={(e) => handleNavLinkClick(e, 'features')}
               className="block px-3 py-2 text-base font-medium text-baro-black-muted"
             >
               기능소개
-            </a>
-            <a
-              href="#analytics"
-              onClick={(e) => handleNavLinkClick(e, 'analytics')}
-              className="block px-3 py-2 text-base font-medium text-baro-black-muted"
-            >
-              데이터분석
-            </a>
-            <a
-              href="#guide"
-              onClick={(e) => handleNavLinkClick(e, 'guide')}
-              className="block px-3 py-2 text-base font-medium text-baro-black-muted"
-            >
-              이용가이드
             </a>
             <Button
               className="bg-baro-blue hover:bg-baro-blue/90 w-full h-11 text-white"
