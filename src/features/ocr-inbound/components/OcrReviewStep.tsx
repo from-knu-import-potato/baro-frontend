@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import {
+  AlertCircle,
   Building2,
   CalendarIcon,
   CheckCircle2,
@@ -10,6 +11,7 @@ import {
   Plus,
   RotateCcw,
   Trash2,
+  TriangleAlert,
   ZoomIn,
   ZoomOut,
 } from 'lucide-react';
@@ -28,6 +30,7 @@ import { Calendar } from '@/shadcn/ui/calendar';
 import { Input } from '@/shadcn/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/shadcn/ui/popover';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/shadcn/ui/tooltip';
 import IngredientRegisterModal from '@/shared/components/IngredientRegisterModal';
 
 const UNITS: OcrUnit[] = ['g', 'ml', '개'];
@@ -114,6 +117,21 @@ const OcrReviewStep = ({
     onItemsChange(items.map((item) => (item.id === id ? { ...item, [field]: value } : item)));
   };
 
+  const handleFactorChange = (id: string, value: string) => {
+    const factor = value === '' ? undefined : Math.max(0, Number(value));
+    onItemsChange(
+      items.map((item) => {
+        if (item.id !== id || !item.purchaseUnit) return item;
+        const quantity =
+          factor !== undefined && item.purchaseQuantity !== undefined
+            ? item.purchaseQuantity * factor
+            : 0;
+        return { ...item, conversionFactor: factor, quantity };
+        // unitPrice는 state에 저장하지 않고 렌더 시 purchaseUnitPrice / factor로 계산
+      }),
+    );
+  };
+
   const handleDelete = (id: string) => {
     onItemsChange(items.filter((item) => item.id !== id));
   };
@@ -131,12 +149,18 @@ const OcrReviewStep = ({
         expiryDate: null,
         memo: null,
         isMatched: false,
+        isWarning: false,
+        warningReason: null,
       },
     ]);
   };
 
   const matchedCount = items.filter((i) => i.isMatched).length;
   const newCount = items.length - matchedCount;
+  const needsFactorCount = items.filter(
+    (i) => i.purchaseUnit && i.conversionFactor === undefined,
+  ).length;
+  const warningCount = items.filter((i) => i.isWarning).length;
 
   const metadataFields = metadata
     ? (
@@ -253,6 +277,17 @@ const OcrReviewStep = ({
                 신규 {newCount}개
               </span>
             )}
+            {needsFactorCount > 0 && (
+              <span className="text-xs bg-amber-50 text-amber-600 px-2 py-0.5 rounded-full border border-amber-200/60">
+                변환 필요 {needsFactorCount}개
+              </span>
+            )}
+            {warningCount > 0 && (
+              <span className="text-xs bg-red-50 text-red-600 px-2 py-0.5 rounded-full border border-red-200/60 flex items-center gap-1">
+                <TriangleAlert className="w-3 h-3" />
+                확인 필요 {warningCount}개
+              </span>
+            )}
           </div>
           <button
             onClick={onReset}
@@ -292,144 +327,230 @@ const OcrReviewStep = ({
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {items.map((item, index) => (
-            <div
-              key={item.id}
-              className={cn(
-                'grid grid-cols-[24px_2fr_1.2fr_80px_1fr_1.4fr_1fr_1.2fr_36px] gap-3 px-4 py-2.5 items-center border-b hover:bg-muted/10 transition-colors',
-                !item.isMatched && 'bg-green-50/20',
-              )}
-            >
-              <span className="text-xs text-muted-foreground/50 text-center">{index + 1}</span>
-              <Input
-                value={item.name}
-                onChange={(e) => handleChange(item.id, 'name', e.target.value)}
-                className="h-8 text-sm"
-                placeholder="식자재명"
-              />
-              <Input
-                type="number"
-                value={item.quantity || ''}
-                onChange={(e) => handleChange(item.id, 'quantity', Number(e.target.value))}
-                className="h-8 text-sm"
-                min={0}
-                placeholder="0"
-              />
-              {item.isMatched ? (
-                <span className="h-8 flex items-center px-3 rounded-md border bg-muted text-sm text-muted-foreground">
-                  {item.unit}
-                </span>
-              ) : (
-                <Select
-                  value={item.unit}
-                  onValueChange={(v) => handleChange(item.id, 'unit', v as OcrUnit)}
-                >
-                  <SelectTrigger className="h-8 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {UNITS.map((u) => (
-                      <SelectItem key={u} value={u}>
-                        {u}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
-              <Input
-                type="number"
-                value={item.unitPrice ?? ''}
-                onChange={(e) =>
-                  onItemsChange(
-                    items.map((i) =>
-                      i.id === item.id
-                        ? { ...i, unitPrice: e.target.value === '' ? null : Number(e.target.value) }
-                        : i,
-                    ),
-                  )
-                }
-                className="h-8 text-sm"
-                min={0}
-                placeholder="미입력"
-              />
-              <Popover>
-                <PopoverTrigger
+          <TooltipProvider>
+            {items.map((item, index) => (
+              <div key={item.id} className="border-b">
+                <div
                   className={cn(
-                    'h-8 w-full flex items-center gap-1.5 px-2.5 rounded-md border text-sm transition-colors hover:bg-muted/50',
-                    item.expiryDate ? 'text-foreground' : 'text-muted-foreground',
+                    'grid grid-cols-[24px_2fr_1.2fr_80px_1fr_1.4fr_1fr_1.2fr_36px] gap-3 px-4 py-2.5 items-center hover:bg-muted/10 transition-colors',
+                    item.isWarning && 'bg-red-50/40',
+                    !item.isWarning && !item.isMatched && 'bg-green-50/20',
+                    !item.isWarning &&
+                      item.purchaseUnit &&
+                      !item.conversionFactor &&
+                      'bg-amber-50/20',
                   )}
                 >
-                  <CalendarIcon className="w-3.5 h-3.5 shrink-0" />
-                  <span className="truncate">{item.expiryDate ?? '미입력'}</span>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={item.expiryDate ? new Date(item.expiryDate) : undefined}
-                    onSelect={(date) =>
-                      handleChange(
-                        item.id,
-                        'expiryDate',
-                        date ? date.toLocaleDateString('sv') : null,
-                      )
-                    }
+                  <div className="flex items-center justify-center">
+                    {item.isWarning ? (
+                      <Tooltip>
+                        <TooltipTrigger className="flex items-center justify-center cursor-default">
+                          <TriangleAlert className="w-3.5 h-3.5 text-red-500" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {item.warningReason ?? '인식 결과가 불확실합니다. 내용을 확인해 주세요.'}
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : (
+                      <span className="text-xs text-muted-foreground/50">{index + 1}</span>
+                    )}
+                  </div>
+                  <Input
+                    value={item.name}
+                    onChange={(e) => handleChange(item.id, 'name', e.target.value)}
+                    className="h-8 text-sm"
+                    placeholder="식자재명"
                   />
-                </PopoverContent>
-              </Popover>
-              <div className="flex items-center gap-1 justify-center flex-wrap">
-                {item.isMatched ? (
-                  <span className="inline-flex items-center gap-1 text-xs text-baro-blue bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/60 whitespace-nowrap">
-                    <CheckCircle2 className="w-3 h-3" />
-                    기존
+                  {item.purchaseUnit ? (
+                    <div className="h-8 flex items-center px-3 rounded-md border bg-muted text-sm text-muted-foreground tabular-nums">
+                      {item.quantity > 0 ? item.quantity.toLocaleString() : '—'}
+                    </div>
+                  ) : (
+                    <Input
+                      type="number"
+                      value={item.quantity || ''}
+                      onChange={(e) => handleChange(item.id, 'quantity', Number(e.target.value))}
+                      className="h-8 text-sm"
+                      min={0}
+                      placeholder="0"
+                    />
+                  )}
+                  {item.isMatched ? (
+                    <span className="h-8 flex items-center px-3 rounded-md border bg-muted text-sm text-muted-foreground">
+                      {item.unit}
+                    </span>
+                  ) : (
+                    <Select
+                      value={item.unit}
+                      onValueChange={(v) => handleChange(item.id, 'unit', v as OcrUnit)}
+                    >
+                      <SelectTrigger className="h-8 text-sm">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {UNITS.map((u) => (
+                          <SelectItem key={u} value={u}>
+                            {u}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                  {(() => {
+                    const derivedUnitPrice =
+                      item.purchaseUnit &&
+                      item.conversionFactor !== undefined &&
+                      item.conversionFactor > 0 &&
+                      item.purchaseUnitPrice !== undefined
+                        ? Math.round((item.purchaseUnitPrice / item.conversionFactor) * 10) / 10
+                        : null;
+                    return (
+                      <Input
+                        type="number"
+                        value={derivedUnitPrice ?? item.unitPrice ?? ''}
+                        onChange={(e) => {
+                          if (derivedUnitPrice !== null) return; // factor 기반 항목은 단가 직접 수정 불가
+                          onItemsChange(
+                            items.map((i) =>
+                              i.id === item.id
+                                ? {
+                                    ...i,
+                                    unitPrice:
+                                      e.target.value === '' ? null : Number(e.target.value),
+                                  }
+                                : i,
+                            ),
+                          );
+                        }}
+                        readOnly={derivedUnitPrice !== null}
+                        className="h-8 text-sm"
+                        min={0}
+                        placeholder="미입력"
+                      />
+                    );
+                  })()}
+                  <Popover>
+                    <PopoverTrigger
+                      className={cn(
+                        'h-8 w-full flex items-center gap-1.5 px-2.5 rounded-md border text-sm transition-colors hover:bg-muted/50',
+                        item.expiryDate ? 'text-foreground' : 'text-muted-foreground',
+                      )}
+                    >
+                      <CalendarIcon className="w-3.5 h-3.5 shrink-0" />
+                      <span className="truncate">{item.expiryDate ?? '미입력'}</span>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={item.expiryDate ? new Date(item.expiryDate) : undefined}
+                        onSelect={(date) =>
+                          handleChange(
+                            item.id,
+                            'expiryDate',
+                            date ? date.toLocaleDateString('sv') : null,
+                          )
+                        }
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  <div className="flex items-center gap-1 justify-center flex-wrap">
+                    {item.isMatched ? (
+                      <span className="inline-flex items-center gap-1 text-xs text-baro-blue bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/60 whitespace-nowrap">
+                        <CheckCircle2 className="w-3 h-3" />
+                        기존
+                      </span>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() =>
+                            setRegisterModal({
+                              open: true,
+                              itemId: item.id,
+                              name: item.name,
+                              unit: item.unit,
+                            })
+                          }
+                          className="inline-flex items-center gap-0.5 text-xs text-baro-green bg-green-50 hover:bg-green-100 px-1.5 py-0.5 rounded-full border border-green-200/60 whitespace-nowrap transition-colors cursor-pointer"
+                        >
+                          <Plus className="w-3 h-3" />
+                          신규
+                        </button>
+                        <button
+                          onClick={() =>
+                            setLinkModal({ open: true, itemId: item.id, name: item.name })
+                          }
+                          className="inline-flex items-center gap-0.5 text-xs text-baro-blue bg-blue-50 hover:bg-blue-100 px-1.5 py-0.5 rounded-full border border-blue-200/60 whitespace-nowrap transition-colors cursor-pointer"
+                        >
+                          <Link className="w-3 h-3" />
+                          연결
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  <span className="text-xs text-muted-foreground truncate" title={item.memo ?? ''}>
+                    {item.memo ?? '—'}
                   </span>
-                ) : (
-                  <>
-                    <button
-                      onClick={() =>
-                        setRegisterModal({
-                          open: true,
-                          itemId: item.id,
-                          name: item.name,
-                          unit: item.unit,
-                        })
-                      }
-                      className="inline-flex items-center gap-0.5 text-xs text-baro-green bg-green-50 hover:bg-green-100 px-1.5 py-0.5 rounded-full border border-green-200/60 whitespace-nowrap transition-colors cursor-pointer"
-                    >
-                      <Plus className="w-3 h-3" />
-                      신규
-                    </button>
-                    <button
-                      onClick={() => setLinkModal({ open: true, itemId: item.id, name: item.name })}
-                      className="inline-flex items-center gap-0.5 text-xs text-baro-blue bg-blue-50 hover:bg-blue-100 px-1.5 py-0.5 rounded-full border border-blue-200/60 whitespace-nowrap transition-colors cursor-pointer"
-                    >
-                      <Link className="w-3 h-3" />
-                      연결
-                    </button>
-                  </>
+                  <button
+                    onClick={() => handleDelete(item.id)}
+                    className="flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground hover:text-baro-red hover:bg-red-50 transition-colors"
+                    aria-label="항목 삭제"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                {/* 비표준 단위 변환 계수 입력 행 */}
+                {item.purchaseUnit && (
+                  <div className="flex items-center gap-2 px-4 py-2 bg-amber-50/60 text-xs">
+                    <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                    <span className="text-muted-foreground">명세서 원본:</span>
+                    <span className="font-medium text-foreground">
+                      {item.purchaseQuantity} {item.purchaseUnit}
+                    </span>
+                    <span className="text-muted-foreground">→ 1 {item.purchaseUnit} =</span>
+                    <Input
+                      type="number"
+                      value={item.conversionFactor ?? ''}
+                      onChange={(e) => handleFactorChange(item.id, e.target.value)}
+                      className="h-6 w-24 text-xs"
+                      min={0.001}
+                      step="any"
+                      placeholder="변환 계수"
+                    />
+                    <span className="text-muted-foreground">{item.unit}</span>
+                    {item.conversionFactor !== undefined && item.purchaseQuantity !== undefined && (
+                      <>
+                        <span className="text-amber-700 font-medium">
+                          → 합계 {(item.purchaseQuantity * item.conversionFactor).toLocaleString()}{' '}
+                          {item.unit}
+                        </span>
+                        {item.purchaseUnitPrice !== undefined && (
+                          <span className="ml-2 text-muted-foreground">
+                            (단가 {item.purchaseUnitPrice.toLocaleString()}원/{item.purchaseUnit}
+                            {' → '}
+                            {(
+                              Math.round((item.purchaseUnitPrice / item.conversionFactor) * 10) / 10
+                            ).toLocaleString()}
+                            원/{item.unit})
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
                 )}
               </div>
-              <span className="text-xs text-muted-foreground truncate" title={item.memo ?? ''}>
-                {item.memo ?? '—'}
-              </span>
+            ))}
+
+            <div className="px-4 py-3">
               <button
-                onClick={() => handleDelete(item.id)}
-                className="flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground hover:text-baro-red hover:bg-red-50 transition-colors"
-                aria-label="항목 삭제"
+                onClick={handleAdd}
+                className="w-full flex items-center justify-center gap-2 py-2.5 border-2 border-dashed rounded-lg text-sm text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Plus className="w-4 h-4" />
+                항목 직접 추가
               </button>
             </div>
-          ))}
-
-          <div className="px-4 py-3">
-            <button
-              onClick={handleAdd}
-              className="w-full flex items-center justify-center gap-2 py-2.5 border-2 border-dashed rounded-lg text-sm text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              항목 직접 추가
-            </button>
-          </div>
+          </TooltipProvider>
         </div>
 
         <div className="border-t px-4 py-3 shrink-0 flex items-center justify-between bg-card">
