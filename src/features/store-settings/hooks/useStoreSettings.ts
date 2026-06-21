@@ -3,7 +3,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import useAuthStore from '@/features/auth/store/authStore';
 import type { OperatingHour } from '@/features/initial-setup/types/initialSetup.types';
 import {
+  fetchStoreMembers,
   fetchStoreSettings,
+  removeMember,
   resetStoreData,
   updateStoreSettings,
   updateOperatingHours,
@@ -48,6 +50,28 @@ export function useResetStoreData() {
       queryClient.invalidateQueries({ queryKey: ['ingredients', storeId] });
       queryClient.invalidateQueries({ queryKey: ['menus', storeId] });
       queryClient.invalidateQueries({ queryKey: ['recipes', storeId] });
+    },
+  });
+}
+
+export function useStoreMembers() {
+  const storeId = useAuthStore((s) => s.storeId);
+
+  return useQuery({
+    queryKey: ['storeMembers', storeId],
+    queryFn: () => fetchStoreMembers(storeId!),
+    enabled: !!storeId,
+  });
+}
+
+export function useRemoveMember() {
+  const storeId = useAuthStore((s) => s.storeId);
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (targetUserId: string) => removeMember(storeId!, targetUserId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['storeMembers', storeId] });
     },
   });
 }

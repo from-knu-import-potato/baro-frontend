@@ -1,5 +1,8 @@
 import type { OperatingHour } from '@/features/initial-setup/types/initialSetup.types';
-import type { StoreSettings } from '@/features/store-settings/types/store-settings.types';
+import type {
+  StoreMember,
+  StoreSettings,
+} from '@/features/store-settings/types/store-settings.types';
 import axiosInstance from '@/shared/api/axiosInstance';
 
 export async function fetchStoreSettings(storeId: string): Promise<StoreSettings & { id: string }> {
@@ -19,6 +22,7 @@ export async function fetchStoreSettings(storeId: string): Promise<StoreSettings
     memo: d.memo ?? '',
     safetyStockPct: d.safetyStockPct ?? null,
     operatingHours: d.operatingHours ?? [],
+    inviteCode: d.inviteCode ?? null,
   };
 }
 
@@ -31,6 +35,15 @@ export async function updateStoreSettings(
 
 export async function resetStoreData(storeId: string): Promise<void> {
   await axiosInstance.post(`/stores/${storeId}/reset`);
+}
+
+export async function fetchStoreMembers(storeId: string): Promise<StoreMember[]> {
+  const response = await axiosInstance.get(`/stores/${storeId}/members`);
+  return response.data.data;
+}
+
+export async function removeMember(storeId: string, targetUserId: string): Promise<void> {
+  await axiosInstance.delete(`/stores/${storeId}/members/${targetUserId}`);
 }
 
 export async function updateOperatingHours(
