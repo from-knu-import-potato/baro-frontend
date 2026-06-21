@@ -24,17 +24,28 @@ export async function uploadOcrImage(storeId: string, file: File): Promise<OcrUp
 
   return {
     metadata,
-    items: items.map((item, i) => ({
-      id: `ocr-${Date.now()}-${i}`,
-      name: item.name,
-      quantity: item.amount,
-      unit: item.unit,
-      unitPrice: item.unitPrice ?? null,
-      supplyPrice: item.supplyPrice ?? null,
-      expiryDate: null,
-      memo: item.memo ?? null,
-      isMatched: item.ingredientId !== null,
-      matchedInventoryId: item.ingredientId ?? undefined,
-    })),
+    items: items.map((item, i) => {
+      const isNonStandard = item.amount === null;
+      return {
+        id: `ocr-${Date.now()}-${i}`,
+        name: item.name,
+        quantity: item.amount ?? 0,
+        unit: item.unit ?? 'g',
+        unitPrice: item.unitPrice ?? null,
+        supplyPrice: item.supplyPrice ?? null,
+        expiryDate: null,
+        memo: item.memo ?? null,
+        isMatched: item.ingredientId !== null,
+        matchedInventoryId: item.ingredientId ?? undefined,
+        isWarning: item.is_warning,
+        warningReason: item.warningReason,
+        // 비표준 단위: 사용자가 변환 계수 직접 입력
+        ...(isNonStandard && {
+          purchaseUnit: item.purchaseUnit,
+          purchaseQuantity: item.purchaseAmount,
+          purchaseUnitPrice: item.unitPrice ?? undefined,
+        }),
+      };
+    }),
   };
 }
