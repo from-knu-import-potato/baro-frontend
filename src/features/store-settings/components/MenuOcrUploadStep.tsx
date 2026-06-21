@@ -32,7 +32,7 @@ const MenuOcrUploadStep = ({ onFileSelect, onBack }: MenuOcrUploadStepProps) => 
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 pr-2">
       <div className="flex flex-col gap-4">
         <div>
           <p className="text-sm font-semibold">메뉴판을 등록해주세요</p>

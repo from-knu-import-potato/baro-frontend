@@ -356,14 +356,17 @@ const SettingsRecipesPage = () => {
       >
         <DialogContent className="flex max-h-[60vh] max-w-xl flex-col overflow-hidden">
           <DialogHeader>
-            <DialogTitle>레시피 수정</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Pencil className="size-4 text-muted-foreground" />
+              레시피 수정
+            </DialogTitle>
             <DialogDescription>
               <span className="font-medium text-foreground">{editingMenuName}</span>의 식자재
               사용량을 수정합니다
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto pb-2">
+          <div className="flex-1 overflow-y-auto pb-2 pr-2">
             <div className="space-y-4 py-2">
               <div className="flex items-center gap-3">
                 <div className="h-px flex-1 bg-border" />
@@ -501,7 +504,10 @@ const SettingsRecipesPage = () => {
       >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle>레시피 삭제</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Trash2 className="size-4 text-baro-red" />
+              레시피 삭제
+            </DialogTitle>
             <DialogDescription>
               <span className="font-medium text-foreground">{deletingMenuName}</span>의 레시피에
               등록된 식자재를 모두 삭제하시겠습니까?

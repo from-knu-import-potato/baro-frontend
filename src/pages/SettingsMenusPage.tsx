@@ -12,6 +12,7 @@ import {
   ScanLine,
   Search,
   Trash2,
+  UtensilsCrossed,
   X,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -141,7 +142,10 @@ const MenuModal = ({
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>{editing ? '메뉴 수정' : '메뉴 등록'}</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <UtensilsCrossed className="size-4 text-muted-foreground" />
+            {editing ? '메뉴 수정' : '메뉴 등록'}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex gap-4 flex-col">
@@ -191,7 +195,7 @@ const MenuModal = ({
                 value={form.categoryId}
                 onValueChange={(val) => setForm((p) => ({ ...p, categoryId: val ?? '' }))}
               >
-                <SelectTrigger id="menu-category" className="h-10 w-full">
+                <SelectTrigger id="menu-category" className="h-10! w-full">
                   {form.categoryId ? (
                     <span className="text-sm">
                       {categories.find((c) => c.id === form.categoryId)?.name ?? '미분류'}

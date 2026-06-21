@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Trash2 } from 'lucide-react';
+import { Package, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
@@ -125,6 +125,7 @@ const IngredientRegisterModal = ({
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle className="text-lg! leading-none! flex items-center gap-2">
+            <Package className="size-4 text-muted-foreground" />
             {isEditMode ? '식자재 수정' : '식자재 등록'}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
@@ -157,7 +158,7 @@ const IngredientRegisterModal = ({
                   v && setForm((prev) => ({ ...prev, unit: v as IngredientUnit }))
                 }
               >
-                <SelectTrigger className="h-9 w-full text-sm">
+                <SelectTrigger className="h-9! w-full text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -248,13 +249,13 @@ const IngredientRegisterModal = ({
           )}
 
           <div className="flex gap-2 pt-1">
-            <Button type="button" variant="outline" className="flex-1" onClick={onClose}>
+            <Button type="button" variant="outline" className="flex-1 h-10" onClick={onClose}>
               취소
             </Button>
             <Button
               type="submit"
               disabled={!form.name.trim() || isPending}
-              className="flex-1 bg-baro-blue hover:bg-baro-blue/90 text-white"
+              className="flex-1 bg-baro-blue hover:bg-baro-blue/90 text-white h-10"
             >
               {isPending
                 ? isEditMode

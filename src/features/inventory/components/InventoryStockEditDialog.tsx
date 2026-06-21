@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-import { CalendarDays, X } from 'lucide-react';
+import { CalendarDays, Pencil, X } from 'lucide-react';
 
 import { useUpdateIngredient } from '@/features/store-settings/hooks/useIngredients';
 import { Button } from '@/shadcn/ui/button';
@@ -157,7 +157,10 @@ const InventoryStockEditDialog = ({ open, onClose, item }: InventoryStockEditDia
   <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
     <DialogContent className="sm:max-w-xs">
       <DialogHeader>
-        <DialogTitle>재고 수정</DialogTitle>
+        <DialogTitle className="flex items-center gap-2">
+          <Pencil className="size-4 text-muted-foreground" />
+          재고 수정
+        </DialogTitle>
       </DialogHeader>
       {item && <DialogForm key={item.id} item={item} onClose={onClose} />}
     </DialogContent>
