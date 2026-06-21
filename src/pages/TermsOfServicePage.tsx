@@ -1,7 +1,5 @@
 import { ArrowLeft } from 'lucide-react';
-import { Link } from 'react-router-dom';
-
-import { routePaths } from '@/app/routes/routePaths';
+import { useNavigate } from 'react-router-dom';
 
 const SECTIONS = [
   {
@@ -79,16 +77,18 @@ const SECTIONS = [
 ];
 
 const TermsOfServicePage = () => {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <Link
-          to={routePaths.landing}
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
           className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 transition-colors mb-10"
         >
           <ArrowLeft className="w-4 h-4" />
           돌아가기
-        </Link>
+        </button>
 
         <h1 className="text-3xl font-bold text-baro-black mb-2">이용 약관</h1>
         <p className="text-sm text-gray-500 mb-10">
