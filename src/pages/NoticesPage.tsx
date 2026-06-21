@@ -72,7 +72,9 @@ const NoticeItem = ({ notice }: { notice: Notice }) => {
       </button>
       {open && (
         <div className="pb-6 px-1">
-          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">{notice.content}</p>
+          <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+            {notice.content}
+          </p>
         </div>
       )}
     </li>
