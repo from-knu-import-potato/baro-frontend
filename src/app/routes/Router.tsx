@@ -25,6 +25,7 @@ import SettingsIngredientsPage from '@/pages/SettingsIngredientsPage';
 import SettingsMenuBoardPage from '@/pages/SettingsMenuBoardPage';
 import SettingsMenusPage from '@/pages/SettingsMenusPage';
 import SettingsRecipesPage from '@/pages/SettingsRecipesPage';
+import SettingsTablePage from '@/pages/SettingsTablePage';
 import StoreHomePage from '@/pages/StoreHomePage';
 import StoreSelectionPage from '@/pages/StoreSelectionPage';
 import StoreSettingsPage from '@/pages/StoreSettingsPage';
@@ -119,6 +120,7 @@ export default function Router() {
         <Route path={routePaths.storeSettings} element={<StoreSettingsPage />} />
         <Route path={routePaths.storeSettingsMenus} element={<SettingsMenusPage />} />
         <Route path={routePaths.storeSettingsMenuBoard} element={<SettingsMenuBoardPage />} />
+        <Route path={routePaths.storeSettingsTable} element={<SettingsTablePage />} />
         <Route path={routePaths.storeSettingsRecipes} element={<SettingsRecipesPage />} />
         <Route path={routePaths.storeSettingsIngredients} element={<SettingsIngredientsPage />} />
         {/* 회원 설정 */}

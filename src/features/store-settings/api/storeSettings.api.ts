@@ -21,6 +21,7 @@ export async function fetchStoreSettings(storeId: string): Promise<StoreSettings
     category: d.category,
     memo: d.memo ?? '',
     safetyStockPct: d.safetyStockPct ?? null,
+    tableCount: d.tableCount ?? null,
     operatingHours: d.operatingHours ?? [],
     inviteCode: d.inviteCode ?? null,
   };

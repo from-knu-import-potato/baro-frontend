@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { AlertCircle, CheckCircle, Loader2, Minus, Plus, ShoppingCart } from 'lucide-react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 import {
   fetchStoreMenuCategories,
@@ -246,15 +246,14 @@ const OrderSuccess = ({
 
 /* ── 메인 페이지 ── */
 const CustomerOrderPage = () => {
-  const { shopId: storeId } = useParams<{ shopId: string }>();
-  const [searchParams] = useSearchParams();
-  const tableNumber = searchParams.get('table');
+  const { storeId, tableNumber } = useParams<{ storeId: string; tableNumber: string }>();
 
   const [activeTab, setActiveTab] = useState<string>('all');
   const [cart, setCart] = useState<Record<string, number>>({});
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [customerNote, setCustomerNote] = useState('');
   const lsKey = `baro_order_success_${storeId}`;
+  const TTL_MS = 2 * 60 * 60 * 1000; // 2시간 후 만료
   const [successInfo, setSuccessInfo] = useState<{
     orderId: string;
     totalAmount: number;
@@ -263,7 +262,19 @@ const CustomerOrderPage = () => {
   } | null>(() => {
     try {
       const raw = localStorage.getItem(`baro_order_success_${storeId}`);
-      return raw ? JSON.parse(raw) : null;
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as {
+        savedAt?: number;
+        orderId: string;
+        totalAmount: number;
+        items: CartItem[];
+        customerNote?: string;
+      };
+      if (parsed.savedAt && Date.now() - parsed.savedAt > TTL_MS) {
+        localStorage.removeItem(`baro_order_success_${storeId}`);
+        return null;
+      }
+      return parsed;
     } catch {
       return null;
     }
@@ -311,6 +322,7 @@ const CustomerOrderPage = () => {
         totalAmount: order.totalPrice,
         items: cartItems,
         customerNote: customerNote || undefined,
+        savedAt: Date.now(),
       };
       localStorage.setItem(lsKey, JSON.stringify(info));
       setSuccessInfo(info);
