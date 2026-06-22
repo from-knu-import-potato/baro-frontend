@@ -16,6 +16,7 @@ export interface StoreSettings {
   category: string;
   memo: string;
   safetyStockPct?: number | null;
+  tableCount?: number | null;
   operatingHours: OperatingHour[];
   inviteCode?: string | null;
 }
