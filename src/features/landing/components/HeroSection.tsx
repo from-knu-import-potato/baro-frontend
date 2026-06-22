@@ -14,7 +14,12 @@ const HeroSection = () => {
   const isLoggedIn = useAuthStore((s) => !!s.accessToken);
 
   const handleStartClick = () => {
-    navigate(isLoggedIn ? routePaths.myStores : routePaths.login);
+    if (isLoggedIn) {
+      if (window.history.length > 1) navigate(-1);
+      else navigate(routePaths.myStores);
+    } else {
+      navigate(routePaths.login);
+    }
   };
 
   const handleFeaturesClick = () => {
@@ -68,7 +73,7 @@ const HeroSection = () => {
                 onClick={handleStartClick}
                 className="h-auto rounded-full bg-baro-blue px-8 py-3 hover:bg-baro-blue/90 w-full sm:w-auto text-white"
               >
-                {isLoggedIn ? '계정 홈으로 가기' : 'BARO 시작하기'}
+                {isLoggedIn ? '돌아가기' : 'BARO 시작하기'}
               </Button>
 
               <Button

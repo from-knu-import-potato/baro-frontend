@@ -21,7 +21,12 @@ const Navbar = () => {
   };
 
   const handleCtaClick = () => {
-    navigate(isLoggedIn ? routePaths.myStores : routePaths.login);
+    if (isLoggedIn) {
+      if (window.history.length > 1) navigate(-1);
+      else navigate(routePaths.myStores);
+    } else {
+      navigate(routePaths.login);
+    }
     setIsMenuOpen(false);
   };
 
@@ -72,7 +77,7 @@ const Navbar = () => {
                 className="bg-baro-blue hover:bg-baro-blue-dark text-xs rounded-full text-white"
                 onClick={handleCtaClick}
               >
-                {isLoggedIn ? '계정 홈으로' : '시작하기'}
+                {isLoggedIn ? '돌아가기' : '시작하기'}
               </Button>
               <ThemeToggle dark={dark} toggleTheme={toggleTheme} />
             </div>
@@ -116,7 +121,7 @@ const Navbar = () => {
               className="bg-baro-blue hover:bg-baro-blue/90 w-full h-11 text-white"
               onClick={handleCtaClick}
             >
-              {isLoggedIn ? '계정 홈으로 가기' : '시작하기'}
+              {isLoggedIn ? '돌아가기' : '시작하기'}
             </Button>
           </div>
         </div>

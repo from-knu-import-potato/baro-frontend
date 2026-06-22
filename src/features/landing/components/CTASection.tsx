@@ -34,10 +34,17 @@ const CTASection = () => {
             매일 반복되는 비효율에서 벗어나세요.
           </p>
           <Button
-            onClick={() => navigate(isLoggedIn ? routePaths.myStores : routePaths.login)}
+            onClick={() => {
+              if (isLoggedIn) {
+                if (window.history.length > 1) navigate(-1);
+                else navigate(routePaths.myStores);
+              } else {
+                navigate(routePaths.login);
+              }
+            }}
             className="mt-8 bg-baro-blue hover:bg-baro-blue/90 text-white font-bold p-4 py-5 rounded-full text-sm"
           >
-            {isLoggedIn ? '계정 홈으로 가기' : 'BARO 무료로 시작하기'}
+            {isLoggedIn ? '돌아가기' : 'BARO 무료로 시작하기'}
           </Button>
         </div>
       </div>
