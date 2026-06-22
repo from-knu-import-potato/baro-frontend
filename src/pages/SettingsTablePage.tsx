@@ -22,8 +22,6 @@ const BASE_URL = window.location.origin;
 const DPR = 150 / 25.4;
 const px = (mm: number) => Math.round(mm * DPR);
 
-const BARO_BLUE = '#449CD4';
-const BARO_BLACK = '#111111';
 const PAGE_W = px(210);
 const PAGE_H = px(297);
 const MARGIN = px(8);
@@ -148,18 +146,18 @@ const SettingsTablePage = () => {
           const qrImg = await loadImage(qrDataUrl);
 
           // ── 컨텐츠 블록 세로 중앙 정렬 ──────────────────────────
-          const tableFont = px(8);   // "N번 테이블"
+          const tableFont = px(8); // "N번 테이블"
           const instrFont = px(4.5); // 안내 문구
-          const baroFont  = px(4);   // 하단 워터마크
+          const baroFont = px(4); // 하단 워터마크
 
           const blockH =
-            QR_SIZE       +  // QR 코드
-            px(8)         +  // QR → 테이블명 간격
-            tableFont     +  // 테이블명
-            px(3)         +  // 테이블명 → 안내 간격
-            instrFont     +  // 안내 문구
-            px(10)        +  // 안내 → BARO 간격
-            baroFont;        // BARO 워터마크
+            QR_SIZE + // QR 코드
+            px(8) + // QR → 테이블명 간격
+            tableFont + // 테이블명
+            px(3) + // 테이블명 → 안내 간격
+            instrFont + // 안내 문구
+            px(10) + // 안내 → BARO 간격
+            baroFont; // BARO 워터마크
 
           let y = cy + Math.round((CARD_H - blockH) / 2);
           const midX = cx + CARD_W / 2;
