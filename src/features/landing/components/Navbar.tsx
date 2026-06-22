@@ -4,6 +4,7 @@ import { Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
+import useAuthStore from '@/features/auth/store/authStore';
 import ThemeToggle from '@/features/theme/components/ThemeToggle';
 import { useTheme } from '@/features/theme/hooks/useTheme';
 import { Button } from '@/shadcn/ui/button';
@@ -12,14 +13,15 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { dark, toggleTheme } = useTheme();
+  const isLoggedIn = useAuthStore((s) => !!s.accessToken);
 
   const handleLogoClick = () => {
     navigate(routePaths.landing);
     setIsMenuOpen(false);
   };
 
-  const handleLoginClick = () => {
-    navigate(routePaths.login);
+  const handleCtaClick = () => {
+    navigate(isLoggedIn ? routePaths.myStores : routePaths.login);
     setIsMenuOpen(false);
   };
 
@@ -68,9 +70,9 @@ const Navbar = () => {
             <div className="flex items-center gap-3 ml-4">
               <Button
                 className="bg-baro-blue hover:bg-baro-blue-dark text-xs rounded-full text-white"
-                onClick={handleLoginClick}
+                onClick={handleCtaClick}
               >
-                시작하기
+                {isLoggedIn ? '계정 홈으로' : '시작하기'}
               </Button>
               <ThemeToggle dark={dark} toggleTheme={toggleTheme} />
             </div>
@@ -112,9 +114,9 @@ const Navbar = () => {
             </a>
             <Button
               className="bg-baro-blue hover:bg-baro-blue/90 w-full h-11 text-white"
-              onClick={handleLoginClick}
+              onClick={handleCtaClick}
             >
-              시작하기
+              {isLoggedIn ? '계정 홈으로 가기' : '시작하기'}
             </Button>
           </div>
         </div>
