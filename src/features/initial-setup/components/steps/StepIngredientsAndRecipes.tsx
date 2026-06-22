@@ -330,7 +330,7 @@ const StepIngredientsAndRecipes = ({
   };
 
   return (
-    <div className="flex flex-1 min-h-0 gap-4">
+    <div className="flex flex-1 min-h-0 flex-col gap-4 md:flex-row">
       {/* ── 왼쪽 패널: 식자재 등록 ── */}
       <div className="flex flex-1 min-h-0 flex-col overflow-hidden rounded-xl border">
         {/* 패널 헤더 */}

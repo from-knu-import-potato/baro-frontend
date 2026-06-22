@@ -1,9 +1,16 @@
 import { useState } from 'react';
 
 import { AlertTriangle, Database, Loader2, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
-import { useResetStoreData } from '@/features/store-settings/hooks/useStoreSettings';
+import { routePaths } from '@/app/routes/routePaths';
+import useAuthStore from '@/features/auth/store/authStore';
+import { useDeleteStore, useLeaveStore } from '@/features/store-registration/hooks/useMyStores';
+import {
+  useResetStoreData,
+  useStoreSettings,
+} from '@/features/store-settings/hooks/useStoreSettings';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -19,8 +26,16 @@ import SettingRow from '@/shared/components/SettingRow';
 import SettingsSection from '@/shared/components/SettingsSection';
 
 const DataSection = () => {
+  const navigate = useNavigate();
+  const storeId = useAuthStore((s) => s.storeId);
+  const { data: settings } = useStoreSettings();
+  const isOwner = settings?.myRole === 'owner';
   const [open, setOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [leaveOpen, setLeaveOpen] = useState(false);
   const { mutate: resetStore, isPending } = useResetStoreData();
+  const { mutate: deleteStoreMutate, isPending: isDeleting } = useDeleteStore();
+  const { mutate: leaveStoreMutate, isPending: isLeaving } = useLeaveStore();
 
   const handleConfirm = () => {
     resetStore(undefined, {
@@ -35,11 +50,41 @@ const DataSection = () => {
     });
   };
 
+  const handleDeleteConfirm = () => {
+    if (!storeId) return;
+    deleteStoreMutate(storeId, {
+      onSuccess: () => {
+        toast.success('가게가 삭제되었습니다.');
+        useAuthStore.setState({ storeId: null });
+        navigate(routePaths.myStores, { replace: true });
+      },
+      onError: () => {
+        toast.error('가게 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+        setDeleteOpen(false);
+      },
+    });
+  };
+
+  const handleLeaveConfirm = () => {
+    if (!storeId) return;
+    leaveStoreMutate(storeId, {
+      onSuccess: () => {
+        toast.success('가게에서 나왔습니다.');
+        useAuthStore.setState({ storeId: null });
+        navigate(routePaths.myStores, { replace: true });
+      },
+      onError: () => {
+        toast.error('가게 나가기에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+        setLeaveOpen(false);
+      },
+    });
+  };
+
   return (
     <>
       <SettingsSection
         title="데이터 관리"
-        description="재고 데이터를 초기화합니다."
+        description="재고 데이터 초기화 또는 가게 삭제를 진행합니다."
         icon={<Database className="h-4 w-4" />}
       >
         {/* MVP 이후 구현 예정
@@ -70,6 +115,39 @@ const DataSection = () => {
             </Button>
           }
         />
+        {isOwner ? (
+          <SettingRow
+            label="가게 삭제"
+            description="가게와 관련된 모든 데이터가 영구 삭제됩니다. 이 작업은 되돌릴 수 없습니다."
+            action={
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 border-baro-red text-baro-red hover:bg-baro-red/10 hover:text-baro-red"
+                onClick={() => setDeleteOpen(true)}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                가게 삭제
+              </Button>
+            }
+          />
+        ) : (
+          <SettingRow
+            label="가게 떠나기"
+            description="가게에서 나가면 더 이상 접근할 수 없습니다. 재합류하려면 초대코드가 필요합니다."
+            action={
+              <Button
+                variant="outline"
+                size="sm"
+                className="gap-1.5 border-baro-red text-baro-red hover:bg-baro-red/10 hover:text-baro-red"
+                onClick={() => setLeaveOpen(true)}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                가게 떠나기
+              </Button>
+            }
+          />
+        )}
       </SettingsSection>
 
       <AlertDialog open={open} onOpenChange={setOpen}>
@@ -134,6 +212,58 @@ const DataSection = () => {
               className="bg-baro-red hover:bg-baro-red-dark text-white"
             >
               {isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : '초기화 확정'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* 가게 나가기 확인 다이얼로그 */}
+      <AlertDialog open={leaveOpen} onOpenChange={setLeaveOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-baro-red">
+              <AlertTriangle className="w-4 h-4" />
+              가게에서 나가시겠어요?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              가게를 떠나면 더 이상 해당 가게에 접근할 수 없습니다. 다시 합류하려면 초대코드가
+              필요합니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLeaving}>취소</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleLeaveConfirm}
+              disabled={isLeaving}
+              className="bg-baro-red hover:bg-baro-red-dark text-white"
+            >
+              {isLeaving ? <Loader2 className="w-4 h-4 animate-spin" /> : '나가기'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* 가게 삭제 확인 다이얼로그 */}
+      <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-baro-red">
+              <AlertTriangle className="w-4 h-4" />
+              가게를 삭제하시겠어요?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              가게를 삭제하면 재고·메뉴·레시피·주문 내역 등 모든 데이터가 영구적으로 삭제됩니다. 이
+              작업은 되돌릴 수 없습니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>취소</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-baro-red hover:bg-baro-red-dark text-white"
+            >
+              {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : '가게 삭제'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

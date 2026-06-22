@@ -62,7 +62,7 @@ const StepOperatingHours = ({ data, onChange }: StepOperatingHoursProps) => {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-1.5">
+    <div className="grid grid-cols-1 gap-1.5 md:grid-cols-2">
       {DAY_OF_WEEK_CONFIG.map((day, index) => {
         const hour = data[index];
         const isSat = day.value === 'saturday';
