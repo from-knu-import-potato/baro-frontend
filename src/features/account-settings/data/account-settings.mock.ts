@@ -20,4 +20,4 @@ export const MOCK_NOTIFICATION_SETTINGS: NotificationSettings = {
   },
 };
 
-export const APP_VERSION = '0.1.0 (Beta)';
+export const APP_VERSION = '1.0.0';
