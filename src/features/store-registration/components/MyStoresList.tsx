@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import {
   Check,
   ChevronRight,
+  Globe,
   Info,
   Loader2,
   LogOut,
@@ -312,6 +313,13 @@ const MyStoresList = () => {
               <DropdownMenuContent side="right" align="start" className="w-48">
                 <DropdownMenuItem disabled className="text-xs text-muted-foreground">
                   버전 {APP_VERSION}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <Link to={routePaths.landing} className="flex items-center gap-2">
+                    <Globe className="h-3.5 w-3.5" />
+                    서비스 소개
+                  </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
