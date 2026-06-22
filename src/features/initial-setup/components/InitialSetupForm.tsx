@@ -165,7 +165,12 @@ const InitialSetupForm = () => {
           </div>
 
           {/* Step card */}
-          <Card className="flex flex-col shadow-sm max-h-[calc(100vh-14rem)] overflow-hidden">
+          <Card
+            className={cn(
+              'flex flex-col shadow-sm overflow-hidden',
+              currentStep >= 3 ? 'h-[calc(100vh-14rem)]' : 'max-h-[calc(100vh-14rem)]',
+            )}
+          >
             <CardHeader>
               <div className="flex items-center gap-2">
                 <span className="flex size-6 items-center justify-center rounded-full bg-baro-blue text-xs font-bold text-white">
@@ -176,7 +181,9 @@ const InitialSetupForm = () => {
               <CardDescription className="mt-0.5">{currentStepConfig.description}</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-1 min-h-0 flex-col px-4 py-2">
-              <div className="flex flex-1 min-h-0 flex-col">{renderStep()}</div>
+              <div className="flex flex-1 min-h-0 flex-col overflow-y-auto overflow-x-hidden">
+                {renderStep()}
+              </div>
             </CardContent>
           </Card>
 
