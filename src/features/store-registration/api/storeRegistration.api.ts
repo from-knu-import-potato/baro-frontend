@@ -18,3 +18,11 @@ export async function regenerateInviteCode(storeId: string): Promise<string> {
   const response = await axiosInstance.post(`/stores/${storeId}/invite-code`);
   return response.data.data.inviteCode;
 }
+
+export async function deleteStore(storeId: string): Promise<void> {
+  await axiosInstance.delete(`/stores/${storeId}`);
+}
+
+export async function leaveStore(storeId: string): Promise<void> {
+  await axiosInstance.delete(`/stores/${storeId}/members/me`);
+}

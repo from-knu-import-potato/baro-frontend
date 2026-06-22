@@ -4,10 +4,12 @@ import {
   Check,
   ChevronRight,
   Info,
+  Loader2,
   LogOut,
   Moon,
   Pencil,
   Plus,
+  Settings,
   Store,
   Sun,
   Trash2,
@@ -23,12 +25,26 @@ import { APP_VERSION } from '@/features/account-settings/data/account-settings.m
 import { useUpdateUserName, useUserInfo } from '@/features/account-settings/hooks/useUserInfo';
 import { logout } from '@/features/auth/api/authApi';
 import useAuthStore from '@/features/auth/store/authStore';
-import { useMyStores } from '@/features/store-registration/hooks/useMyStores';
+import {
+  useDeleteStore,
+  useLeaveStore,
+  useMyStores,
+} from '@/features/store-registration/hooks/useMyStores';
 import type { MyStore } from '@/features/store-registration/types/storeRegistration.types';
 import { fetchStoreSettings } from '@/features/store-settings/api/storeSettings.api';
 import ThemeToggle from '@/features/theme/components/ThemeToggle';
 import { useTheme } from '@/features/theme/hooks/useTheme';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/shadcn/ui/alert-dialog';
 import { Button } from '@/shadcn/ui/button';
 import {
   Dialog,
@@ -74,7 +90,13 @@ const MyStoresList = () => {
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [isEditingName, setIsEditingName] = useState(false);
   const [draftName, setDraftName] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
+  const [leaveTargetId, setLeaveTargetId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const { mutate: deleteStoreMutate, isPending: isDeleting } = useDeleteStore();
+  const { mutate: leaveStoreMutate, isPending: isLeaving } = useLeaveStore();
 
   const handleSelectStore = async (storeId: string) => {
     setSelectingId(storeId);
@@ -129,6 +151,36 @@ const MyStoresList = () => {
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') handleSaveName();
     if (e.key === 'Escape') setIsEditingName(false);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deleteTargetId) return;
+    deleteStoreMutate(deleteTargetId, {
+      onSuccess: () => {
+        toast.success('가게가 삭제되었습니다.');
+        useAuthStore.setState({ storeId: null });
+        setDeleteTargetId(null);
+        setIsEditMode(false);
+      },
+      onError: () => {
+        toast.error('가게 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      },
+    });
+  };
+
+  const handleLeaveConfirm = () => {
+    if (!leaveTargetId) return;
+    leaveStoreMutate(leaveTargetId, {
+      onSuccess: () => {
+        toast.success('가게에서 나왔습니다.');
+        useAuthStore.setState({ storeId: null });
+        setLeaveTargetId(null);
+        setIsEditMode(false);
+      },
+      onError: () => {
+        toast.error('가게 나가기에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      },
+    });
   };
 
   const isBlocked = selectingId !== null || isLoggingOut;
@@ -232,6 +284,20 @@ const MyStoresList = () => {
               <ThemeToggle dark={dark} toggleTheme={toggleTheme} />
             </div>
 
+            {/* 내 가게 설정 */}
+            {stores && stores.length > 0 && (
+              <button
+                onClick={() => setIsEditMode((v) => !v)}
+                className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm text-left transition-colors hover:bg-muted"
+              >
+                <div className="flex items-center gap-2.5">
+                  <Settings className="h-4 w-4 text-muted-foreground" />
+                  <span>{isEditMode ? '편집 완료' : '내 가게 설정'}</span>
+                </div>
+                {isEditMode && <span className="h-2 w-2 rounded-full bg-baro-blue animate-pulse" />}
+              </button>
+            )}
+
             {/* 서비스 정보 드롭다운 */}
             <DropdownMenu>
               <DropdownMenuTrigger>
@@ -299,7 +365,7 @@ const MyStoresList = () => {
           </div>
 
           {/* Stores grid — scrolls internally */}
-          <div className="flex-1 overflow-y-auto p-1 md:overflow-y-auto">
+          <div className="flex-1 overflow-y-auto p-1 pt-3 md:overflow-y-auto">
             {isStoresLoading ? (
               <div className="grid grid-cols-2 gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-3">
                 {Array.from({ length: 3 }).map((_, i) => (
@@ -314,11 +380,29 @@ const MyStoresList = () => {
                     <div
                       key={store.storeId}
                       className={cn(
-                        'group flex flex-col justify-between gap-5 rounded-2xl border bg-background p-5',
-                        'shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 ',
+                        'group relative flex flex-col justify-between gap-5 rounded-2xl border bg-background p-5',
+                        'shadow-sm transition-all duration-200',
+                        !isEditMode && 'hover:shadow-md hover:-translate-y-0.5',
                         isSelecting && 'pointer-events-none opacity-60',
+                        isEditMode && 'animate-wiggle',
                       )}
                     >
+                      {isEditMode && store.role === 'owner' && (
+                        <button
+                          className="absolute -right-2 -top-2 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-baro-blue text-white shadow"
+                          onClick={() => setDeleteTargetId(store.storeId)}
+                        >
+                          <X className="size-3" />
+                        </button>
+                      )}
+                      {isEditMode && store.role === 'staff' && (
+                        <button
+                          className="absolute -right-2 -top-2 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-baro-blue text-white shadow text-sm font-bold leading-none"
+                          onClick={() => setLeaveTargetId(store.storeId)}
+                        >
+                          –
+                        </button>
+                      )}
                       <div className="space-y-3">
                         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted">
                           <Store className="size-6 text-muted-foreground" />
@@ -339,7 +423,7 @@ const MyStoresList = () => {
                         size="sm"
                         className="w-full h-9 rounded-full bg-baro-blue text-white hover:bg-baro-blue/90"
                         onClick={() => handleSelectStore(store.storeId)}
-                        disabled={isBlocked}
+                        disabled={isBlocked || isEditMode}
                       >
                         {isSelecting ? '이동 중...' : '입장하기'}
                       </Button>
@@ -348,37 +432,97 @@ const MyStoresList = () => {
                 })}
 
                 {/* Add store card */}
-                <button
-                  onClick={() => navigate(routePaths.storeSelection)}
-                  disabled={isBlocked}
-                  className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed bg-background text-muted-foreground transition-colors hover:border-baro-blue/40 hover:bg-baro-blue/5 hover:text-baro-blue min-h-44"
-                >
-                  <Plus className="size-6" />
-                  <span className="text-sm font-medium">새 가게 추가</span>
-                  <span className="text-xs">새 가게 등록 또는 초대코드로 합류</span>
-                </button>
+                {!isEditMode && (
+                  <button
+                    onClick={() => navigate(routePaths.storeSelection)}
+                    disabled={isBlocked}
+                    className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed bg-background text-muted-foreground transition-colors hover:border-baro-blue/40 hover:bg-baro-blue/5 hover:text-baro-blue min-h-44"
+                  >
+                    <Plus className="size-6" />
+                    <span className="text-sm font-medium">새 가게 추가</span>
+                    <span className="text-xs">새 가게 등록 또는 초대코드로 합류</span>
+                  </button>
+                )}
               </div>
             ) : (
-              <div className="flex h-full flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed bg-background text-center">
-                <Store className="size-10 text-muted-foreground/40" />
-                <div>
-                  <p className="font-semibold">참여 중인 가게가 없어요</p>
-                  <p className="mt-0.5 text-sm text-muted-foreground">
-                    가게를 만들거나 초대코드로 합류해 보세요.
+              <div className="flex h-full flex-col items-center justify-center gap-4 rounded-2xl border bg-background text-center">
+                <Store className="size-9 text-muted-foreground" strokeWidth={1.25} />
+                <div className="space-y-1">
+                  <p className="font-medium">참여 중인 가게가 없어요</p>
+                  <p className="text-sm text-muted-foreground">
+                    가게를 등록하거나 초대코드로 합류하세요.
                   </p>
                 </div>
                 <Button
-                  className="mt-2 gap-2 bg-baro-blue text-white hover:bg-baro-blue/90"
+                  size="sm"
+                  className="bg-baro-blue text-white hover:bg-baro-blue/90"
                   onClick={() => navigate(routePaths.storeSelection)}
                 >
-                  <Plus className="size-4" />
-                  시작하기
+                  가게 추가하기
                 </Button>
               </div>
             )}
           </div>
         </main>
       </div>
+
+      {/* Delete store dialog */}
+      <AlertDialog
+        open={deleteTargetId !== null}
+        onOpenChange={(open) => !open && setDeleteTargetId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-baro-red">
+              <TriangleAlert className="size-4" />
+              가게를 삭제하시겠어요?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              가게를 삭제하면 재고·메뉴·레시피 등 모든 데이터가 영구적으로 삭제됩니다. 이 작업은
+              되돌릴 수 없습니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>취소</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+              className="bg-baro-red hover:bg-baro-red-dark text-white"
+            >
+              {isDeleting ? <Loader2 className="size-4 animate-spin" /> : '삭제'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Leave store dialog */}
+      <AlertDialog
+        open={leaveTargetId !== null}
+        onOpenChange={(open) => !open && setLeaveTargetId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <TriangleAlert className="size-4 text-baro-red" />
+              가게에서 나가시겠어요?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              가게를 나가면 더 이상 해당 가게에 접근할 수 없습니다. 다시 합류하려면 초대코드가
+              필요합니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLeaving}>취소</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleLeaveConfirm}
+              disabled={isLeaving}
+              className="bg-baro-red hover:bg-baro-red-dark text-white"
+            >
+              {isLeaving ? <Loader2 className="size-4 animate-spin" /> : '나가기'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Withdraw dialog */}
       <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
