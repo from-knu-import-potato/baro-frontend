@@ -13,7 +13,6 @@ import useAuthStore from '@/features/auth/store/authStore';
 import { Button } from '@/shadcn/ui/button';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
-import axiosInstance from '@/shared/api/axiosInstance';
 
 const schema = z.object({
   username: z
@@ -30,7 +29,7 @@ type FormValues = z.infer<typeof schema>;
 
 const RegisterForm = () => {
   const navigate = useNavigate();
-  const { setTokens, setStoreId } = useAuthStore();
+  const { setTokens } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -41,23 +40,9 @@ const RegisterForm = () => {
 
   const onSubmit = async (values: FormValues) => {
     try {
-      const { accessToken, refreshToken, isNewUser } = await registerApi(values);
+      const { accessToken, refreshToken } = await registerApi(values);
       setTokens(accessToken, refreshToken);
-
-      if (isNewUser) {
-        navigate(routePaths.initialSetup, { replace: true });
-        return;
-      }
-
-      axiosInstance
-        .get('/users/me/store')
-        .then((res) => {
-          if (res.data.data?.storeId) {
-            setStoreId(res.data.data.storeId);
-          }
-        })
-        .catch(() => {})
-        .finally(() => navigate(routePaths.storeHome, { replace: true }));
+      navigate(routePaths.myStores, { replace: true });
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response?.status;
       if (status === 403) {
