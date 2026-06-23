@@ -28,6 +28,12 @@ import {
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/shadcn/ui/dropdown-menu';
 import { Input } from '@/shadcn/ui/input';
 import { Skeleton } from '@/shadcn/ui/skeleton';
 
@@ -68,7 +74,8 @@ const STATUS_CONFIG: Record<
 > = {
   critical: {
     label: '재고 부족',
-    badgeClass: 'bg-red-50 text-red-400 border border-red-200/60',
+    badgeClass:
+      'bg-red-50 text-red-400 border border-red-200/60 dark:bg-red-950/40 dark:border-red-800/40',
     rowClass: 'border-l-4 border-l-red-300',
     icon: <AlertTriangle className="w-3 h-3" />,
   },
@@ -80,13 +87,15 @@ const STATUS_CONFIG: Record<
   },
   normal: {
     label: '정상',
-    badgeClass: 'bg-slate-100 text-slate-400 border border-slate-200',
+    badgeClass:
+      'bg-slate-100 text-slate-400 border border-slate-200 dark:bg-slate-800 dark:border-slate-700',
     rowClass: 'border-l-4 border-l-transparent',
     icon: <CheckCircle2 className="w-3 h-3" />,
   },
   depleted: {
     label: '소진',
-    badgeClass: 'bg-zinc-100 text-zinc-400 border border-zinc-200',
+    badgeClass:
+      'bg-zinc-100 text-zinc-400 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700',
     rowClass: 'border-l-4 border-l-zinc-300',
     icon: <MinusCircle className="w-3 h-3" />,
   },
@@ -109,11 +118,16 @@ const getDday = (expiryDate?: string) => {
   const diff = Math.ceil(
     (new Date(expiryDate).getTime() - new Date().setHours(0, 0, 0, 0)) / (1000 * 60 * 60 * 24),
   );
-  if (diff < 0) return { text: '만료됨', chipClass: 'bg-zinc-100 text-zinc-400' };
-  if (diff === 0) return { text: 'D-Day', chipClass: 'bg-red-50 text-red-400 font-bold' };
-  if (diff <= 3) return { text: `D-${diff}`, chipClass: 'bg-red-50 text-red-400 font-semibold' };
+  if (diff < 0) return { text: '만료됨', chipClass: 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800' };
+  if (diff === 0)
+    return { text: 'D-Day', chipClass: 'bg-red-50 text-red-400 font-bold dark:bg-red-950/40' };
+  if (diff <= 3)
+    return {
+      text: `D-${diff}`,
+      chipClass: 'bg-red-50 text-red-400 font-semibold dark:bg-red-950/40',
+    };
   if (diff <= 7) return { text: `D-${diff}`, chipClass: 'bg-baro-yellow/10 text-baro-yellow-text' };
-  return { text: `D-${diff}`, chipClass: 'bg-slate-100 text-slate-400' };
+  return { text: `D-${diff}`, chipClass: 'bg-slate-100 text-slate-400 dark:bg-slate-800' };
 };
 
 /* ── 그리드 레이아웃 ── */
@@ -132,108 +146,171 @@ const InventoryRow = ({ item, onToggleFavorite, onEdit }: InventoryRowProps) => 
   const dday = getDday(item.expiryDate);
 
   return (
-    <div
-      className={cn(
-        'hidden md:grid gap-4 px-5 py-4 hover:bg-muted/20 transition-colors items-center',
-        GRID,
-        config.rowClass,
-      )}
-    >
-      {/* 즐겨찾기 버튼 */}
-      <button
-        onClick={() => onToggleFavorite(item.id, item.isFavorite)}
-        className="flex items-center justify-center"
-        aria-label={item.isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+    <>
+      {/* 데스크탑 행 */}
+      <div
+        className={cn(
+          'hidden md:grid gap-4 px-5 py-4 hover:bg-muted/20 transition-colors items-center',
+          GRID,
+          config.rowClass,
+        )}
       >
-        <Star
-          className={cn(
-            'w-4 h-4 transition-colors',
-            item.isFavorite
-              ? 'fill-baro-yellow text-baro-yellow'
-              : 'text-muted-foreground/30 hover:text-baro-yellow',
-          )}
-        />
-      </button>
-
-      {/* 식자재명 */}
-      <div className="min-w-0">
-        <span className="text-sm font-semibold truncate block">{item.name}</span>
-      </div>
-
-      {/* 현재 재고 */}
-      <div className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className="text-sm font-semibold tabular-nums">
-          {item.currentStock.toLocaleString()}
-        </span>
-        <span className="text-xs text-muted-foreground">{item.unit}</span>
-      </div>
-
-      {/* 안전 재고 */}
-      <div className="flex items-baseline gap-1 whitespace-nowrap">
-        <span className="text-sm tabular-nums text-muted-foreground">
-          {item.safetyStock.toLocaleString()}
-        </span>
-        <span className="text-xs text-muted-foreground">{item.safetyStockUnit}</span>
-      </div>
-
-      {/* 입고날짜 */}
-      <div>
-        {item.inboundDate ? (
-          <span className="text-sm text-foreground">{item.inboundDate}</span>
-        ) : (
-          <span className="text-sm text-muted-foreground/40">—</span>
-        )}
-      </div>
-
-      {/* 유통기한 */}
-      <div className="flex items-center gap-2">
-        {item.expiryDate && dday ? (
-          <>
-            <span className="text-sm text-foreground">{item.expiryDate}</span>
-            <span
-              className={`px-2 py-0.5 rounded-full text-[11px] font-medium whitespace-nowrap ${dday.chipClass}`}
-            >
-              {dday.text}
-            </span>
-          </>
-        ) : (
-          <span className="text-sm text-muted-foreground/40">—</span>
-        )}
-      </div>
-
-      {/* 포함 레시피 */}
-      <div>
-        {item.recipeCount > 0 ? (
-          <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
-            <BookOpen className="w-3.5 h-3.5 shrink-0" />
-            {item.recipeCount}개 메뉴
-          </span>
-        ) : (
-          <span className="text-sm text-muted-foreground/40">—</span>
-        )}
-      </div>
-
-      {/* 상태 뱃지 */}
-      <div className="flex justify-center">
-        <span
-          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${config.badgeClass}`}
-        >
-          {config.icon}
-          {config.label}
-        </span>
-      </div>
-
-      {/* 재고 수정 버튼 */}
-      <div className="flex justify-center">
         <button
-          onClick={() => onEdit(item)}
-          className="p-1.5 rounded-md text-muted-foreground/40 hover:text-baro-blue hover:bg-blue-50 transition-colors"
-          aria-label="재고 수정"
+          onClick={() => onToggleFavorite(item.id, item.isFavorite)}
+          className="flex items-center justify-center"
+          aria-label={item.isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
         >
-          <Pencil className="w-3.5 h-3.5" />
+          <Star
+            className={cn(
+              'w-4 h-4 transition-colors',
+              item.isFavorite
+                ? 'fill-baro-yellow text-baro-yellow'
+                : 'text-muted-foreground/30 hover:text-baro-yellow',
+            )}
+          />
         </button>
+        <div className="min-w-0">
+          <span className="text-sm font-semibold truncate block">{item.name}</span>
+        </div>
+        <div className="flex items-baseline gap-1 whitespace-nowrap">
+          <span className="text-sm font-semibold tabular-nums">
+            {item.currentStock.toLocaleString()}
+          </span>
+          <span className="text-xs text-muted-foreground">{item.unit}</span>
+        </div>
+        <div className="flex items-baseline gap-1 whitespace-nowrap">
+          <span className="text-sm tabular-nums text-muted-foreground">
+            {item.safetyStock.toLocaleString()}
+          </span>
+          <span className="text-xs text-muted-foreground">{item.safetyStockUnit}</span>
+        </div>
+        <div>
+          {item.inboundDate ? (
+            <span className="text-sm text-foreground">{item.inboundDate}</span>
+          ) : (
+            <span className="text-sm text-muted-foreground/40">—</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {item.expiryDate && dday ? (
+            <>
+              <span className="text-sm text-foreground">{item.expiryDate}</span>
+              <span
+                className={`px-2 py-0.5 rounded-full text-[11px] font-medium whitespace-nowrap ${dday.chipClass}`}
+              >
+                {dday.text}
+              </span>
+            </>
+          ) : (
+            <span className="text-sm text-muted-foreground/40">—</span>
+          )}
+        </div>
+        <div>
+          {item.recipeCount > 0 ? (
+            <span className="inline-flex items-center gap-1.5 text-sm text-muted-foreground">
+              <BookOpen className="w-3.5 h-3.5 shrink-0" />
+              {item.recipeCount}개 메뉴
+            </span>
+          ) : (
+            <span className="text-sm text-muted-foreground/40">—</span>
+          )}
+        </div>
+        <div className="flex justify-center">
+          <span
+            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${config.badgeClass}`}
+          >
+            {config.icon}
+            {config.label}
+          </span>
+        </div>
+        <div className="flex justify-center">
+          <button
+            onClick={() => onEdit(item)}
+            className="p-1.5 rounded-md text-muted-foreground/40 hover:text-baro-blue hover:bg-blue-50 transition-colors"
+            aria-label="재고 수정"
+          >
+            <Pencil className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
-    </div>
+
+      {/* 모바일 카드 */}
+      <div
+        className={cn('md:hidden px-4 py-3 hover:bg-muted/20 transition-colors', config.rowClass)}
+      >
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <button
+              onClick={() => onToggleFavorite(item.id, item.isFavorite)}
+              aria-label={item.isFavorite ? '즐겨찾기 해제' : '즐겨찾기 추가'}
+              className="shrink-0"
+            >
+              <Star
+                className={cn(
+                  'w-3.5 h-3.5 transition-colors',
+                  item.isFavorite
+                    ? 'fill-baro-yellow text-baro-yellow'
+                    : 'text-muted-foreground/30',
+                )}
+              />
+            </button>
+            <span className="text-sm font-semibold truncate">{item.name}</span>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium whitespace-nowrap ${config.badgeClass}`}
+            >
+              {config.icon}
+              {config.label}
+            </span>
+            <button
+              onClick={() => onEdit(item)}
+              className="p-1.5 rounded-md text-muted-foreground/40 hover:text-baro-blue hover:bg-blue-50 transition-colors"
+              aria-label="재고 수정"
+            >
+              <Pencil className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-2.5 grid grid-cols-2 gap-x-3 gap-y-2">
+          <div>
+            <p className="text-[10px] text-muted-foreground mb-0.5">현재 재고</p>
+            <p className="text-sm font-semibold">
+              {item.currentStock.toLocaleString()} {item.unit}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] text-muted-foreground mb-0.5">안전 재고</p>
+            <p className="text-sm text-foreground">
+              {item.safetyStock.toLocaleString()} {item.safetyStockUnit}
+            </p>
+          </div>
+          {item.expiryDate && dday && (
+            <div>
+              <p className="text-[10px] text-muted-foreground mb-0.5">유통기한</p>
+              <p className="text-sm flex items-center gap-1.5">
+                <span>{item.expiryDate}</span>
+                <span
+                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium shrink-0 ${dday.chipClass}`}
+                >
+                  {dday.text}
+                </span>
+              </p>
+            </div>
+          )}
+          {item.recipeCount > 0 && (
+            <div>
+              <p className="text-[10px] text-muted-foreground mb-0.5">포함 레시피</p>
+              <p className="text-sm flex items-center gap-1 text-foreground">
+                <BookOpen className="w-3 h-3 shrink-0" />
+                {item.recipeCount}개 메뉴
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </>
   );
 };
 
@@ -315,8 +392,9 @@ const InventoryTable = () => {
           </div>
 
           {/* 상태 필터 탭 + 액션 버튼 */}
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex gap-1">
+          <div className="flex flex-wrap items-center gap-2 min-w-0 overflow-hidden">
+            {/* 필터 탭 */}
+            <div className="flex gap-1 flex-1 min-w-0">
               {FILTER_TABS.map((tab) => {
                 const count =
                   tab.key === 'all' ? items.length : countByStatus(tab.key as InventoryStatus);
@@ -339,7 +417,7 @@ const InventoryTable = () => {
                         isActive
                           ? 'bg-baro-blue text-white'
                           : tab.key === 'critical' && count > 0
-                            ? 'bg-red-50 text-red-400'
+                            ? 'bg-red-50 text-red-400 dark:bg-red-950/40'
                             : 'bg-muted text-muted-foreground',
                       )}
                     >
@@ -350,89 +428,137 @@ const InventoryTable = () => {
               })}
             </div>
 
-            {/* 액션 버튼 */}
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={() => navigate(routePaths.ocrInbound)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-baro-blue text-white hover:bg-baro-blue/90 transition-colors"
-              >
-                <ScanLine className="w-3.5 h-3.5" />
-                재고 등록하기
-              </button>
-              <button
-                onClick={() => setArchivedOpen(true)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border border-input text-muted-foreground hover:bg-muted/50 transition-colors"
-              >
-                <Archive className="w-3.5 h-3.5" />
-                보관된 식자재
-                {archivedList.length > 0 && (
-                  <span className="ml-0.5 bg-muted text-muted-foreground rounded-full w-4 h-4 inline-flex items-center justify-center text-[10px] font-bold">
-                    {archivedList.length}
-                  </span>
-                )}
-              </button>
-              <button
-                onClick={() => setShowFavoritesOnly((prev) => !prev)}
-                className={cn(
-                  'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors',
-                  showFavoritesOnly
-                    ? 'bg-baro-yellow/10 border-baro-yellow/50 text-baro-yellow-text'
-                    : 'border-input text-muted-foreground hover:bg-muted/50',
-                )}
-              >
-                <Star
-                  className={cn(
-                    'w-3.5 h-3.5',
-                    showFavoritesOnly && 'fill-baro-yellow text-baro-yellow',
+            {/* 액션 버튼 — 모바일: 2행 / 데스크탑: 1행 */}
+            <div className="flex flex-col gap-2 w-full min-w-0 sm:flex-row sm:flex-wrap sm:items-center sm:w-auto">
+              {/* 1행(모바일): 보관함 + 즐찾 + 정렬 — 좁은 화면에서 가로 스크롤 */}
+              <div className="flex items-center gap-2 overflow-x-auto">
+                <button
+                  onClick={() => setArchivedOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border border-input text-muted-foreground hover:bg-muted/50 transition-colors"
+                >
+                  <Archive className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">보관된 식자재</span>
+                  {archivedList.length > 0 && (
+                    <span className="ml-0.5 bg-muted text-muted-foreground rounded-full w-4 h-4 inline-flex items-center justify-center text-[10px] font-bold">
+                      {archivedList.length}
+                    </span>
                   )}
-                />
-                즐겨찾기만
-                {favoriteCount > 0 && (
-                  <span className="ml-0.5 bg-baro-yellow text-white rounded-full w-4 h-4 inline-flex items-center justify-center text-[10px] font-bold">
-                    {favoriteCount}
-                  </span>
-                )}
-              </button>
-              <div className="flex items-center gap-0.5 border rounded-md px-1.5 py-0.5">
-                <ArrowUpDown className="w-3 h-3 text-muted-foreground mr-0.5 shrink-0" />
-                {(
-                  [
-                    { key: 'expiryDate', label: '유통기한순' },
-                    { key: 'inboundDate', label: '입고날짜순' },
-                  ] as const
-                ).map(({ key, label }) => {
-                  const isActive = sortKey === key;
-                  return (
-                    <button
-                      key={key}
-                      onClick={() => handleSortClick(key)}
-                      className={cn(
-                        'px-2 py-1 rounded text-xs font-medium transition-colors',
-                        isActive ? 'text-baro-blue' : 'text-muted-foreground hover:bg-muted/60',
-                      )}
-                    >
-                      {label}
-                      {isActive && <span className="ml-0.5">{sortDir === 'asc' ? '↑' : '↓'}</span>}
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="relative w-52">
-                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                <Input
-                  placeholder="식자재 검색..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-8 h-8 text-xs placeholder:text-xs"
-                />
-                {search && (
-                  <button
-                    onClick={() => setSearch('')}
-                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                </button>
+                <button
+                  onClick={() => setShowFavoritesOnly((prev) => !prev)}
+                  className={cn(
+                    'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors',
+                    showFavoritesOnly
+                      ? 'bg-baro-yellow/10 border-baro-yellow/50 text-baro-yellow-text'
+                      : 'border-input text-muted-foreground hover:bg-muted/50',
+                  )}
+                >
+                  <Star
+                    className={cn(
+                      'w-3.5 h-3.5',
+                      showFavoritesOnly && 'fill-baro-yellow text-baro-yellow',
+                    )}
+                  />
+                  <span className="hidden sm:inline">즐겨찾기만</span>
+                  {favoriteCount > 0 && (
+                    <span className="bg-baro-yellow text-white rounded-full w-4 h-4 inline-flex items-center justify-center text-[10px] font-bold">
+                      {favoriteCount}
+                    </span>
+                  )}
+                </button>
+                {/* 모바일: 드롭다운 */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger
+                    className={cn(
+                      'sm:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border transition-colors shrink-0',
+                      sortKey !== 'default'
+                        ? 'border-baro-blue/50 text-baro-blue bg-baro-blue/5'
+                        : 'border-input text-muted-foreground hover:bg-muted/50',
+                    )}
                   >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
+                    <ArrowUpDown className="w-3.5 h-3.5 shrink-0" />
+                    {sortKey !== 'default' && (
+                      <span className="whitespace-nowrap">
+                        {sortKey === 'expiryDate' ? '유통기한순' : '입고날짜순'}{' '}
+                        {sortDir === 'asc' ? '↑' : '↓'}
+                      </span>
+                    )}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start">
+                    {(
+                      [
+                        { key: 'expiryDate', label: '유통기한순' },
+                        { key: 'inboundDate', label: '입고날짜순' },
+                      ] as const
+                    ).map(({ key, label }) => (
+                      <DropdownMenuItem
+                        key={key}
+                        onSelect={(e) => e.preventDefault()}
+                        onClick={() => handleSortClick(key)}
+                        className={cn(sortKey === key && 'text-baro-blue font-medium')}
+                      >
+                        {label}
+                        {sortKey === key && (
+                          <span className="ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>
+                        )}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {/* 데스크탑: 버튼 그룹 */}
+                <div className="hidden sm:flex items-center gap-0.5 border rounded-md px-1.5 py-0.5">
+                  <ArrowUpDown className="w-3 h-3 text-muted-foreground mr-0.5 shrink-0" />
+                  {(
+                    [
+                      { key: 'expiryDate', label: '유통기한순' },
+                      { key: 'inboundDate', label: '입고날짜순' },
+                    ] as const
+                  ).map(({ key, label }) => {
+                    const isActive = sortKey === key;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => handleSortClick(key)}
+                        className={cn(
+                          'px-2 py-1 rounded text-xs font-medium transition-colors whitespace-nowrap',
+                          isActive ? 'text-baro-blue' : 'text-muted-foreground hover:bg-muted/60',
+                        )}
+                      >
+                        {label}
+                        <span className={cn('ml-0.5', !isActive && 'invisible')}>
+                          {sortDir === 'asc' ? '↑' : '↓'}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              {/* 2행(모바일): 등록 + 검색 */}
+              <div className="flex items-center gap-2 min-w-0">
+                <button
+                  onClick={() => navigate(routePaths.ocrInbound)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium bg-baro-blue text-white hover:bg-baro-blue/90 transition-colors shrink-0"
+                >
+                  <ScanLine className="w-3.5 h-3.5" />
+                  재고 등록하기
+                </button>
+                <div className="relative flex-1 min-w-0 sm:flex-none sm:w-52">
+                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                  <Input
+                    placeholder="식자재 검색..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    className="pl-8 h-8 text-xs placeholder:text-xs"
+                  />
+                  {search && (
+                    <button
+                      onClick={() => setSearch('')}
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
@@ -458,15 +584,27 @@ const InventoryTable = () => {
           {isLoading ? (
             <div className="divide-y flex-1 overflow-y-auto">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className={`hidden md:grid ${GRID} gap-4 px-5 py-4 items-center`}>
-                  <Skeleton className="w-4 h-4 rounded-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-16" />
-                  <Skeleton className="h-4 w-16" />
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-4 w-12" />
-                  <Skeleton className="h-6 w-16 rounded-full mx-auto" />
+                <div key={i}>
+                  <div className={`hidden md:grid ${GRID} gap-4 px-5 py-4 items-center`}>
+                    <Skeleton className="w-4 h-4 rounded-full" />
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-6 w-16 rounded-full mx-auto" />
+                  </div>
+                  <div className="md:hidden px-4 py-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-5 w-14 rounded-full" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Skeleton className="h-3 w-24" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

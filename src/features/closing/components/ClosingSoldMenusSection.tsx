@@ -34,28 +34,29 @@ const ClosingSoldMenusSection = ({ menus }: ClosingSoldMenusSectionProps) => {
             </div>
             <div className="divide-y max-h-72 overflow-y-auto">
               {menus.map((menu) => (
-                <div
-                  key={menu.menuId}
-                  className="grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr] gap-2 md:gap-4 px-5 py-3.5 hover:bg-muted/20 transition-colors"
-                >
-                  <span className="text-sm font-medium col-span-2 md:col-span-1">
-                    {menu.menuName}
-                  </span>
-                  <div className="flex justify-between md:contents">
-                    <span className="text-xs text-muted-foreground md:hidden">단가</span>
-                    <span className="text-sm text-muted-foreground md:text-right">
+                <div key={menu.menuId} className="hover:bg-muted/20 transition-colors">
+                  {/* 데스크탑 행 */}
+                  <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 px-5 py-3.5 items-center">
+                    <span className="text-sm font-medium">{menu.menuName}</span>
+                    <span className="text-sm text-muted-foreground text-right">
                       {formatCurrency(menu.unitPrice)}
                     </span>
-                  </div>
-                  <div className="flex justify-between md:contents">
-                    <span className="text-xs text-muted-foreground md:hidden">수량</span>
-                    <span className="text-sm font-medium md:text-right">{menu.quantity}개</span>
-                  </div>
-                  <div className="flex justify-between md:contents">
-                    <span className="text-xs text-muted-foreground md:hidden">소계</span>
-                    <span className="text-sm font-semibold text-foreground md:text-right">
+                    <span className="text-sm font-medium text-right">{menu.quantity}개</span>
+                    <span className="text-sm font-semibold text-right">
                       {formatCurrency(menu.subtotal)}
                     </span>
+                  </div>
+                  {/* 모바일 카드 */}
+                  <div className="md:hidden px-4 py-3 flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm font-medium">{menu.menuName}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {formatCurrency(menu.unitPrice)} · {menu.quantity}개
+                      </p>
+                    </div>
+                    <p className="text-sm font-semibold shrink-0">
+                      {formatCurrency(menu.subtotal)}
+                    </p>
                   </div>
                 </div>
               ))}

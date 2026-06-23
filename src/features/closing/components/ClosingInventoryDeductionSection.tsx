@@ -81,37 +81,24 @@ const ClosingInventoryDeductionSection = ({
                     const isNegative = remaining < 0;
 
                     return (
-                      <div
-                        key={row.ingredientId}
-                        className="grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-3 md:gap-4 px-5 py-4 items-center hover:bg-muted/20 transition-colors"
-                      >
-                        <div className="col-span-2 md:col-span-1">
-                          <span className="text-sm font-medium">{row.ingredientName}</span>
-                          <span className="ml-1.5 text-xs text-muted-foreground">({row.unit})</span>
-                        </div>
-                        <div className="flex justify-between md:contents">
-                          <span className="text-xs text-muted-foreground md:hidden self-center">
-                            현재 재고
-                          </span>
-                          <span className="text-sm text-muted-foreground md:text-right self-center">
+                      <div key={row.ingredientId} className="hover:bg-muted/20 transition-colors">
+                        {/* 데스크탑 행 */}
+                        <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-4 px-5 py-4 items-center">
+                          <div>
+                            <span className="text-sm font-medium">{row.ingredientName}</span>
+                            <span className="ml-1.5 text-xs text-muted-foreground">
+                              ({row.unit})
+                            </span>
+                          </div>
+                          <span className="text-sm text-muted-foreground text-right">
                             {row.currentStock.toLocaleString()}
                             {row.unit}
                           </span>
-                        </div>
-                        <div className="flex justify-between md:contents">
-                          <span className="text-xs text-muted-foreground md:hidden self-center">
-                            이론 사용량
-                          </span>
-                          <span className="text-sm text-muted-foreground md:text-right self-center">
+                          <span className="text-sm text-muted-foreground text-right">
                             {row.theoreticalUsage.toLocaleString()}
                             {row.unit}
                           </span>
-                        </div>
-                        <div className="flex justify-between md:contents items-center">
-                          <span className="text-xs text-muted-foreground md:hidden">
-                            실제 사용량
-                          </span>
-                          <div className="flex items-center gap-1 md:justify-center">
+                          <div className="flex items-center gap-1 justify-center">
                             <Input
                               type="number"
                               min={0}
@@ -123,15 +110,8 @@ const ClosingInventoryDeductionSection = ({
                             />
                             <span className="text-xs text-muted-foreground">{row.unit}</span>
                           </div>
-                        </div>
-                        <div className="flex justify-between md:contents items-center">
-                          <span className="text-xs text-muted-foreground md:hidden">
-                            차감 후 재고
-                          </span>
                           <span
-                            className={`text-sm font-semibold md:text-right ${
-                              isNegative ? 'text-baro-red' : 'text-foreground'
-                            }`}
+                            className={`text-sm font-semibold text-right ${isNegative ? 'text-baro-red' : 'text-foreground'}`}
                           >
                             {remaining.toLocaleString()}
                             {row.unit}
@@ -139,6 +119,61 @@ const ClosingInventoryDeductionSection = ({
                               <span className="ml-1 text-xs font-normal text-baro-red">(부족)</span>
                             )}
                           </span>
+                        </div>
+                        {/* 모바일 카드 */}
+                        <div className="md:hidden px-4 py-3 space-y-1.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1 min-w-0">
+                              <span className="text-sm font-medium truncate">
+                                {row.ingredientName}
+                              </span>
+                              <span className="text-xs text-muted-foreground shrink-0">
+                                ({row.unit})
+                              </span>
+                            </div>
+                            <div className="text-right shrink-0">
+                              <p className="text-[10px] text-muted-foreground">차감 후 재고</p>
+                              <p
+                                className={`text-sm font-semibold ${isNegative ? 'text-baro-red' : 'text-foreground'}`}
+                              >
+                                {remaining.toLocaleString()}
+                                {row.unit}
+                                {isNegative && (
+                                  <span className="ml-1 text-xs font-normal">(부족)</span>
+                                )}
+                              </p>
+                            </div>
+                          </div>
+                          <p className="text-xs text-muted-foreground">
+                            현재 {row.currentStock.toLocaleString()}
+                            {row.unit}
+                          </p>
+                          <div className="grid grid-cols-2 gap-2 pt-0.5">
+                            <div>
+                              <p className="text-[10px] text-muted-foreground mb-1">이론 사용량</p>
+                              <p className="text-sm text-muted-foreground">
+                                {row.theoreticalUsage.toLocaleString()}
+                                {row.unit}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-muted-foreground mb-1">실제 사용량</p>
+                              <div className="flex items-center gap-1">
+                                <Input
+                                  type="number"
+                                  min={0}
+                                  value={row.actualUsage}
+                                  onChange={(e) =>
+                                    onChange(row.ingredientId, Math.max(0, Number(e.target.value)))
+                                  }
+                                  className="h-8 w-full text-sm text-center"
+                                />
+                                <span className="text-xs text-muted-foreground shrink-0">
+                                  {row.unit}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     );
@@ -161,37 +196,25 @@ const ClosingInventoryDeductionSection = ({
                     const isNegative = remaining < 0;
 
                     return (
-                      <div
-                        key={row.ingredientId}
-                        className="grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-3 md:gap-4 px-5 py-4 items-center hover:bg-muted/20 transition-colors"
-                      >
-                        <div className="col-span-2 md:col-span-1 flex items-center gap-2">
-                          <span className="text-sm font-medium">{row.ingredientName}</span>
-                          <span className="text-xs text-muted-foreground">({row.unit})</span>
-                          <Badge
-                            variant="outline"
-                            className="text-[10px] px-1.5 py-0 h-4 border-baro-red/30 text-baro-red shrink-0"
-                          >
-                            추가
-                          </Badge>
-                        </div>
-                        <div className="flex justify-between md:contents">
-                          <span className="text-xs text-muted-foreground md:hidden self-center">
-                            현재 재고
-                          </span>
-                          <span className="text-sm text-muted-foreground md:text-right self-center">
+                      <div key={row.ingredientId} className="hover:bg-muted/20 transition-colors">
+                        {/* 데스크탑 행 */}
+                        <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-4 px-5 py-4 items-center">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium">{row.ingredientName}</span>
+                            <span className="text-xs text-muted-foreground">({row.unit})</span>
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] px-1.5 py-0 h-4 border-baro-red/30 text-baro-red shrink-0"
+                            >
+                              추가
+                            </Badge>
+                          </div>
+                          <span className="text-sm text-muted-foreground text-right">
                             {row.currentStock.toLocaleString()}
                             {row.unit}
                           </span>
-                        </div>
-                        <div className="hidden md:flex items-center justify-end">
-                          <span className="text-sm text-muted-foreground">—</span>
-                        </div>
-                        <div className="flex justify-between md:contents items-center">
-                          <span className="text-xs text-muted-foreground md:hidden">
-                            실제 사용량
-                          </span>
-                          <div className="flex items-center gap-1 md:justify-center">
+                          <span className="text-sm text-muted-foreground text-right">—</span>
+                          <div className="flex items-center gap-1 justify-center">
                             <Input
                               type="number"
                               min={0.001}
@@ -207,12 +230,7 @@ const ClosingInventoryDeductionSection = ({
                             />
                             <span className="text-xs text-muted-foreground">{row.unit}</span>
                           </div>
-                        </div>
-                        <div className="flex justify-between md:contents items-center">
-                          <span className="text-xs text-muted-foreground md:hidden">
-                            차감 후 재고
-                          </span>
-                          <div className="flex items-center gap-2 md:justify-end">
+                          <div className="flex items-center gap-2 justify-end">
                             <span
                               className={`text-sm font-semibold ${isNegative ? 'text-baro-red' : 'text-foreground'}`}
                             >
@@ -233,6 +251,78 @@ const ClosingInventoryDeductionSection = ({
                             >
                               <X className="w-3 h-3" />
                             </Button>
+                          </div>
+                        </div>
+                        {/* 모바일 카드 */}
+                        <div className="md:hidden px-4 py-3 space-y-1.5">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1 min-w-0">
+                              <span className="text-sm font-medium truncate">
+                                {row.ingredientName}
+                              </span>
+                              <span className="text-xs text-muted-foreground shrink-0">
+                                ({row.unit})
+                              </span>
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] px-1.5 py-0 h-4 border-baro-red/30 text-baro-red shrink-0"
+                              >
+                                추가
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-1 shrink-0">
+                              <div className="text-right">
+                                <p className="text-[10px] text-muted-foreground">차감 후 재고</p>
+                                <p
+                                  className={`text-sm font-semibold ${isNegative ? 'text-baro-red' : 'text-foreground'}`}
+                                >
+                                  {remaining.toLocaleString()}
+                                  {row.unit}
+                                  {isNegative && (
+                                    <span className="ml-1 text-xs font-normal">(부족)</span>
+                                  )}
+                                </p>
+                              </div>
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-muted-foreground hover:text-baro-red hover:bg-red-50"
+                                onClick={() => onExtraRemove(row.ingredientId)}
+                              >
+                                <X className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 pt-0.5">
+                            <div>
+                              <p className="text-[10px] text-muted-foreground mb-1">현재 재고</p>
+                              <p className="text-sm text-muted-foreground">
+                                {row.currentStock.toLocaleString()}
+                                {row.unit}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-[10px] text-muted-foreground mb-1">사용량</p>
+                              <div className="flex items-center gap-1">
+                                <Input
+                                  type="number"
+                                  min={0.001}
+                                  step="any"
+                                  value={row.amount}
+                                  onChange={(e) =>
+                                    onExtraAmountChange(
+                                      row.ingredientId,
+                                      Math.max(0, Number(e.target.value)),
+                                    )
+                                  }
+                                  className="h-8 w-full text-sm text-center"
+                                />
+                                <span className="text-xs text-muted-foreground shrink-0">
+                                  {row.unit}
+                                </span>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>

@@ -95,7 +95,7 @@ const StepMenuRegistration = ({ data, onChange }: StepMenuRegistrationProps) => 
   /* OCR 플로우 활성 중 */
   if (ocrStep !== null) {
     return (
-      <div className="flex flex-1 min-h-0 flex-col overflow-y-auto py-2">
+      <div className="flex flex-1 min-h-0 flex-col overflow-hidden py-2">
         {ocrStep === 'upload' && (
           <>
             {ocrError && (

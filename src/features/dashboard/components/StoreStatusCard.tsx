@@ -19,7 +19,7 @@ interface StatTileProps {
 const StatTile = ({ label, value, comment, commentColor }: StatTileProps) => (
   <div className="flex-1 min-w-0 rounded-xl border bg-card p-3 space-y-1">
     <p className="text-xs text-muted-foreground">{label}</p>
-    <p className="text-2xl font-bold tracking-tight">{value}</p>
+    <p className="text-base font-bold tracking-tight md:text-2xl">{value}</p>
     <p className={`text-xs font-medium ${commentColor}`}>{comment}</p>
   </div>
 );

@@ -34,25 +34,27 @@ const MenuOcrUploadStep = ({ onFileSelect, onBack }: MenuOcrUploadStepProps) => 
   return (
     <div className="flex flex-col gap-6 pr-2">
       <div className="flex flex-col gap-4">
-        <div>
+        <div className="text-center">
           <p className="text-sm font-semibold">메뉴판을 등록해주세요</p>
           <p className="text-xs text-muted-foreground mt-1">
             이미지를 업로드하면 AI가 메뉴 항목을 자동으로 인식합니다
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-start justify-center">
           {STEPS.map((step, i) => (
-            <div key={step.num} className="flex items-center gap-2">
-              <div className="flex items-center gap-2 bg-muted/60 rounded-lg px-3 py-2">
-                <span className="w-5 h-5 rounded-full bg-baro-blue text-white text-xs font-bold flex items-center justify-center shrink-0">
+            <div key={step.num} className="flex items-start">
+              <div className="flex flex-col items-center gap-2 text-center w-20">
+                <span className="w-6 h-6 rounded-full bg-baro-blue text-white text-xs font-bold flex items-center justify-center shrink-0">
                   {step.num}
                 </span>
-                <span className="text-xs font-medium text-foreground/80 whitespace-nowrap">
+                <span className="text-[10px] font-medium text-foreground/70 leading-snug">
                   {step.label}
                 </span>
               </div>
-              {i < STEPS.length - 1 && <span className="text-muted-foreground/40 text-sm">→</span>}
+              {i < STEPS.length - 1 && (
+                <span className="text-muted-foreground/40 text-sm mt-1 px-1 shrink-0">→</span>
+              )}
             </div>
           ))}
         </div>
@@ -83,10 +85,10 @@ const MenuOcrUploadStep = ({ onFileSelect, onBack }: MenuOcrUploadStepProps) => 
           <div className="flex-1 h-px bg-border" />
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-3 md:flex-row">
           <Button
             variant="outline"
-            className="flex-1"
+            className="w-full"
             onClick={() => fileInputRef.current?.click()}
           >
             <FileImage className="w-4 h-4" />
@@ -94,7 +96,7 @@ const MenuOcrUploadStep = ({ onFileSelect, onBack }: MenuOcrUploadStepProps) => 
           </Button>
           <Button
             variant="outline"
-            className="flex-1"
+            className="w-full"
             onClick={() => cameraInputRef.current?.click()}
           >
             <Camera className="w-4 h-4" />

@@ -114,50 +114,52 @@ const SettingsIngredientsPage = () => {
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden bg-background">
-      <header className="shrink-0 flex items-center gap-3 border-b px-6 py-4 bg-background">
+      <header className="shrink-0 flex flex-wrap items-center gap-3 border-b px-4 py-3 bg-background md:px-6 md:py-4">
         <Button variant="ghost" size="icon" onClick={() => navigate(routePaths.storeSettings)}>
           <ArrowLeft className="size-4" />
         </Button>
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold">식자재 관리</p>
           <p className="text-xs text-muted-foreground">
             {showArchived ? '보관된 식자재 목록입니다.' : '재고로 관리할 식자재를 등록합니다.'}
           </p>
         </div>
-        <div className="ml-auto flex items-center gap-2">
-          <div className="relative w-52">
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
+          <div className="relative w-full md:w-52">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
             <Input
               placeholder="식자재 이름 검색"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 pl-8 pr-3 text-sm"
+              className="h-8 pl-8 pr-3 text-sm w-full"
             />
           </div>
-          <Button variant="outline" size="sm" onClick={handleOpenSafety}>
-            <ShieldCheck className="size-4 mr-1" /> 안전 재고 기준
-          </Button>
-          <Button
-            variant={showArchived ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setShowArchived((prev) => !prev)}
-            className={showArchived ? 'bg-baro-blue hover:bg-baro-blue/80 text-white' : ''}
-          >
-            <Archive className="size-4 mr-1" />
-            보관함
-            {(archivedIngredients?.length ?? 0) > 0 && (
-              <span className="ml-1 bg-white/30 text-current rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none">
-                {archivedIngredients!.length}
-              </span>
-            )}
-          </Button>
-          <Button
-            size="sm"
-            className="bg-baro-blue hover:bg-baro-blue/80 text-white"
-            onClick={() => setAddOpen(true)}
-          >
-            <Plus className="size-4 mr-1" /> 식자재 추가
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              className="bg-baro-blue hover:bg-baro-blue/80 text-white"
+              onClick={() => setAddOpen(true)}
+            >
+              <Plus className="size-4 mr-1" /> 식자재 추가
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleOpenSafety}>
+              <ShieldCheck className="size-4 mr-1" /> 안전 재고 기준
+            </Button>
+            <Button
+              variant={showArchived ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setShowArchived((prev) => !prev)}
+              className={showArchived ? 'bg-baro-blue hover:bg-baro-blue/80 text-white' : ''}
+            >
+              <Archive className="size-4 mr-1" />
+              보관함
+              {(archivedIngredients?.length ?? 0) > 0 && (
+                <span className="ml-1 bg-white/30 text-current rounded-full px-1.5 py-0.5 text-[10px] font-bold leading-none">
+                  {archivedIngredients!.length}
+                </span>
+              )}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -358,7 +360,18 @@ const SettingsIngredientsPage = () => {
               </span>
             </p>
             <div className="flex justify-center py-4">
-              <SafetyStockDial value={safetyPct} onChange={setSafetyPct} step={5} />
+              {/* 모바일: compact */}
+              <div className="sm:hidden flex flex-col items-center gap-2">
+                <SafetyStockDial value={safetyPct} onChange={setSafetyPct} step={5} compact />
+                <p className="text-xs text-muted-foreground text-center">
+                  전체 재고의 <span className="font-semibold text-foreground">{safetyPct}%</span>를
+                  안전 재고 기준으로 설정
+                </p>
+              </div>
+              {/* 데스크탑: 전체 */}
+              <div className="hidden sm:block">
+                <SafetyStockDial value={safetyPct} onChange={setSafetyPct} step={5} />
+              </div>
             </div>
             <Button
               className="w-full bg-baro-blue hover:bg-baro-blue/80 text-white h-10"

@@ -173,7 +173,7 @@ const ClosingPage = () => {
     <>
       <div className="flex flex-col">
         {/* 헤더 — sticky */}
-        <div className="sticky top-0 z-10 bg-background border-b px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 z-10 bg-background border-b px-4 py-3 flex items-center justify-between md:px-6 md:py-4">
           <div>
             <h1 className="text-lg font-bold">마감하기</h1>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
@@ -233,7 +233,7 @@ const ClosingPage = () => {
         </div>
 
         {/* 하단 버튼 — sticky */}
-        <div className="sticky bottom-0 z-10 bg-background border-t px-6 py-4">
+        <div className="sticky bottom-0 z-10 bg-background border-t px-4 py-3 md:px-6 md:py-4">
           {preview.isClosed ? (
             <Button
               onClick={handleComplete}

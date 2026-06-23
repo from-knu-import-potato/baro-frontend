@@ -64,7 +64,7 @@ const DetailView = ({ storeId, item, onBack }: DetailViewProps) => {
 
       <Separator />
 
-      <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-6 md:px-6">
         {isLoading ? (
           <div className="space-y-3">
             <Skeleton className="h-5 w-32" />
@@ -87,8 +87,8 @@ const DetailView = ({ storeId, item, onBack }: DetailViewProps) => {
               {detail.soldMenus.length === 0 ? (
                 <p className="text-sm text-muted-foreground pl-6">판매 내역이 없습니다.</p>
               ) : (
-                <div className="rounded-lg border overflow-hidden">
-                  <table className="w-full text-sm">
+                <div className="rounded-lg border overflow-hidden overflow-x-auto">
+                  <table className="w-full min-w-[320px] text-sm">
                     <thead>
                       <tr className="bg-muted/50 text-muted-foreground">
                         <th className="text-left px-3 py-2 font-medium">메뉴</th>
@@ -140,8 +140,8 @@ const DetailView = ({ storeId, item, onBack }: DetailViewProps) => {
               {detail.inventoryDeductions.length === 0 ? (
                 <p className="text-sm text-muted-foreground pl-6">차감된 재고가 없습니다.</p>
               ) : (
-                <div className="rounded-lg border overflow-hidden">
-                  <table className="w-full text-sm">
+                <div className="rounded-lg border overflow-hidden overflow-x-auto">
+                  <table className="w-full min-w-[280px] text-sm">
                     <thead>
                       <tr className="bg-muted/50 text-muted-foreground">
                         <th className="text-left px-3 py-2 font-medium">식자재</th>
@@ -225,13 +225,15 @@ const ClosingHistorySheet = ({ open, onClose, storeId }: ClosingHistorySheetProp
                       <div className="flex items-center gap-3">
                         <CalendarDays className="w-4 h-4 text-muted-foreground shrink-0" />
                         <div>
-                          <p className="text-sm font-medium">{formatDate(item.date)}</p>
+                          <p className="text-sm font-medium whitespace-nowrap">
+                            {formatDate(item.date)}
+                          </p>
                           <p className="text-xs text-muted-foreground mt-0.5">
                             {daysAgo === 0 ? '오늘' : `${daysAgo}일 전`}
                           </p>
                         </div>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right shrink-0">
                         <p className="text-sm font-semibold">{formatCurrency(item.totalRevenue)}</p>
                         <p className="text-xs text-muted-foreground mt-0.5 group-hover:text-foreground transition-colors">
                           상세보기 →

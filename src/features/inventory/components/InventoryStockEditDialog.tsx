@@ -1,12 +1,15 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import { CalendarDays, Pencil, X } from 'lucide-react';
 
 import { useUpdateIngredient } from '@/features/store-settings/hooks/useIngredients';
+import { cn } from '@/lib/utils';
 import { Button } from '@/shadcn/ui/button';
+import { Calendar } from '@/shadcn/ui/calendar';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shadcn/ui/popover';
 
 interface EditableItem {
   id: string;
@@ -23,43 +26,40 @@ interface InventoryStockEditDialogProps {
   item: EditableItem | null;
 }
 
-interface DateInputProps {
+interface DatePickerProps {
   id: string;
   value: string;
   onChange: (v: string) => void;
   optional?: boolean;
 }
 
-const DateInput = ({ id, value, onChange, optional }: DateInputProps) => {
-  const ref = useRef<HTMLInputElement>(null);
-
+const DatePicker = ({ id, value, onChange, optional }: DatePickerProps) => {
   return (
-    <div className="relative flex items-center h-9">
-      <input
-        ref={ref}
-        id={id}
-        type="date"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        onClick={(e) => e.currentTarget.showPicker?.()}
-        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-      />
-      <div className="flex items-center w-full h-9 rounded-md border border-input bg-background px-3 text-sm pointer-events-none select-none">
-        <span className={value ? 'text-foreground' : 'text-muted-foreground/50'}>
-          {value || '날짜 선택'}
-        </span>
-        <div className="ml-auto flex items-center gap-1">
-          <CalendarDays className="w-4 h-4 text-muted-foreground" />
-        </div>
-      </div>
+    <div className="relative flex items-center">
+      <Popover>
+        <PopoverTrigger
+          id={id}
+          className={cn(
+            'h-9 w-full flex items-center gap-1.5 px-3 rounded-md border border-input bg-background text-sm transition-colors hover:bg-muted/50',
+            value ? 'text-foreground' : 'text-muted-foreground/50',
+          )}
+        >
+          <span className="flex-1 text-left truncate">{value || '날짜 선택'}</span>
+          <CalendarDays className="w-4 h-4 text-muted-foreground shrink-0" />
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={value ? new Date(value + 'T00:00:00') : undefined}
+            onSelect={(date) => onChange(date ? date.toLocaleDateString('sv') : '')}
+          />
+        </PopoverContent>
+      </Popover>
       {optional && value && (
         <button
           type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            onChange('');
-          }}
-          className="absolute right-7 z-20 p-0.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+          onClick={() => onChange('')}
+          className="absolute right-8 z-20 p-0.5 rounded hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
         >
           <X className="w-3.5 h-3.5" />
         </button>
@@ -126,14 +126,14 @@ const DialogForm = ({ item, onClose }: DialogFormProps) => {
           <Label htmlFor="inbound-date" className="text-xs text-muted-foreground">
             입고날짜
           </Label>
-          <DateInput id="inbound-date" value={inboundDate} onChange={setInboundDate} />
+          <DatePicker id="inbound-date" value={inboundDate} onChange={setInboundDate} />
         </div>
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="expiry-date" className="text-xs text-muted-foreground">
             유통기한 <span className="font-normal">(선택)</span>
           </Label>
-          <DateInput id="expiry-date" value={expiryDate} onChange={setExpiryDate} optional />
+          <DatePicker id="expiry-date" value={expiryDate} onChange={setExpiryDate} optional />
         </div>
       </div>
 

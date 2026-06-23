@@ -55,7 +55,7 @@ const IngredientTag = ({
       'inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all select-none',
       added
         ? 'bg-baro-blue text-white hover:bg-baro-blue/80'
-        : 'border border-gray-200 bg-white text-gray-600 hover:border-baro-blue/60 hover:bg-baro-blue/5 hover:text-baro-blue',
+        : 'border border-gray-200 bg-white text-gray-600 hover:border-baro-blue/60 hover:bg-baro-blue/5 hover:text-baro-blue dark:bg-muted dark:border-border dark:text-muted-foreground dark:hover:border-baro-blue/40 dark:hover:bg-baro-blue/10',
     )}
   >
     {added ? (
@@ -301,21 +301,21 @@ const SettingsRecipesPage = () => {
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden bg-background">
-      <header className="shrink-0 flex items-center gap-3 border-b px-6 py-4 bg-background">
+      <header className="shrink-0 flex flex-wrap items-center gap-3 border-b px-4 py-3 bg-background md:px-6 md:py-4">
         <Button variant="ghost" size="icon" onClick={() => navigate(routePaths.storeSettings)}>
           <ArrowLeft className="size-4" />
         </Button>
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold">레시피 관리</p>
           <p className="text-xs text-muted-foreground">메뉴별 식자재 사용량을 설정합니다.</p>
         </div>
-        <div className="relative ml-auto w-56">
+        <div className="relative w-full sm:w-56">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
           <Input
             placeholder="메뉴 이름 검색"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-8 pl-8 pr-3 text-sm"
+            className="h-8 pl-8 pr-3 text-sm w-full"
           />
         </div>
       </header>

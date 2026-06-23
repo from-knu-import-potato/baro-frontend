@@ -131,15 +131,15 @@ const StoreHomePage = () => {
     switch (currentCase) {
       case 'already-open':
         return (
-          <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+          <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-800/40 dark:bg-green-950/30 dark:text-green-400">
             <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-green-500 animate-pulse" />
             <span>현재 영업이 진행 중입니다.</span>
           </div>
         );
       case 'before-open-closed':
         return (
-          <div className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-            <Clock className="h-4 w-4 shrink-0 text-blue-500" />
+          <div className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-800/40 dark:bg-blue-950/30 dark:text-blue-400">
+            <Clock className="h-4 w-4 shrink-0 text-blue-500 dark:text-blue-400" />
             <span>
               오늘 영업은 <span className="font-semibold">{todayOpenTime}</span> 이후에 시작할 수
               있습니다.
@@ -160,21 +160,21 @@ const StoreHomePage = () => {
         );
       case 'today-closed':
         return (
-          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400">
             <MoonStar className="h-4 w-4 shrink-0 text-slate-400" />
             <span>오늘 영업이 마감되었습니다.</span>
           </div>
         );
       case 'holiday':
         return (
-          <div className="flex items-center gap-3 rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-600">
+          <div className="flex items-center gap-3 rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400">
             <MoonStar className="h-4 w-4 shrink-0 text-slate-400" />
             <span>오늘은 설정된 휴무일입니다.</span>
           </div>
         );
       case 'holiday-closed':
         return (
-          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400">
             <MoonStar className="h-4 w-4 shrink-0 text-slate-400" />
             <span>오늘 임시 영업이 마감되었습니다.</span>
           </div>

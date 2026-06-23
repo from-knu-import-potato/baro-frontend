@@ -92,7 +92,7 @@ const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
   const consumptionRatio = total > 0 ? latest.consumption / total : 0;
 
   return (
-    <Card size="sm" className="h-full">
+    <Card size="sm" className="md:h-full">
       <CardHeader className="border-b px-4">
         <CardTitle className="text-sm flex items-center gap-2">
           <PieChart className="w-4 h-4 text-muted-foreground" />
@@ -146,7 +146,7 @@ const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
             <span className="text-xs text-muted-foreground">순이익</span>
             <div className="flex items-center gap-1.5">
               {isDeficit && (
-                <span className="text-[10px] text-baro-red bg-red-50 border border-red-200/60 px-1.5 py-0.5 rounded-full leading-none">
+                <span className="text-[10px] text-baro-red bg-red-50 border border-red-200/60 px-1.5 py-0.5 rounded-full leading-none dark:bg-red-950/40 dark:border-red-800/40">
                   적자
                 </span>
               )}

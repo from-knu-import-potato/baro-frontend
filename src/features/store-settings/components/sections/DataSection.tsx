@@ -188,7 +188,7 @@ const DataSection = () => {
                         key={label}
                         className={
                           del
-                            ? 'rounded-md bg-red-50 px-2 py-0.5 text-xs text-baro-red border border-red-100'
+                            ? 'rounded-md bg-red-50 px-2 py-0.5 text-xs text-baro-red border border-red-100 dark:bg-red-950/40 dark:border-red-800/40'
                             : 'rounded-md bg-muted px-2 py-0.5 text-xs text-muted-foreground border border-border'
                         }
                       >

@@ -31,10 +31,10 @@ const OcrUploadStep = ({ onFileSelect }: OcrUploadStepProps) => {
   };
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-center py-10 px-6 overflow-y-auto -mt-16">
-      <div className="w-full max-w-lg flex flex-col gap-8">
+    <div className="flex-1 flex flex-col items-center justify-center py-6 md:py-10 px-6 overflow-y-auto">
+      <div className="w-full max-w-lg flex flex-col gap-6 md:gap-8 flex-1 md:flex-none">
         {/* 설명 섹션 */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 items-center text-center md:items-start md:text-left">
           <div>
             <p className="text-base font-semibold">거래명세서를 등록해주세요</p>
             <p className="text-sm text-muted-foreground mt-1">
@@ -42,8 +42,8 @@ const OcrUploadStep = ({ onFileSelect }: OcrUploadStepProps) => {
             </p>
           </div>
 
-          {/* 단계 표시 */}
-          <div className="flex items-center gap-2">
+          {/* 단계 표시 — 데스크탑: 가로 pill, 모바일: 세로 컬럼 */}
+          <div className="hidden md:flex items-center gap-2">
             {STEPS.map((step, i) => (
               <div key={step.num} className="flex items-center gap-2">
                 <div className="flex items-center gap-2 bg-muted/60 rounded-lg px-3 py-2">
@@ -60,15 +60,32 @@ const OcrUploadStep = ({ onFileSelect }: OcrUploadStepProps) => {
               </div>
             ))}
           </div>
+          <div className="flex items-start justify-center md:hidden">
+            {STEPS.map((step, i) => (
+              <div key={step.num} className="flex items-start">
+                <div className="flex flex-col items-center gap-2 text-center w-20">
+                  <span className="w-6 h-6 rounded-full bg-baro-blue text-white text-xs font-bold flex items-center justify-center shrink-0">
+                    {step.num}
+                  </span>
+                  <span className="text-[10px] font-medium text-foreground/70 leading-snug">
+                    {step.label}
+                  </span>
+                </div>
+                {i < STEPS.length - 1 && (
+                  <span className="text-muted-foreground/40 text-sm mt-1 px-1 shrink-0">→</span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* 업로드 영역 */}
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 flex-1 md:flex-none">
           <div
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
             onClick={() => fileInputRef.current?.click()}
-            className="border-2 border-dashed border-border hover:border-baro-blue/50 rounded-xl bg-muted/20 hover:bg-blue-50/30 transition-all cursor-pointer flex flex-col items-center justify-center gap-3 py-14"
+            className="flex-1 border-2 border-dashed border-border hover:border-baro-blue/50 rounded-xl bg-muted/20 hover:bg-blue-50/30 transition-all cursor-pointer flex flex-col items-center justify-center gap-3 py-10 md:flex-none md:py-14"
           >
             <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center">
               <FileImage className="w-6 h-6 text-muted-foreground" />
@@ -88,10 +105,10 @@ const OcrUploadStep = ({ onFileSelect }: OcrUploadStepProps) => {
             <div className="flex-1 h-px bg-border" />
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col gap-3 md:flex-row">
             <Button
               variant="outline"
-              className="flex-1"
+              className="w-full md:flex-1"
               onClick={() => fileInputRef.current?.click()}
             >
               <FileImage className="w-4 h-4" />
@@ -99,7 +116,7 @@ const OcrUploadStep = ({ onFileSelect }: OcrUploadStepProps) => {
             </Button>
             <Button
               variant="outline"
-              className="flex-1"
+              className="w-full md:flex-1"
               onClick={() => cameraInputRef.current?.click()}
             >
               <Camera className="w-4 h-4" />

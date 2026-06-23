@@ -99,17 +99,17 @@ const SettingsMenuBoardPage = () => {
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden bg-background">
-      <header className="shrink-0 flex items-center gap-3 border-b px-6 py-4 bg-background">
+      <header className="shrink-0 flex flex-wrap items-center gap-3 border-b px-4 py-3 bg-background md:px-6 md:py-4">
         <Button variant="ghost" size="icon" onClick={() => navigate(routePaths.storeSettings)}>
           <ArrowLeft className="size-4" />
         </Button>
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold">메뉴판 설정</p>
           <p className="text-xs text-muted-foreground">
             손님 메뉴판의 테마 색상, 레이아웃, 배너를 설정합니다.
           </p>
         </div>
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex items-center gap-2">
           {storeId && (
             <Button
               size="sm"
