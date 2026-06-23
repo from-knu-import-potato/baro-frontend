@@ -364,7 +364,8 @@ const SettingsIngredientsPage = () => {
               <div className="sm:hidden flex flex-col items-center gap-2">
                 <SafetyStockDial value={safetyPct} onChange={setSafetyPct} step={5} compact />
                 <p className="text-xs text-muted-foreground text-center">
-                  전체 재고의 <span className="font-semibold text-foreground">{safetyPct}%</span>를 안전 재고 기준으로 설정
+                  전체 재고의 <span className="font-semibold text-foreground">{safetyPct}%</span>를
+                  안전 재고 기준으로 설정
                 </p>
               </div>
               {/* 데스크탑: 전체 */}

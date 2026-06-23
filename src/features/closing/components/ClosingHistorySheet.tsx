@@ -225,7 +225,9 @@ const ClosingHistorySheet = ({ open, onClose, storeId }: ClosingHistorySheetProp
                       <div className="flex items-center gap-3">
                         <CalendarDays className="w-4 h-4 text-muted-foreground shrink-0" />
                         <div>
-                          <p className="text-sm font-medium whitespace-nowrap">{formatDate(item.date)}</p>
+                          <p className="text-sm font-medium whitespace-nowrap">
+                            {formatDate(item.date)}
+                          </p>
                           <p className="text-xs text-muted-foreground mt-0.5">
                             {daysAgo === 0 ? '오늘' : `${daysAgo}일 전`}
                           </p>

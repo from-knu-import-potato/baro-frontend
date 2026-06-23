@@ -86,47 +86,91 @@ const ClosingInventoryDeductionSection = ({
                         <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_1fr] gap-4 px-5 py-4 items-center">
                           <div>
                             <span className="text-sm font-medium">{row.ingredientName}</span>
-                            <span className="ml-1.5 text-xs text-muted-foreground">({row.unit})</span>
+                            <span className="ml-1.5 text-xs text-muted-foreground">
+                              ({row.unit})
+                            </span>
                           </div>
-                          <span className="text-sm text-muted-foreground text-right">{row.currentStock.toLocaleString()}{row.unit}</span>
-                          <span className="text-sm text-muted-foreground text-right">{row.theoreticalUsage.toLocaleString()}{row.unit}</span>
+                          <span className="text-sm text-muted-foreground text-right">
+                            {row.currentStock.toLocaleString()}
+                            {row.unit}
+                          </span>
+                          <span className="text-sm text-muted-foreground text-right">
+                            {row.theoreticalUsage.toLocaleString()}
+                            {row.unit}
+                          </span>
                           <div className="flex items-center gap-1 justify-center">
-                            <Input type="number" min={0} value={row.actualUsage} onChange={(e) => onChange(row.ingredientId, Math.max(0, Number(e.target.value)))} className="h-8 w-24 text-sm text-center" />
+                            <Input
+                              type="number"
+                              min={0}
+                              value={row.actualUsage}
+                              onChange={(e) =>
+                                onChange(row.ingredientId, Math.max(0, Number(e.target.value)))
+                              }
+                              className="h-8 w-24 text-sm text-center"
+                            />
                             <span className="text-xs text-muted-foreground">{row.unit}</span>
                           </div>
-                          <span className={`text-sm font-semibold text-right ${isNegative ? 'text-baro-red' : 'text-foreground'}`}>
-                            {remaining.toLocaleString()}{row.unit}
-                            {isNegative && <span className="ml-1 text-xs font-normal text-baro-red">(부족)</span>}
+                          <span
+                            className={`text-sm font-semibold text-right ${isNegative ? 'text-baro-red' : 'text-foreground'}`}
+                          >
+                            {remaining.toLocaleString()}
+                            {row.unit}
+                            {isNegative && (
+                              <span className="ml-1 text-xs font-normal text-baro-red">(부족)</span>
+                            )}
                           </span>
                         </div>
                         {/* 모바일 카드 */}
                         <div className="md:hidden px-4 py-3 space-y-1.5">
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-1 min-w-0">
-                              <span className="text-sm font-medium truncate">{row.ingredientName}</span>
-                              <span className="text-xs text-muted-foreground shrink-0">({row.unit})</span>
+                              <span className="text-sm font-medium truncate">
+                                {row.ingredientName}
+                              </span>
+                              <span className="text-xs text-muted-foreground shrink-0">
+                                ({row.unit})
+                              </span>
                             </div>
                             <div className="text-right shrink-0">
                               <p className="text-[10px] text-muted-foreground">차감 후 재고</p>
-                              <p className={`text-sm font-semibold ${isNegative ? 'text-baro-red' : 'text-foreground'}`}>
-                                {remaining.toLocaleString()}{row.unit}
-                                {isNegative && <span className="ml-1 text-xs font-normal">(부족)</span>}
+                              <p
+                                className={`text-sm font-semibold ${isNegative ? 'text-baro-red' : 'text-foreground'}`}
+                              >
+                                {remaining.toLocaleString()}
+                                {row.unit}
+                                {isNegative && (
+                                  <span className="ml-1 text-xs font-normal">(부족)</span>
+                                )}
                               </p>
                             </div>
                           </div>
                           <p className="text-xs text-muted-foreground">
-                            현재 {row.currentStock.toLocaleString()}{row.unit}
+                            현재 {row.currentStock.toLocaleString()}
+                            {row.unit}
                           </p>
                           <div className="grid grid-cols-2 gap-2 pt-0.5">
                             <div>
                               <p className="text-[10px] text-muted-foreground mb-1">이론 사용량</p>
-                              <p className="text-sm text-muted-foreground">{row.theoreticalUsage.toLocaleString()}{row.unit}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {row.theoreticalUsage.toLocaleString()}
+                                {row.unit}
+                              </p>
                             </div>
                             <div>
                               <p className="text-[10px] text-muted-foreground mb-1">실제 사용량</p>
                               <div className="flex items-center gap-1">
-                                <Input type="number" min={0} value={row.actualUsage} onChange={(e) => onChange(row.ingredientId, Math.max(0, Number(e.target.value)))} className="h-8 w-full text-sm text-center" />
-                                <span className="text-xs text-muted-foreground shrink-0">{row.unit}</span>
+                                <Input
+                                  type="number"
+                                  min={0}
+                                  value={row.actualUsage}
+                                  onChange={(e) =>
+                                    onChange(row.ingredientId, Math.max(0, Number(e.target.value)))
+                                  }
+                                  className="h-8 w-full text-sm text-center"
+                                />
+                                <span className="text-xs text-muted-foreground shrink-0">
+                                  {row.unit}
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -158,20 +202,53 @@ const ClosingInventoryDeductionSection = ({
                           <div className="flex items-center gap-2">
                             <span className="text-sm font-medium">{row.ingredientName}</span>
                             <span className="text-xs text-muted-foreground">({row.unit})</span>
-                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-baro-red/30 text-baro-red shrink-0">추가</Badge>
+                            <Badge
+                              variant="outline"
+                              className="text-[10px] px-1.5 py-0 h-4 border-baro-red/30 text-baro-red shrink-0"
+                            >
+                              추가
+                            </Badge>
                           </div>
-                          <span className="text-sm text-muted-foreground text-right">{row.currentStock.toLocaleString()}{row.unit}</span>
+                          <span className="text-sm text-muted-foreground text-right">
+                            {row.currentStock.toLocaleString()}
+                            {row.unit}
+                          </span>
                           <span className="text-sm text-muted-foreground text-right">—</span>
                           <div className="flex items-center gap-1 justify-center">
-                            <Input type="number" min={0.001} step="any" value={row.amount} onChange={(e) => onExtraAmountChange(row.ingredientId, Math.max(0, Number(e.target.value)))} className="h-8 w-24 text-sm text-center" />
+                            <Input
+                              type="number"
+                              min={0.001}
+                              step="any"
+                              value={row.amount}
+                              onChange={(e) =>
+                                onExtraAmountChange(
+                                  row.ingredientId,
+                                  Math.max(0, Number(e.target.value)),
+                                )
+                              }
+                              className="h-8 w-24 text-sm text-center"
+                            />
                             <span className="text-xs text-muted-foreground">{row.unit}</span>
                           </div>
                           <div className="flex items-center gap-2 justify-end">
-                            <span className={`text-sm font-semibold ${isNegative ? 'text-baro-red' : 'text-foreground'}`}>
-                              {remaining.toLocaleString()}{row.unit}
-                              {isNegative && <span className="ml-1 text-xs font-normal text-baro-red">(부족)</span>}
+                            <span
+                              className={`text-sm font-semibold ${isNegative ? 'text-baro-red' : 'text-foreground'}`}
+                            >
+                              {remaining.toLocaleString()}
+                              {row.unit}
+                              {isNegative && (
+                                <span className="ml-1 text-xs font-normal text-baro-red">
+                                  (부족)
+                                </span>
+                              )}
                             </span>
-                            <Button type="button" size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-baro-red hover:bg-red-50 shrink-0" onClick={() => onExtraRemove(row.ingredientId)}>
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              className="h-7 w-7 text-muted-foreground hover:text-baro-red hover:bg-red-50 shrink-0"
+                              onClick={() => onExtraRemove(row.ingredientId)}
+                            >
                               <X className="w-3 h-3" />
                             </Button>
                           </div>
@@ -180,19 +257,39 @@ const ClosingInventoryDeductionSection = ({
                         <div className="md:hidden px-4 py-3 space-y-1.5">
                           <div className="flex items-center justify-between gap-2">
                             <div className="flex items-center gap-1 min-w-0">
-                              <span className="text-sm font-medium truncate">{row.ingredientName}</span>
-                              <span className="text-xs text-muted-foreground shrink-0">({row.unit})</span>
-                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-baro-red/30 text-baro-red shrink-0">추가</Badge>
+                              <span className="text-sm font-medium truncate">
+                                {row.ingredientName}
+                              </span>
+                              <span className="text-xs text-muted-foreground shrink-0">
+                                ({row.unit})
+                              </span>
+                              <Badge
+                                variant="outline"
+                                className="text-[10px] px-1.5 py-0 h-4 border-baro-red/30 text-baro-red shrink-0"
+                              >
+                                추가
+                              </Badge>
                             </div>
                             <div className="flex items-center gap-1 shrink-0">
                               <div className="text-right">
                                 <p className="text-[10px] text-muted-foreground">차감 후 재고</p>
-                                <p className={`text-sm font-semibold ${isNegative ? 'text-baro-red' : 'text-foreground'}`}>
-                                  {remaining.toLocaleString()}{row.unit}
-                                  {isNegative && <span className="ml-1 text-xs font-normal">(부족)</span>}
+                                <p
+                                  className={`text-sm font-semibold ${isNegative ? 'text-baro-red' : 'text-foreground'}`}
+                                >
+                                  {remaining.toLocaleString()}
+                                  {row.unit}
+                                  {isNegative && (
+                                    <span className="ml-1 text-xs font-normal">(부족)</span>
+                                  )}
                                 </p>
                               </div>
-                              <Button type="button" size="icon" variant="ghost" className="h-7 w-7 text-muted-foreground hover:text-baro-red hover:bg-red-50" onClick={() => onExtraRemove(row.ingredientId)}>
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                className="h-7 w-7 text-muted-foreground hover:text-baro-red hover:bg-red-50"
+                                onClick={() => onExtraRemove(row.ingredientId)}
+                              >
                                 <X className="w-3 h-3" />
                               </Button>
                             </div>
@@ -200,13 +297,30 @@ const ClosingInventoryDeductionSection = ({
                           <div className="grid grid-cols-2 gap-2 pt-0.5">
                             <div>
                               <p className="text-[10px] text-muted-foreground mb-1">현재 재고</p>
-                              <p className="text-sm text-muted-foreground">{row.currentStock.toLocaleString()}{row.unit}</p>
+                              <p className="text-sm text-muted-foreground">
+                                {row.currentStock.toLocaleString()}
+                                {row.unit}
+                              </p>
                             </div>
                             <div>
                               <p className="text-[10px] text-muted-foreground mb-1">사용량</p>
                               <div className="flex items-center gap-1">
-                                <Input type="number" min={0.001} step="any" value={row.amount} onChange={(e) => onExtraAmountChange(row.ingredientId, Math.max(0, Number(e.target.value)))} className="h-8 w-full text-sm text-center" />
-                                <span className="text-xs text-muted-foreground shrink-0">{row.unit}</span>
+                                <Input
+                                  type="number"
+                                  min={0.001}
+                                  step="any"
+                                  value={row.amount}
+                                  onChange={(e) =>
+                                    onExtraAmountChange(
+                                      row.ingredientId,
+                                      Math.max(0, Number(e.target.value)),
+                                    )
+                                  }
+                                  className="h-8 w-full text-sm text-center"
+                                />
+                                <span className="text-xs text-muted-foreground shrink-0">
+                                  {row.unit}
+                                </span>
                               </div>
                             </div>
                           </div>

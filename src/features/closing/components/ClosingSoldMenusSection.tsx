@@ -38,9 +38,13 @@ const ClosingSoldMenusSection = ({ menus }: ClosingSoldMenusSectionProps) => {
                   {/* 데스크탑 행 */}
                   <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr] gap-4 px-5 py-3.5 items-center">
                     <span className="text-sm font-medium">{menu.menuName}</span>
-                    <span className="text-sm text-muted-foreground text-right">{formatCurrency(menu.unitPrice)}</span>
+                    <span className="text-sm text-muted-foreground text-right">
+                      {formatCurrency(menu.unitPrice)}
+                    </span>
                     <span className="text-sm font-medium text-right">{menu.quantity}개</span>
-                    <span className="text-sm font-semibold text-right">{formatCurrency(menu.subtotal)}</span>
+                    <span className="text-sm font-semibold text-right">
+                      {formatCurrency(menu.subtotal)}
+                    </span>
                   </div>
                   {/* 모바일 카드 */}
                   <div className="md:hidden px-4 py-3 flex items-start justify-between gap-3">
@@ -50,7 +54,9 @@ const ClosingSoldMenusSection = ({ menus }: ClosingSoldMenusSectionProps) => {
                         {formatCurrency(menu.unitPrice)} · {menu.quantity}개
                       </p>
                     </div>
-                    <p className="text-sm font-semibold shrink-0">{formatCurrency(menu.subtotal)}</p>
+                    <p className="text-sm font-semibold shrink-0">
+                      {formatCurrency(menu.subtotal)}
+                    </p>
                   </div>
                 </div>
               ))}

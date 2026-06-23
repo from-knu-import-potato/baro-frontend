@@ -129,10 +129,20 @@ const StepOperatingHours = ({ data, onChange }: StepOperatingHoursProps) => {
             : 'border border-dashed border-border hover:border-border/80 hover:bg-muted/30',
         )}
       >
-        <span className={cn('text-sm font-bold', allOpen ? 'text-baro-blue' : 'text-muted-foreground/30')}>
+        <span
+          className={cn(
+            'text-sm font-bold',
+            allOpen ? 'text-baro-blue' : 'text-muted-foreground/30',
+          )}
+        >
           전체
         </span>
-        <span className={cn('text-xs font-medium', allOpen ? 'text-muted-foreground' : 'text-muted-foreground/30')}>
+        <span
+          className={cn(
+            'text-xs font-medium',
+            allOpen ? 'text-muted-foreground' : 'text-muted-foreground/30',
+          )}
+        >
           {allOpen ? '전체 닫기' : '모두 열기'}
         </span>
       </button>

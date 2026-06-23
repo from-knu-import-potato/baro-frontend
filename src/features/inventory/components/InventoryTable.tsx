@@ -74,7 +74,8 @@ const STATUS_CONFIG: Record<
 > = {
   critical: {
     label: '재고 부족',
-    badgeClass: 'bg-red-50 text-red-400 border border-red-200/60 dark:bg-red-950/40 dark:border-red-800/40',
+    badgeClass:
+      'bg-red-50 text-red-400 border border-red-200/60 dark:bg-red-950/40 dark:border-red-800/40',
     rowClass: 'border-l-4 border-l-red-300',
     icon: <AlertTriangle className="w-3 h-3" />,
   },
@@ -86,13 +87,15 @@ const STATUS_CONFIG: Record<
   },
   normal: {
     label: '정상',
-    badgeClass: 'bg-slate-100 text-slate-400 border border-slate-200 dark:bg-slate-800 dark:border-slate-700',
+    badgeClass:
+      'bg-slate-100 text-slate-400 border border-slate-200 dark:bg-slate-800 dark:border-slate-700',
     rowClass: 'border-l-4 border-l-transparent',
     icon: <CheckCircle2 className="w-3 h-3" />,
   },
   depleted: {
     label: '소진',
-    badgeClass: 'bg-zinc-100 text-zinc-400 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700',
+    badgeClass:
+      'bg-zinc-100 text-zinc-400 border border-zinc-200 dark:bg-zinc-800 dark:border-zinc-700',
     rowClass: 'border-l-4 border-l-zinc-300',
     icon: <MinusCircle className="w-3 h-3" />,
   },
@@ -116,8 +119,13 @@ const getDday = (expiryDate?: string) => {
     (new Date(expiryDate).getTime() - new Date().setHours(0, 0, 0, 0)) / (1000 * 60 * 60 * 24),
   );
   if (diff < 0) return { text: '만료됨', chipClass: 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800' };
-  if (diff === 0) return { text: 'D-Day', chipClass: 'bg-red-50 text-red-400 font-bold dark:bg-red-950/40' };
-  if (diff <= 3) return { text: `D-${diff}`, chipClass: 'bg-red-50 text-red-400 font-semibold dark:bg-red-950/40' };
+  if (diff === 0)
+    return { text: 'D-Day', chipClass: 'bg-red-50 text-red-400 font-bold dark:bg-red-950/40' };
+  if (diff <= 3)
+    return {
+      text: `D-${diff}`,
+      chipClass: 'bg-red-50 text-red-400 font-semibold dark:bg-red-950/40',
+    };
   if (diff <= 7) return { text: `D-${diff}`, chipClass: 'bg-baro-yellow/10 text-baro-yellow-text' };
   return { text: `D-${diff}`, chipClass: 'bg-slate-100 text-slate-400 dark:bg-slate-800' };
 };
@@ -228,10 +236,7 @@ const InventoryRow = ({ item, onToggleFavorite, onEdit }: InventoryRowProps) => 
 
       {/* 모바일 카드 */}
       <div
-        className={cn(
-          'md:hidden px-4 py-3 hover:bg-muted/20 transition-colors',
-          config.rowClass,
-        )}
+        className={cn('md:hidden px-4 py-3 hover:bg-muted/20 transition-colors', config.rowClass)}
       >
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
@@ -286,7 +291,9 @@ const InventoryRow = ({ item, onToggleFavorite, onEdit }: InventoryRowProps) => 
               <p className="text-[10px] text-muted-foreground mb-0.5">유통기한</p>
               <p className="text-sm flex items-center gap-1.5">
                 <span>{item.expiryDate}</span>
-                <span className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium shrink-0 ${dday.chipClass}`}>
+                <span
+                  className={`px-1.5 py-0.5 rounded-full text-[10px] font-medium shrink-0 ${dday.chipClass}`}
+                >
                   {dday.text}
                 </span>
               </p>
@@ -472,7 +479,8 @@ const InventoryTable = () => {
                     <ArrowUpDown className="w-3.5 h-3.5 shrink-0" />
                     {sortKey !== 'default' && (
                       <span className="whitespace-nowrap">
-                        {sortKey === 'expiryDate' ? '유통기한순' : '입고날짜순'} {sortDir === 'asc' ? '↑' : '↓'}
+                        {sortKey === 'expiryDate' ? '유통기한순' : '입고날짜순'}{' '}
+                        {sortDir === 'asc' ? '↑' : '↓'}
                       </span>
                     )}
                   </DropdownMenuTrigger>
@@ -490,7 +498,9 @@ const InventoryTable = () => {
                         className={cn(sortKey === key && 'text-baro-blue font-medium')}
                       >
                         {label}
-                        {sortKey === key && <span className="ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>}
+                        {sortKey === key && (
+                          <span className="ml-1">{sortDir === 'asc' ? '↑' : '↓'}</span>
+                        )}
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>

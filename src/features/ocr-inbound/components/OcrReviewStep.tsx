@@ -384,7 +384,10 @@ const OcrReviewStep = ({
               const rowBg = cn(
                 item.isWarning && 'bg-red-50/40 dark:bg-red-950/20',
                 !item.isWarning && !item.isMatched && 'bg-green-50/20 dark:bg-green-950/10',
-                !item.isWarning && item.purchaseUnit && !item.conversionFactor && 'bg-baro-yellow/10',
+                !item.isWarning &&
+                  item.purchaseUnit &&
+                  !item.conversionFactor &&
+                  'bg-baro-yellow/10',
               );
 
               const warningIcon = item.isWarning ? (
@@ -446,7 +449,10 @@ const OcrReviewStep = ({
                     onItemsChange(
                       items.map((i) =>
                         i.id === item.id
-                          ? { ...i, unitPrice: e.target.value === '' ? null : Number(e.target.value) }
+                          ? {
+                              ...i,
+                              unitPrice: e.target.value === '' ? null : Number(e.target.value),
+                            }
                           : i,
                       ),
                     );
@@ -474,7 +480,11 @@ const OcrReviewStep = ({
                       mode="single"
                       selected={item.expiryDate ? new Date(item.expiryDate) : undefined}
                       onSelect={(date) =>
-                        handleChange(item.id, 'expiryDate', date ? date.toLocaleDateString('sv') : null)
+                        handleChange(
+                          item.id,
+                          'expiryDate',
+                          date ? date.toLocaleDateString('sv') : null,
+                        )
                       }
                     />
                   </PopoverContent>
@@ -489,7 +499,14 @@ const OcrReviewStep = ({
               );
               const registerBtn = (
                 <button
-                  onClick={() => setRegisterModal({ open: true, itemId: item.id, name: item.name, unit: item.unit })}
+                  onClick={() =>
+                    setRegisterModal({
+                      open: true,
+                      itemId: item.id,
+                      name: item.name,
+                      unit: item.unit,
+                    })
+                  }
                   className="inline-flex items-center gap-0.5 text-xs text-baro-green bg-green-50 hover:bg-green-100 px-1.5 py-0.5 rounded-full border border-green-200/60 whitespace-nowrap transition-colors cursor-pointer dark:bg-green-950/40 dark:border-green-800/40 dark:hover:bg-green-950/60"
                 >
                   <Plus className="w-3 h-3" />
@@ -505,11 +522,21 @@ const OcrReviewStep = ({
                   연결
                 </button>
               );
-              const statusField = item.isMatched ? matchedBadge : (
-                <div className="flex flex-col gap-1">{registerBtn}{linkBtn}</div>
+              const statusField = item.isMatched ? (
+                matchedBadge
+              ) : (
+                <div className="flex flex-col gap-1">
+                  {registerBtn}
+                  {linkBtn}
+                </div>
               );
-              const mobileStatusField = item.isMatched ? matchedBadge : (
-                <div className="flex flex-col gap-1">{registerBtn}{linkBtn}</div>
+              const mobileStatusField = item.isMatched ? (
+                matchedBadge
+              ) : (
+                <div className="flex flex-col gap-1">
+                  {registerBtn}
+                  {linkBtn}
+                </div>
               );
 
               const deleteBtn = (
@@ -525,15 +552,32 @@ const OcrReviewStep = ({
               return (
                 <div key={item.id} className="border-b">
                   {/* 데스크탑 행 */}
-                  <div className={cn('hidden md:grid grid-cols-[24px_2fr_1.2fr_80px_1fr_1.4fr_1fr_1.2fr_36px] gap-3 px-4 py-2.5 items-center hover:bg-muted/10 transition-colors', rowBg)}>
+                  <div
+                    className={cn(
+                      'hidden md:grid grid-cols-[24px_2fr_1.2fr_80px_1fr_1.4fr_1fr_1.2fr_36px] gap-3 px-4 py-2.5 items-center hover:bg-muted/10 transition-colors',
+                      rowBg,
+                    )}
+                  >
                     <div className="flex items-center justify-center">{warningIcon}</div>
-                    <Input value={item.name} onChange={(e) => handleChange(item.id, 'name', e.target.value)} className="h-8 text-sm" placeholder="식자재명" />
+                    <Input
+                      value={item.name}
+                      onChange={(e) => handleChange(item.id, 'name', e.target.value)}
+                      className="h-8 text-sm"
+                      placeholder="식자재명"
+                    />
                     {quantityField}
                     {unitField}
                     {priceField}
                     {expiryField}
-                    <div className="flex items-center gap-1 justify-center flex-wrap">{statusField}</div>
-                    <span className="text-xs text-muted-foreground truncate" title={item.memo ?? ''}>{item.memo ?? '—'}</span>
+                    <div className="flex items-center gap-1 justify-center flex-wrap">
+                      {statusField}
+                    </div>
+                    <span
+                      className="text-xs text-muted-foreground truncate"
+                      title={item.memo ?? ''}
+                    >
+                      {item.memo ?? '—'}
+                    </span>
                     {deleteBtn}
                   </div>
 
@@ -542,7 +586,12 @@ const OcrReviewStep = ({
                     {/* 이름 + 상태 + 삭제 */}
                     <div className="flex items-center gap-2">
                       <div className="w-5 shrink-0 flex justify-center">{warningIcon}</div>
-                      <Input value={item.name} onChange={(e) => handleChange(item.id, 'name', e.target.value)} className="flex-1 h-8 text-sm min-w-0" placeholder="식자재명" />
+                      <Input
+                        value={item.name}
+                        onChange={(e) => handleChange(item.id, 'name', e.target.value)}
+                        className="flex-1 h-8 text-sm min-w-0"
+                        placeholder="식자재명"
+                      />
                       <div className="shrink-0">{mobileStatusField}</div>
                       {deleteBtn}
                     </div>
@@ -593,22 +642,29 @@ const OcrReviewStep = ({
                         placeholder="변환 계수"
                       />
                       <span className="text-muted-foreground">{item.unit}</span>
-                      {item.conversionFactor !== undefined && item.purchaseQuantity !== undefined && (
-                        <>
-                          <span className="text-baro-yellow-text font-medium">
-                            → 합계 {(item.purchaseQuantity * item.conversionFactor).toLocaleString()}{' '}
-                            {item.unit}
-                          </span>
-                          {item.purchaseUnitPrice !== undefined && (
-                            <span className="text-muted-foreground">
-                              (단가 {item.purchaseUnitPrice.toLocaleString()}원/{item.purchaseUnit}
-                              {' → '}
-                              {(Math.round((item.purchaseUnitPrice / item.conversionFactor) * 10) / 10).toLocaleString()}
-                              원/{item.unit})
+                      {item.conversionFactor !== undefined &&
+                        item.purchaseQuantity !== undefined && (
+                          <>
+                            <span className="text-baro-yellow-text font-medium">
+                              → 합계{' '}
+                              {(item.purchaseQuantity * item.conversionFactor).toLocaleString()}{' '}
+                              {item.unit}
                             </span>
-                          )}
-                        </>
-                      )}
+                            {item.purchaseUnitPrice !== undefined && (
+                              <span className="text-muted-foreground">
+                                (단가 {item.purchaseUnitPrice.toLocaleString()}원/
+                                {item.purchaseUnit}
+                                {' → '}
+                                {(
+                                  Math.round(
+                                    (item.purchaseUnitPrice / item.conversionFactor) * 10,
+                                  ) / 10
+                                ).toLocaleString()}
+                                원/{item.unit})
+                              </span>
+                            )}
+                          </>
+                        )}
                     </div>
                   )}
                 </div>

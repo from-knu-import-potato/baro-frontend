@@ -17,7 +17,6 @@ const DayClosedPage = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 px-6 py-12">
       <div className="w-full max-w-sm flex flex-col items-center gap-8">
-
         {/* 아이콘 */}
         <div className="relative">
           <div className="w-24 h-24 rounded-full bg-slate-800 ring-1 ring-white/10 flex items-center justify-center">
