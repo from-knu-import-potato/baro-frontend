@@ -87,15 +87,9 @@ const ClosingExtraDeductionDialog = ({
               식자재 <span className="text-baro-red">*</span>
             </Label>
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  className="w-full justify-between h-9 text-sm font-normal"
-                >
-                  {selected ? selected.name : '식자재 선택'}
-                  <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
-                </Button>
+              <PopoverTrigger className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-1 text-sm font-normal shadow-xs hover:bg-accent hover:text-accent-foreground focus-visible:outline-none">
+                {selected ? selected.name : <span className="text-muted-foreground">식자재 선택</span>}
+                <ChevronsUpDown className="ml-2 h-3.5 w-3.5 shrink-0 text-muted-foreground" />
               </PopoverTrigger>
               <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
                 <div className="flex items-center border-b px-3 py-2 gap-2">
