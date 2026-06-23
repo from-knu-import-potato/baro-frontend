@@ -75,7 +75,7 @@ const StepOperatingHours = ({ data, onChange }: StepOperatingHoursProps) => {
             : isSat
               ? 'text-blue-500'
               : 'text-baro-blue'
-          : 'text-gray-300';
+          : 'text-muted-foreground/30';
 
         return (
           <div
@@ -83,8 +83,8 @@ const StepOperatingHours = ({ data, onChange }: StepOperatingHoursProps) => {
             className={cn(
               'flex flex-col gap-1.5 rounded-xl p-2.5 transition-all duration-150',
               hour.isOpen
-                ? 'border border-transparent bg-white shadow-[0_2px_8px_-1px_rgba(0,0,0,0.08)]'
-                : 'border border-gray-100 bg-gray-50',
+                ? 'border border-border bg-card shadow-[0_2px_8px_-1px_rgba(0,0,0,0.08)]'
+                : 'border border-border/50 bg-muted/40',
             )}
           >
             <div className="flex items-center justify-between">
@@ -111,7 +111,7 @@ const StepOperatingHours = ({ data, onChange }: StepOperatingHoursProps) => {
                   />
                 </>
               ) : (
-                <span className="text-xs font-medium text-gray-300">휴무</span>
+                <span className="text-xs font-medium text-muted-foreground/30">휴무</span>
               )}
             </div>
           </div>
@@ -125,14 +125,14 @@ const StepOperatingHours = ({ data, onChange }: StepOperatingHoursProps) => {
         className={cn(
           'flex flex-col justify-between gap-1.5 rounded-xl p-2.5 text-left transition-all duration-150',
           allOpen
-            ? 'bg-white shadow-[0_2px_8px_-1px_rgba(0,0,0,0.08)]'
-            : 'border border-dashed border-gray-200 hover:border-gray-300 hover:bg-gray-50/60',
+            ? 'bg-card shadow-[0_2px_8px_-1px_rgba(0,0,0,0.08)]'
+            : 'border border-dashed border-border hover:border-border/80 hover:bg-muted/30',
         )}
       >
-        <span className={cn('text-sm font-bold', allOpen ? 'text-baro-blue' : 'text-gray-300')}>
+        <span className={cn('text-sm font-bold', allOpen ? 'text-baro-blue' : 'text-muted-foreground/30')}>
           전체
         </span>
-        <span className={cn('text-xs font-medium', allOpen ? 'text-gray-400' : 'text-gray-300')}>
+        <span className={cn('text-xs font-medium', allOpen ? 'text-muted-foreground' : 'text-muted-foreground/30')}>
           {allOpen ? '전체 닫기' : '모두 열기'}
         </span>
       </button>

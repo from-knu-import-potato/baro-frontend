@@ -201,11 +201,11 @@ const SettingsTablePage = () => {
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden bg-background">
-      <header className="shrink-0 flex items-center gap-3 border-b px-6 py-4 bg-background">
+      <header className="shrink-0 flex flex-wrap items-center gap-3 border-b px-4 py-3 bg-background md:px-6 md:py-4">
         <Button variant="ghost" size="icon" onClick={() => navigate(routePaths.storeSettings)}>
           <ArrowLeft className="size-4" />
         </Button>
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold">테이블 관리</p>
           <p className="text-xs text-muted-foreground">
             테이블 수를 설정하고 손님 주문용 QR 코드를 생성합니다.
@@ -233,7 +233,7 @@ const SettingsTablePage = () => {
         <div className="space-y-5">
           {/* 테이블 수 설정 */}
           <div className="overflow-hidden rounded-xl border bg-card">
-            <div className="flex items-center justify-between px-4 py-3.5">
+            <div className="flex flex-col gap-3 px-4 py-3.5 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-sm font-medium">테이블 수</p>
                 <p className="text-xs text-muted-foreground mt-0.5">
@@ -251,7 +251,7 @@ const SettingsTablePage = () => {
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-                    className="h-8 w-20 text-center text-sm"
+                    className="h-8 flex-1 md:flex-none md:w-20 text-center text-sm"
                     autoFocus
                   />
                   <Button

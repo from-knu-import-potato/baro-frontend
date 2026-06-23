@@ -100,7 +100,7 @@ const InviteCodeModal = ({ open, onOpenChange }: InviteCodeModalProps) => {
           <Button
             variant="outline"
             onClick={() => handleOpenChange(false)}
-            className="flex-1 h-9"
+            className="w-full sm:flex-1 h-9"
             disabled={isPending}
           >
             취소
@@ -108,7 +108,7 @@ const InviteCodeModal = ({ open, onOpenChange }: InviteCodeModalProps) => {
           <Button
             onClick={handleConfirm}
             disabled={code.trim().length === 0 || isPending}
-            className="flex-1 bg-baro-blue text-white hover:bg-baro-blue/90 h-9"
+            className="w-full sm:flex-1 bg-baro-blue text-white hover:bg-baro-blue/90 h-9"
           >
             {isPending ? '참여 중...' : '입장하기'}
           </Button>
