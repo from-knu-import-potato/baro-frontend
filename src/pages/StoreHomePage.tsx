@@ -20,6 +20,7 @@ import { routePaths } from '@/app/routes/routePaths';
 import useAuthStore from '@/features/auth/store/authStore';
 import { openBusiness } from '@/features/closing/api/closing.api';
 import ClosingCancelModal from '@/features/closing/components/ClosingCancelModal';
+import ClosingHistorySheet from '@/features/closing/components/ClosingHistorySheet';
 import { useClosingHistory } from '@/features/closing/hooks/useClosingHistory';
 import useClosingStore from '@/features/closing/store/closingStore';
 import { useDashboardStats } from '@/features/dashboard/hooks/useDashboardStats';
@@ -99,6 +100,7 @@ const StoreHomePage = () => {
 
   const [isStarting, setIsStarting] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showHistorySheet, setShowHistorySheet] = useState(false);
   const [showHolidayModal, setShowHolidayModal] = useState(false);
 
   const getCase = (): BusinessCase => {
@@ -425,7 +427,7 @@ const StoreHomePage = () => {
               <div className="grid grid-cols-2 gap-3 md:flex-1 md:grid-cols-3 md:gap-4 md:min-h-0">
                 <button
                   onClick={() => navigate('/inventory')}
-                  className="flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-green/40 hover:bg-baro-green/5 md:h-full md:p-5"
+                  className="cursor-pointer flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-green/40 hover:bg-baro-green/5 md:h-full md:p-5"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-baro-green/10">
                     <Archive className="h-5 w-5 text-baro-green" />
@@ -438,7 +440,7 @@ const StoreHomePage = () => {
 
                 <button
                   onClick={() => navigate('/order-guide')}
-                  className="flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-yellow/50 hover:bg-baro-yellow/10 md:h-full md:p-5"
+                  className="cursor-pointer flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-yellow/50 hover:bg-baro-yellow/10 md:h-full md:p-5"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-baro-yellow/20">
                     <ClipboardList className="h-5 w-5 text-baro-yellow-dark" />
@@ -450,8 +452,8 @@ const StoreHomePage = () => {
                 </button>
 
                 <button
-                  onClick={() => toast.info('이전 마감 현황 기능은 준비 중이에요.')}
-                  className="col-span-2 flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-blue/40 hover:bg-baro-blue/5 md:col-span-1 md:h-full md:p-5"
+                  onClick={() => setShowHistorySheet(true)}
+                  className="cursor-pointer col-span-2 flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-blue/40 hover:bg-baro-blue/5 md:col-span-1 md:h-full md:p-5"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-baro-blue/10">
                     <History className="h-5 w-5 text-baro-blue" />
@@ -467,7 +469,7 @@ const StoreHomePage = () => {
               <div className="grid grid-cols-2 gap-3 md:flex-1 md:gap-4 md:min-h-0">
                 <button
                   onClick={() => setShowCancelModal(true)}
-                  className="flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-red/40 hover:bg-red-50 dark:hover:bg-red-950/20 md:h-full md:p-5"
+                  className="cursor-pointer flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-red/40 hover:bg-red-50 dark:hover:bg-red-950/20 md:h-full md:p-5"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-baro-red/10">
                     <Trash2 className="h-5 w-5 text-baro-red" />
@@ -482,7 +484,7 @@ const StoreHomePage = () => {
 
                 <button
                   onClick={() => navigate('/store-settings')}
-                  className="flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:bg-muted/50 md:h-full md:p-5"
+                  className="cursor-pointer flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:bg-muted/50 md:h-full md:p-5"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted">
                     <Settings className="h-5 w-5 text-muted-foreground" />
@@ -497,6 +499,13 @@ const StoreHomePage = () => {
           )}
         </main>
       </div>
+
+      {/* 이전 마감 현황 시트 */}
+      <ClosingHistorySheet
+        open={showHistorySheet}
+        onClose={() => setShowHistorySheet(false)}
+        storeId={storeId}
+      />
 
       {/* 마감 취소 모달 */}
       {storeId && (
