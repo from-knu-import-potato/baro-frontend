@@ -28,7 +28,13 @@ const AuthCallbackPage = () => {
     }
 
     setTokens(accessToken, refreshToken);
-    navigate(routePaths.myStores, { replace: true });
+    const redirectPath = sessionStorage.getItem('baro-redirect-after-login');
+    if (redirectPath) {
+      sessionStorage.removeItem('baro-redirect-after-login');
+      navigate(redirectPath, { replace: true });
+    } else {
+      navigate(routePaths.myStores, { replace: true });
+    }
   }, [navigate, setTokens]);
 
   return (

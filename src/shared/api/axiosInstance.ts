@@ -24,6 +24,12 @@ axiosInstance.interceptors.response.use(
     const isRefreshRequest = requestUrl.includes('/auth/refresh');
     const isAuthRequest = AUTH_REQUEST_URLS.some((url) => requestUrl.includes(url));
     if (error.response?.status === 401 && !isRefreshRequest && !isAuthRequest) {
+      const currentPath = window.location.pathname + window.location.search;
+      const AUTH_PAGE_PREFIXES = ['/login', '/auth/', '/register'];
+      const isAuthPage = AUTH_PAGE_PREFIXES.some((p) => currentPath.startsWith(p));
+      if (!isAuthPage && currentPath !== '/') {
+        sessionStorage.setItem('baro-redirect-after-login', currentPath);
+      }
       useAuthStore.getState().clearAuth();
       window.location.href = '/login';
     }
