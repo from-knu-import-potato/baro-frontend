@@ -2,6 +2,7 @@ import type {
   BusinessOpenRequest,
   BusinessOpenResponse,
   BusinessOpenStatus,
+  ClosingDetail,
   ClosingHistory,
   ClosingHistoryItem,
   ClosingPreview,
@@ -26,6 +27,11 @@ export const fetchClosingHistory = (storeId: string): Promise<ClosingHistory> =>
   axiosInstance
     .get<{ success: boolean; data: ClosingHistoryItem[] }>(`/stores/${storeId}/closing`)
     .then((res) => ({ closings: res.data.data }));
+
+export const fetchClosingDetail = (storeId: string, closingId: string): Promise<ClosingDetail> =>
+  axiosInstance
+    .get<{ success: boolean; data: ClosingDetail }>(`/stores/${storeId}/closing/${closingId}`)
+    .then((res) => res.data.data);
 
 export const cancelClosing = (storeId: string, id: string): Promise<void> =>
   axiosInstance.delete(`/stores/${storeId}/closing/${id}`).then(() => undefined);
