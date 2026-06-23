@@ -7,6 +7,9 @@ import { toast } from 'sonner';
 
 import useAuthStore from '@/features/auth/store/authStore';
 import AfterClosingModal from '@/features/closing/components/AfterClosingModal';
+import ClosingExtraDeductionDialog, {
+  type ExtraDeductionRow,
+} from '@/features/closing/components/ClosingExtraDeductionDialog';
 import ClosingInventoryDeductionSection, {
   type DeductionRow,
 } from '@/features/closing/components/ClosingInventoryDeductionSection';
@@ -50,6 +53,8 @@ const ClosingPage = () => {
   const { data: preview, isLoading, isError } = useClosingPreview(storeId, dateParam);
 
   const [deductionRows, setDeductionRows] = useState<DeductionRow[]>([]);
+  const [extraDeductions, setExtraDeductions] = useState<ExtraDeductionRow[]>([]);
+  const [extraDialogOpen, setExtraDialogOpen] = useState(false);
   const [afterModalOpen, setAfterModalOpen] = useState(false);
   const [alreadyClosedModalOpen, setAlreadyClosedModalOpen] = useState(false);
   const [finalRevenue, setFinalRevenue] = useState(0);
@@ -75,6 +80,29 @@ const ClosingPage = () => {
     );
   };
 
+  const handleAddExtra = (row: ExtraDeductionRow) => {
+    setExtraDeductions((prev) => {
+      const exists = prev.find((r) => r.ingredientId === row.ingredientId);
+      if (exists) {
+        return prev.map((r) =>
+          r.ingredientId === row.ingredientId ? { ...r, amount: r.amount + row.amount } : r,
+        );
+      }
+      return [...prev, row];
+    });
+    setExtraDialogOpen(false);
+  };
+
+  const handleExtraAmountChange = (ingredientId: string, amount: number) => {
+    setExtraDeductions((prev) =>
+      prev.map((r) => (r.ingredientId === ingredientId ? { ...r, amount } : r)),
+    );
+  };
+
+  const handleExtraRemove = (ingredientId: string) => {
+    setExtraDeductions((prev) => prev.filter((r) => r.ingredientId !== ingredientId));
+  };
+
   const handleComplete = () => {
     if (!storeId || !preview) return;
 
@@ -83,10 +111,18 @@ const ClosingPage = () => {
       return;
     }
 
+    const merged = new Map<string, number>();
+    deductionRows.forEach(({ ingredientId, actualUsage }) => {
+      merged.set(ingredientId, (merged.get(ingredientId) ?? 0) + actualUsage);
+    });
+    extraDeductions.forEach(({ ingredientId, amount }) => {
+      merged.set(ingredientId, (merged.get(ingredientId) ?? 0) + amount);
+    });
+
     submitClosing(
       {
         date: preview.date,
-        inventoryDeductions: deductionRows.map(({ ingredientId, actualUsage }) => ({
+        inventoryDeductions: Array.from(merged.entries()).map(([ingredientId, actualUsage]) => ({
           ingredientId,
           actualUsage,
         })),
@@ -135,9 +171,9 @@ const ClosingPage = () => {
 
   return (
     <>
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* 헤더 */}
-        <div className="shrink-0 bg-background border-b px-6 py-4 flex items-center justify-between">
+      <div className="flex flex-col">
+        {/* 헤더 — sticky */}
+        <div className="sticky top-0 z-10 bg-background border-b px-6 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-lg font-bold">마감하기</h1>
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-0.5">
@@ -147,19 +183,19 @@ const ClosingPage = () => {
           </div>
         </div>
 
-        {/* 소급 마감 안내 배너 */}
-        {isRetroactive && (
-          <div className="mx-6 mt-4 flex items-start gap-2.5 rounded-lg border border-baro-yellow/30 bg-baro-yellow/10 px-4 py-3 text-sm text-baro-yellow-text">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-baro-yellow-dark" />
-            <p>
-              전날 마감을 소급 처리합니다. 오늘 이미 발생한 매출과 재고 차감 순서가 실제와 다를 수
-              있습니다.
-            </p>
-          </div>
-        )}
+        {/* 콘텐츠 — 페이지 자연 스크롤 */}
+        <div className="flex flex-col gap-4 p-4">
+          {/* 소급 마감 안내 배너 */}
+          {isRetroactive && (
+            <div className="flex items-start gap-2.5 rounded-lg border border-baro-yellow/30 bg-baro-yellow/10 px-4 py-3 text-sm text-baro-yellow-text">
+              <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-baro-yellow-dark" />
+              <p>
+                전날 마감을 소급 처리합니다. 오늘 이미 발생한 매출과 재고 차감 순서가 실제와 다를 수
+                있습니다.
+              </p>
+            </div>
+          )}
 
-        {/* 스크롤 영역 */}
-        <div className="flex-1 overflow-y-auto flex flex-col gap-4 p-4">
           {/* 총 매출 카드 */}
           <Card>
             <CardContent className="px-6 flex items-center justify-between">
@@ -186,11 +222,18 @@ const ClosingPage = () => {
           <ClosingSoldMenusSection menus={preview.soldMenus} />
 
           {/* 재고 차감 섹션 */}
-          <ClosingInventoryDeductionSection rows={deductionRows} onChange={handleDeductionChange} />
+          <ClosingInventoryDeductionSection
+            rows={deductionRows}
+            onChange={handleDeductionChange}
+            extraRows={extraDeductions}
+            onAddExtra={() => setExtraDialogOpen(true)}
+            onExtraAmountChange={handleExtraAmountChange}
+            onExtraRemove={handleExtraRemove}
+          />
         </div>
 
-        {/* 하단 버튼 */}
-        <div className="shrink-0 bg-background border-t px-6 py-4">
+        {/* 하단 버튼 — sticky */}
+        <div className="sticky bottom-0 z-10 bg-background border-t px-6 py-4">
           {preview.isClosed ? (
             <Button
               onClick={handleComplete}
@@ -211,6 +254,12 @@ const ClosingPage = () => {
           )}
         </div>
       </div>
+
+      <ClosingExtraDeductionDialog
+        open={extraDialogOpen}
+        onClose={() => setExtraDialogOpen(false)}
+        onAdd={handleAddExtra}
+      />
 
       {storeId && (
         <AfterClosingModal
