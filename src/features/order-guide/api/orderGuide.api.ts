@@ -1,4 +1,8 @@
-import type { OrderGuideItem, UrgencyLevel } from '@/features/order-guide/types/orderGuide.types';
+import type {
+  OrderGuideItem,
+  PurchaseConversion,
+  UrgencyLevel,
+} from '@/features/order-guide/types/orderGuide.types';
 import axiosInstance from '@/shared/api/axiosInstance';
 
 interface BackendOrderGuideItem {
@@ -10,6 +14,7 @@ interface BackendOrderGuideItem {
   status: 'critical' | 'warning' | 'expiry';
   recommendedOrderAmount: number;
   reason: string;
+  purchaseConversions: PurchaseConversion[];
 }
 
 interface BackendOrderGuideResponse {
@@ -39,6 +44,7 @@ const mapItem = (item: BackendOrderGuideItem): OrderGuideItem => ({
   safetyStockUnit: item.unit,
   recommendedOrderQty: item.recommendedOrderAmount,
   recommendedOrderUnit: item.unit,
+  purchaseConversions: item.purchaseConversions ?? [],
   reason: item.reason,
   urgency: mapStatus(item.status),
   lastOrderDate: '',

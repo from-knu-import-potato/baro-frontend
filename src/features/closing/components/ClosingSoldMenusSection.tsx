@@ -11,7 +11,7 @@ const formatCurrency = (amount: number) => `${amount.toLocaleString('ko-KR')}원
 
 const ClosingSoldMenusSection = ({ menus }: ClosingSoldMenusSectionProps) => {
   return (
-    <Card>
+    <Card className="pb-0">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm flex items-center gap-2">
           <ShoppingBag className="w-4 h-4 text-muted-foreground" />
@@ -32,7 +32,7 @@ const ClosingSoldMenusSection = ({ menus }: ClosingSoldMenusSectionProps) => {
               <span className="text-right">수량</span>
               <span className="text-right">소계</span>
             </div>
-            <div className="divide-y">
+            <div className="divide-y max-h-72 overflow-y-auto">
               {menus.map((menu) => (
                 <div
                   key={menu.menuId}
