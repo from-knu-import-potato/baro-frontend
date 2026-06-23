@@ -1,25 +1,34 @@
 import { useState } from 'react';
 
 import { Menu, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
+import useAuthStore from '@/features/auth/store/authStore';
 import ThemeToggle from '@/features/theme/components/ThemeToggle';
 import { useTheme } from '@/features/theme/hooks/useTheme';
 import { Button } from '@/shadcn/ui/button';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { dark, toggleTheme } = useTheme();
+  const isLoggedIn = useAuthStore((s) => !!s.accessToken);
+  const canGoBack = location.key !== 'default';
 
   const handleLogoClick = () => {
     navigate(routePaths.landing);
     setIsMenuOpen(false);
   };
 
-  const handleLoginClick = () => {
-    navigate(routePaths.login);
+  const handleCtaClick = () => {
+    if (isLoggedIn) {
+      if (canGoBack) navigate(-1);
+      else navigate(routePaths.myStores);
+    } else {
+      navigate(routePaths.login);
+    }
     setIsMenuOpen(false);
   };
 
@@ -68,9 +77,9 @@ const Navbar = () => {
             <div className="flex items-center gap-3 ml-4">
               <Button
                 className="bg-baro-blue hover:bg-baro-blue-dark text-xs rounded-full text-white"
-                onClick={handleLoginClick}
+                onClick={handleCtaClick}
               >
-                시작하기
+                {isLoggedIn ? (canGoBack ? '돌아가기' : '계정 홈으로') : '시작하기'}
               </Button>
               <ThemeToggle dark={dark} toggleTheme={toggleTheme} />
             </div>
@@ -112,9 +121,9 @@ const Navbar = () => {
             </a>
             <Button
               className="bg-baro-blue hover:bg-baro-blue/90 w-full h-11 text-white"
-              onClick={handleLoginClick}
+              onClick={handleCtaClick}
             >
-              시작하기
+              {isLoggedIn ? '돌아가기' : '시작하기'}
             </Button>
           </div>
         </div>

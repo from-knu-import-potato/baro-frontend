@@ -185,13 +185,19 @@ const OrderGuideList = ({ items, generatedAt }: OrderGuideListProps) => {
                       </span>
                     </div>
 
-                    <div className="flex flex-col justify-center">
+                    <div className="flex flex-col justify-center gap-0.5">
                       <span className="md:hidden text-xs text-muted-foreground mb-0.5">
                         권장 발주량
                       </span>
                       <span className="text-sm font-semibold text-baro-blue-dark">
                         {formatStock(item.recommendedOrderQty, item.recommendedOrderUnit)}
                       </span>
+                      {item.purchaseConversions.map((c) => (
+                        <span key={c.purchaseUnit} className="text-xs text-muted-foreground">
+                          약 {c.purchaseAmount} × {c.purchaseUnit} ({c.factor.toLocaleString()}
+                          {item.recommendedOrderUnit})
+                        </span>
+                      ))}
                     </div>
 
                     <div className="flex flex-col justify-center gap-1">

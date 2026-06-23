@@ -12,6 +12,12 @@ export interface AiDemandPrediction {
   generatedAt: string;
 }
 
+export interface PurchaseConversion {
+  purchaseUnit: string;
+  factor: number;
+  purchaseAmount: number;
+}
+
 export interface OrderGuideItem {
   id: string;
   name: string;
@@ -22,6 +28,7 @@ export interface OrderGuideItem {
   safetyStockUnit: string;
   recommendedOrderQty: number;
   recommendedOrderUnit: string;
+  purchaseConversions: PurchaseConversion[];
   reason: string;
   urgency: UrgencyLevel;
   lastOrderDate: string;

@@ -18,6 +18,7 @@ export const routePaths = {
   storeSettings: '/store-settings',
   storeSettingsMenus: '/store-settings/menus',
   storeSettingsMenuBoard: '/store-settings/menu-board',
+  storeSettingsTable: '/store-settings/table',
   storeSettingsRecipes: '/store-settings/recipes',
   storeSettingsIngredients: '/store-settings/ingredients',
   settings: '/settings',
@@ -25,7 +26,7 @@ export const routePaths = {
   notices: '/notices',
   terms: '/terms',
   privacy: '/privacy',
-  customerOrder: '/menu/:shopId',
+  customerOrder: '/order/:storeId/table/:tableNumber',
   authCallback: '/auth/callback',
   notFound: '*',
 } as const;

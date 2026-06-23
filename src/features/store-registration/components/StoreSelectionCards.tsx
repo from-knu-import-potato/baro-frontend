@@ -26,7 +26,7 @@ const StoreSelectionCards = () => {
     <div className="relative flex min-h-screen flex-col bg-background">
       <BackButton onClick={() => navigate(-1)} />
       {/* Header */}
-      <div className="flex flex-col items-center gap-2 px-4 pt-8 mt-8 text-center">
+      <div className="flex flex-col items-center gap-2 px-4 pt-8 mt-8 text-center mb-4 mb:sm:mb-0">
         <img src={baroLogo} alt="BARO Logo" className="h-9 w-auto" />
         <div>
           <p className="text-3xl tracking-tight">어떻게 시작할까요?</p>
@@ -38,7 +38,7 @@ const StoreSelectionCards = () => {
 
       {/* Cards */}
       <div className="flex flex-1 flex-col items-center justify-center gap-16 px-4">
-        <div className="flex w-full max-w-3xl flex-col gap-8 sm:flex-row">
+        <div className="flex w-full max-w-3xl flex-col gap-4 mb:gap-8 sm:flex-row">
           {/* New Store Card */}
           <button
             onClick={handleNewStore}
@@ -165,7 +165,7 @@ const StoreSelectionCards = () => {
         </div>
 
         {/* Footer hint */}
-        <p className="text-center text-xs text-muted-foreground">
+        <p className="text-center text-xs text-muted-foreground pb-4 mb:sm:pb-0">
           선택 후에도 언제든지 가게를 변경하거나 나갈 수 있어요.
         </p>
       </div>

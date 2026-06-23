@@ -312,7 +312,7 @@ const OcrInboundPage = () => {
           <span className="text-sm font-semibold">OCR 입고 처리</span>
         </div>
         {step === 'review' && (
-          <p className="ml-auto text-xs text-muted-foreground">
+          <p className="ml-auto text-xs text-muted-foreground hidden sm:block">
             인식 결과를 확인·수정한 후 입고 확정해주세요
           </p>
         )}

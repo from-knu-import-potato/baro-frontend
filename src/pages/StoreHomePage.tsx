@@ -20,6 +20,7 @@ import { routePaths } from '@/app/routes/routePaths';
 import useAuthStore from '@/features/auth/store/authStore';
 import { openBusiness } from '@/features/closing/api/closing.api';
 import ClosingCancelModal from '@/features/closing/components/ClosingCancelModal';
+import ClosingHistorySheet from '@/features/closing/components/ClosingHistorySheet';
 import { useClosingHistory } from '@/features/closing/hooks/useClosingHistory';
 import useClosingStore from '@/features/closing/store/closingStore';
 import { useDashboardStats } from '@/features/dashboard/hooks/useDashboardStats';
@@ -99,6 +100,7 @@ const StoreHomePage = () => {
 
   const [isStarting, setIsStarting] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showHistorySheet, setShowHistorySheet] = useState(false);
   const [showHolidayModal, setShowHolidayModal] = useState(false);
 
   const getCase = (): BusinessCase => {
@@ -129,15 +131,15 @@ const StoreHomePage = () => {
     switch (currentCase) {
       case 'already-open':
         return (
-          <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+          <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-800/40 dark:bg-green-950/30 dark:text-green-400">
             <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-green-500 animate-pulse" />
             <span>현재 영업이 진행 중입니다.</span>
           </div>
         );
       case 'before-open-closed':
         return (
-          <div className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-            <Clock className="h-4 w-4 shrink-0 text-blue-500" />
+          <div className="flex items-center gap-3 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800 dark:border-blue-800/40 dark:bg-blue-950/30 dark:text-blue-400">
+            <Clock className="h-4 w-4 shrink-0 text-blue-500 dark:text-blue-400" />
             <span>
               오늘 영업은 <span className="font-semibold">{todayOpenTime}</span> 이후에 시작할 수
               있습니다.
@@ -158,21 +160,21 @@ const StoreHomePage = () => {
         );
       case 'today-closed':
         return (
-          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400">
             <MoonStar className="h-4 w-4 shrink-0 text-slate-400" />
             <span>오늘 영업이 마감되었습니다.</span>
           </div>
         );
       case 'holiday':
         return (
-          <div className="flex items-center gap-3 rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-600">
+          <div className="flex items-center gap-3 rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400">
             <MoonStar className="h-4 w-4 shrink-0 text-slate-400" />
             <span>오늘은 설정된 휴무일입니다.</span>
           </div>
         );
       case 'holiday-closed':
         return (
-          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700">
+          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-800/60 dark:text-slate-400">
             <MoonStar className="h-4 w-4 shrink-0 text-slate-400" />
             <span>오늘 임시 영업이 마감되었습니다.</span>
           </div>
@@ -425,7 +427,7 @@ const StoreHomePage = () => {
               <div className="grid grid-cols-2 gap-3 md:flex-1 md:grid-cols-3 md:gap-4 md:min-h-0">
                 <button
                   onClick={() => navigate('/inventory')}
-                  className="flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-green/40 hover:bg-baro-green/5 md:h-full md:p-5"
+                  className="cursor-pointer flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-green/40 hover:bg-baro-green/5 md:h-full md:p-5"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-baro-green/10">
                     <Archive className="h-5 w-5 text-baro-green" />
@@ -438,7 +440,7 @@ const StoreHomePage = () => {
 
                 <button
                   onClick={() => navigate('/order-guide')}
-                  className="flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-yellow/50 hover:bg-baro-yellow/10 md:h-full md:p-5"
+                  className="cursor-pointer flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-yellow/50 hover:bg-baro-yellow/10 md:h-full md:p-5"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-baro-yellow/20">
                     <ClipboardList className="h-5 w-5 text-baro-yellow-dark" />
@@ -450,8 +452,8 @@ const StoreHomePage = () => {
                 </button>
 
                 <button
-                  onClick={() => toast.info('이전 마감 현황 기능은 준비 중이에요.')}
-                  className="col-span-2 flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-blue/40 hover:bg-baro-blue/5 md:col-span-1 md:h-full md:p-5"
+                  onClick={() => setShowHistorySheet(true)}
+                  className="cursor-pointer col-span-2 flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-blue/40 hover:bg-baro-blue/5 md:col-span-1 md:h-full md:p-5"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-baro-blue/10">
                     <History className="h-5 w-5 text-baro-blue" />
@@ -467,7 +469,7 @@ const StoreHomePage = () => {
               <div className="grid grid-cols-2 gap-3 md:flex-1 md:gap-4 md:min-h-0">
                 <button
                   onClick={() => setShowCancelModal(true)}
-                  className="flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-red/40 hover:bg-red-50 dark:hover:bg-red-950/20 md:h-full md:p-5"
+                  className="cursor-pointer flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:border-baro-red/40 hover:bg-red-50 dark:hover:bg-red-950/20 md:h-full md:p-5"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-baro-red/10">
                     <Trash2 className="h-5 w-5 text-baro-red" />
@@ -482,7 +484,7 @@ const StoreHomePage = () => {
 
                 <button
                   onClick={() => navigate('/store-settings')}
-                  className="flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:bg-muted/50 md:h-full md:p-5"
+                  className="cursor-pointer flex h-32 flex-col justify-between rounded-xl border bg-background p-4 text-left shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5 hover:bg-muted/50 md:h-full md:p-5"
                 >
                   <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-muted">
                     <Settings className="h-5 w-5 text-muted-foreground" />
@@ -497,6 +499,13 @@ const StoreHomePage = () => {
           )}
         </main>
       </div>
+
+      {/* 이전 마감 현황 시트 */}
+      <ClosingHistorySheet
+        open={showHistorySheet}
+        onClose={() => setShowHistorySheet(false)}
+        storeId={storeId}
+      />
 
       {/* 마감 취소 모달 */}
       {storeId && (

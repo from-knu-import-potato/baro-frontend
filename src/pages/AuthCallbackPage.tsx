@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
 import useAuthStore from '@/features/auth/store/authStore';
-import { fetchMyStores } from '@/features/store-registration/api/storeRegistration.api';
+import axiosInstance from '@/shared/api/axiosInstance';
 
 /* TODO: 백엔드와 협의 후 URL 쿼리로 토큰 전달 방식 개선 필요
    - 현재: accessToken/refreshToken이 URL에 노출 → 브라우저 히스토리, 서버 로그에 잔류
@@ -31,19 +31,26 @@ const AuthCallbackPage = () => {
 
     setTokens(accessToken, refreshToken);
 
-    fetchMyStores()
-      .then((stores) => {
-        if (stores.length === 0) {
-          navigate(routePaths.storeSelection, { replace: true });
-        } else {
-          const saved = useAuthStore.getState().storeId;
-          const match = stores.find((s) => s.storeId === saved);
-          const target = match ?? stores[0];
-          setStoreId(target.storeId);
-          navigate(routePaths.myStores, { replace: true });
-        }
+    const doRedirect = () => {
+      const redirectPath = sessionStorage.getItem('baro-redirect-after-login');
+      if (redirectPath) {
+        sessionStorage.removeItem('baro-redirect-after-login');
+        navigate(redirectPath, { replace: true });
+      } else {
+        navigate(routePaths.myStores, { replace: true });
+      }
+    };
+
+    // clearAuth()로 storeId가 null이 되므로 재로그인 시 재조회 후 navigate
+    axiosInstance
+      .get('/users/me/stores')
+      .then((res) => {
+        const stores = res?.data?.data as { storeId: string }[] | undefined;
+        const storeId = stores?.[0]?.storeId ?? null;
+        if (storeId) setStoreId(storeId);
       })
-      .catch(() => navigate(routePaths.storeSelection, { replace: true }));
+      .catch(() => {})
+      .finally(doRedirect);
   }, [navigate, setTokens, setStoreId]);
 
   return (

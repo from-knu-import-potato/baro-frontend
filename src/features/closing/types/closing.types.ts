@@ -79,3 +79,28 @@ export interface ClosingHistoryItem {
 export interface ClosingHistory {
   closings: ClosingHistoryItem[];
 }
+
+export interface ClosingDetailSoldMenu {
+  menuId: string;
+  menuName: string;
+  quantity: number;
+  unitPrice: number;
+  subtotal: number;
+}
+
+export interface ClosingDetailInventoryDeduction {
+  ingredientId: string;
+  ingredientName: string;
+  unit: 'g' | 'ml' | '개';
+  usedAmount: number;
+  remainingStock: number;
+}
+
+export interface ClosingDetail {
+  id: string;
+  date: string;
+  totalRevenue: number;
+  createdAt: string;
+  soldMenus: ClosingDetailSoldMenu[];
+  inventoryDeductions: ClosingDetailInventoryDeduction[];
+}

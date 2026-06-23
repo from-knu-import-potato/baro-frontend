@@ -1,13 +1,17 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
+import useAuthStore from '@/features/auth/store/authStore';
 import { cn } from '@/lib/utils';
 import { Button } from '@/shadcn/ui/button';
 import { useScrollReveal } from '@/shared/hooks/useScrollReveal';
 
 const CTASection = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { ref, isVisible } = useScrollReveal();
+  const isLoggedIn = useAuthStore((s) => !!s.accessToken);
+  const canGoBack = location.key !== 'default';
 
   return (
     <section ref={ref} className="py-20 overflow-hidden mb-20">
@@ -19,7 +23,7 @@ const CTASection = () => {
           )}
         >
           <p className="text-baro-blue text-xs font-bold uppercase tracking-[0.2em] mb-6">
-            무료로 시작하기
+            {isLoggedIn ? '이미 로그인되어 있어요' : '무료로 시작하기'}
           </p>
           <h2 className="text-2xl lg:text-4xl font-black text-baro-black dark:text-white leading-tight mb-4">
             지금 바로,
@@ -32,10 +36,17 @@ const CTASection = () => {
             매일 반복되는 비효율에서 벗어나세요.
           </p>
           <Button
-            onClick={() => navigate(routePaths.login)}
+            onClick={() => {
+              if (isLoggedIn) {
+                if (canGoBack) navigate(-1);
+                else navigate(routePaths.myStores);
+              } else {
+                navigate(routePaths.login);
+              }
+            }}
             className="mt-8 bg-baro-blue hover:bg-baro-blue/90 text-white font-bold p-4 py-5 rounded-full text-sm"
           >
-            BARO 무료로 시작하기
+            {isLoggedIn ? (canGoBack ? '돌아가기' : '계정 홈으로 가기') : 'BARO 무료로 시작하기'}
           </Button>
         </div>
       </div>

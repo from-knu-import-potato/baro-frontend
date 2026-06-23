@@ -1,7 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
-import { AlignJustify, ArrowLeft, Grid2x2, ImagePlus, Loader2, X } from 'lucide-react';
+import {
+  AlignJustify,
+  ArrowLeft,
+  ExternalLink,
+  Grid2x2,
+  ImagePlus,
+  Loader2,
+  X,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
@@ -91,24 +99,37 @@ const SettingsMenuBoardPage = () => {
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden bg-background">
-      <header className="shrink-0 flex items-center gap-3 border-b px-6 py-4 bg-background">
+      <header className="shrink-0 flex flex-wrap items-center gap-3 border-b px-4 py-3 bg-background md:px-6 md:py-4">
         <Button variant="ghost" size="icon" onClick={() => navigate(routePaths.storeSettings)}>
           <ArrowLeft className="size-4" />
         </Button>
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold">메뉴판 설정</p>
           <p className="text-xs text-muted-foreground">
             손님 메뉴판의 테마 색상, 레이아웃, 배너를 설정합니다.
           </p>
         </div>
-        <Button
-          size="sm"
-          onClick={() => updateTheme(form)}
-          disabled={!isDirty || isSaving || isLoading}
-          className="ml-auto bg-baro-blue text-white hover:bg-baro-blue/80"
-        >
-          {isSaving ? <Loader2 className="size-3.5 animate-spin" /> : '저장'}
-        </Button>
+        <div className="flex items-center gap-2">
+          {storeId && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5"
+              onClick={() => window.open(`/order/${storeId}/table/1`, '_blank')}
+            >
+              <ExternalLink className="size-3.5" />
+              미리보기
+            </Button>
+          )}
+          <Button
+            size="sm"
+            onClick={() => updateTheme(form)}
+            disabled={!isDirty || isSaving || isLoading}
+            className="bg-baro-blue text-white hover:bg-baro-blue/80"
+          >
+            {isSaving ? <Loader2 className="size-3.5 animate-spin" /> : '저장'}
+          </Button>
+        </div>
       </header>
 
       <div className="flex-1 overflow-y-auto p-4">

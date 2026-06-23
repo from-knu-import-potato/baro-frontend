@@ -15,7 +15,7 @@ import { useNavigate } from 'react-router-dom';
 import { useGenerateOrderGuide } from '@/features/order-guide/hooks/useGenerateOrderGuide';
 import type { OrderGuideItem, UrgencyLevel } from '@/features/order-guide/types/orderGuide.types';
 import { Button } from '@/shadcn/ui/button';
-import { Dialog, DialogContent, DialogFooter } from '@/shadcn/ui/dialog';
+import { Dialog, DialogContent } from '@/shadcn/ui/dialog';
 
 interface AfterClosingModalProps {
   open: boolean;
@@ -36,19 +36,22 @@ const URGENCY_CONFIG: Record<
 > = {
   critical: {
     label: '긴급',
-    badgeClass: 'bg-red-100 text-baro-red border border-red-200',
+    badgeClass:
+      'bg-red-100 text-baro-red border border-red-200 dark:bg-red-950/40 dark:text-red-400 dark:border-red-800/40',
     borderClass: 'border-l-2 border-l-baro-red',
     icon: <Siren className="w-3 h-3" />,
   },
   warning: {
     label: '주의',
-    badgeClass: 'bg-orange-100 text-orange-600 border border-orange-200',
+    badgeClass:
+      'bg-orange-100 text-orange-600 border border-orange-200 dark:bg-orange-950/40 dark:text-orange-400 dark:border-orange-800/40',
     borderClass: 'border-l-2 border-l-orange-400',
     icon: <AlertTriangle className="w-3 h-3" />,
   },
   recommended: {
     label: '권장',
-    badgeClass: 'bg-blue-100 text-baro-blue border border-blue-200',
+    badgeClass:
+      'bg-blue-100 text-baro-blue border border-blue-200 dark:bg-blue-950/40 dark:border-blue-800/40',
     borderClass: '',
     icon: <ShoppingCart className="w-3 h-3" />,
   },
@@ -314,7 +317,7 @@ const AfterClosingModal = ({
                 발주 가이드 메뉴에서 확인할 수 있어요.
               </p>
             </div>
-            <DialogFooter className="flex gap-2">
+            <div className="flex gap-2">
               <Button variant="outline" className="flex-1 h-10" onClick={() => setStep('choose')}>
                 취소
               </Button>
@@ -325,7 +328,7 @@ const AfterClosingModal = ({
                 <LogOut className="w-4 h-4" />
                 {isRetroactive ? '돌아가기' : '종료'}
               </Button>
-            </DialogFooter>
+            </div>
           </div>
         )}
       </DialogContent>

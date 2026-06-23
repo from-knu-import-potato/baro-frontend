@@ -330,7 +330,7 @@ const StepIngredientsAndRecipes = ({
   };
 
   return (
-    <div className="flex flex-1 min-h-0 gap-4">
+    <div className="flex flex-1 min-h-0 flex-col gap-4 md:flex-row">
       {/* ── 왼쪽 패널: 식자재 등록 ── */}
       <div className="flex flex-1 min-h-0 flex-col overflow-hidden rounded-xl border">
         {/* 패널 헤더 */}
@@ -343,8 +343,8 @@ const StepIngredientsAndRecipes = ({
 
         {/* 안전 재고 기준 설정 */}
         <div className="shrink-0 border-b px-3 py-2">
-          <div className="flex items-center justify-between gap-2">
-            <div>
+          <div className="flex flex-col items-center gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div className="self-start sm:self-auto">
               <p className="text-xs font-medium">안전 재고 기준</p>
               <p className="mt-0.5 text-[10px] text-muted-foreground">재고 없음 — 초기값 0</p>
             </div>

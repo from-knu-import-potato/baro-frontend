@@ -97,7 +97,7 @@ const MenuOcrModal = ({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
-      <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-3xl max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ScanLine className="size-4 text-muted-foreground" />
@@ -127,13 +127,15 @@ const MenuOcrModal = ({
         )}
 
         {step === 'review' && (
-          <MenuOcrReviewStep
-            items={reviewItems}
-            existingNames={existingNames}
-            onItemsChange={setReviewItems}
-            onConfirm={handleConfirm}
-            onReset={() => setStep('upload')}
-          />
+          <div className="flex-1 min-h-0">
+            <MenuOcrReviewStep
+              items={reviewItems}
+              existingNames={existingNames}
+              onItemsChange={setReviewItems}
+              onConfirm={handleConfirm}
+              onReset={() => setStep('upload')}
+            />
+          </div>
         )}
 
         {isConfirming && (

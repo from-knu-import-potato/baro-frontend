@@ -1,7 +1,8 @@
 import { CheckCircle2, ClipboardCheck } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
+import useAuthStore from '@/features/auth/store/authStore';
 import { cn } from '@/lib/utils';
 import { Button } from '@/shadcn/ui/button';
 import baroLogo from '@/shared/assets/images/baro-logo.png';
@@ -9,10 +10,18 @@ import { useScrollReveal } from '@/shared/hooks/useScrollReveal';
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { ref, isVisible } = useScrollReveal();
+  const isLoggedIn = useAuthStore((s) => !!s.accessToken);
+  const canGoBack = location.key !== 'default';
 
   const handleStartClick = () => {
-    navigate(routePaths.login);
+    if (isLoggedIn) {
+      if (canGoBack) navigate(-1);
+      else navigate(routePaths.myStores);
+    } else {
+      navigate(routePaths.login);
+    }
   };
 
   const handleFeaturesClick = () => {
@@ -66,7 +75,7 @@ const HeroSection = () => {
                 onClick={handleStartClick}
                 className="h-auto rounded-full bg-baro-blue px-8 py-3 hover:bg-baro-blue/90 w-full sm:w-auto text-white"
               >
-                BARO 시작하기
+                {isLoggedIn ? (canGoBack ? '돌아가기' : '계정 홈으로 가기') : 'BARO 시작하기'}
               </Button>
 
               <Button

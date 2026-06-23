@@ -226,6 +226,16 @@ code {
   }
 }
 
+/* iOS 스타일 카드 흔들기 애니메이션 */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-0.6deg); }
+  50% { transform: rotate(0.6deg); }
+}
+
+.animate-wiggle {
+  animation: wiggle 0.4s ease-in-out infinite;
+}
+
 /* 페이지 전환 애니메이션 */
 @keyframes page-fade-in {
   from {

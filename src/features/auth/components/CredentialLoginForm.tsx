@@ -10,7 +10,6 @@ import { z } from 'zod';
 import { routePaths } from '@/app/routes/routePaths';
 import { credentialLogin } from '@/features/auth/api/authApi';
 import useAuthStore from '@/features/auth/store/authStore';
-import { fetchMyStores } from '@/features/store-registration/api/storeRegistration.api';
 import { Button } from '@/shadcn/ui/button';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
@@ -24,7 +23,7 @@ type FormValues = z.infer<typeof schema>;
 
 const CredentialLoginForm = () => {
   const navigate = useNavigate();
-  const { setTokens, setStoreId } = useAuthStore();
+  const { setTokens } = useAuthStore();
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -37,19 +36,13 @@ const CredentialLoginForm = () => {
     try {
       const { accessToken, refreshToken } = await credentialLogin(values);
       setTokens(accessToken, refreshToken);
-
-      const stores = await fetchMyStores().catch(() => []);
-
-      if (stores.length === 0) {
-        navigate(routePaths.storeSelection, { replace: true });
-        return;
+      const redirectPath = sessionStorage.getItem('baro-redirect-after-login');
+      if (redirectPath) {
+        sessionStorage.removeItem('baro-redirect-after-login');
+        navigate(redirectPath, { replace: true });
+      } else {
+        navigate(routePaths.myStores, { replace: true });
       }
-
-      const saved = useAuthStore.getState().storeId;
-      const match = stores.find((s) => s.storeId === saved);
-      const target = match ?? stores[0];
-      setStoreId(target.storeId);
-      navigate(routePaths.myStores, { replace: true });
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response?.status;
       if (status === 401) {

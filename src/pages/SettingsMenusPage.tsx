@@ -637,22 +637,22 @@ const SettingsMenusPage = () => {
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden bg-background">
-      <header className="shrink-0 flex items-center gap-3 border-b px-6 py-4 bg-background">
+      <header className="shrink-0 flex flex-wrap items-center gap-3 border-b px-4 py-3 bg-background md:px-6 md:py-4">
         <Button variant="ghost" size="icon" onClick={() => navigate(routePaths.storeSettings)}>
           <ArrowLeft className="size-4" />
         </Button>
-        <div>
+        <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold">메뉴 관리</p>
           <p className="text-xs text-muted-foreground">판매 메뉴를 등록하고 관리합니다.</p>
         </div>
-        <div className="ml-auto flex items-center gap-2">
-          <div className="relative w-52">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <div className="relative flex-1 sm:w-52 sm:flex-none">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground pointer-events-none" />
             <Input
               placeholder="메뉴 이름 검색"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="h-8 pl-8 pr-3 text-sm"
+              className="h-8 pl-8 pr-3 text-sm w-full"
             />
           </div>
           <Button size="sm" variant="outline" onClick={() => setOcrOpen(true)}>

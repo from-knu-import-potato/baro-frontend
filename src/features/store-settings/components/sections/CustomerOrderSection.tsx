@@ -1,4 +1,4 @@
-import { ChevronRight, ClipboardList, Layers, Salad, UtensilsCrossed } from 'lucide-react';
+import { ChevronRight, Palette, QrCode, Smartphone } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
@@ -27,37 +27,31 @@ const NavRow = ({ icon, label, description, onClick }: NavRowProps) => (
   </button>
 );
 
-const StoreOperationSection = () => {
+const CustomerOrderSection = () => {
   const navigate = useNavigate();
 
   return (
     <SettingsSection
-      title="운영 정보 관리"
-      description="초기 세팅에서 입력한 메뉴·레시피·주요 식자재를 수정합니다."
-      icon={<Layers className="h-4 w-4" />}
+      title="손님 주문 설정"
+      description="손님이 보는 메뉴판과 테이블 QR 코드를 관리합니다."
+      icon={<Smartphone className="h-4 w-4" />}
     >
       <div className="divide-y overflow-hidden rounded-lg border">
         <NavRow
-          icon={<ClipboardList className="h-4 w-4" />}
-          label="메뉴 관리"
-          description="판매 중인 메뉴 목록을 추가·수정·삭제합니다."
-          onClick={() => navigate(routePaths.storeSettingsMenus)}
+          icon={<Palette className="h-4 w-4" />}
+          label="메뉴판 설정"
+          description="손님 메뉴판의 테마 색상, 레이아웃, 배너 이미지를 설정합니다."
+          onClick={() => navigate(routePaths.storeSettingsMenuBoard)}
         />
         <NavRow
-          icon={<UtensilsCrossed className="h-4 w-4" />}
-          label="레시피 관리"
-          description="각 메뉴의 재료 구성과 사용량을 관리합니다."
-          onClick={() => navigate(routePaths.storeSettingsRecipes)}
-        />
-        <NavRow
-          icon={<Salad className="h-4 w-4" />}
-          label="주요 식자재 관리"
-          description="재고 알림 기준이 되는 주요 식자재를 설정합니다."
-          onClick={() => navigate(routePaths.storeSettingsIngredients)}
+          icon={<QrCode className="h-4 w-4" />}
+          label="테이블 관리"
+          description="테이블 수를 설정하고 손님 주문용 QR 코드를 생성합니다."
+          onClick={() => navigate(routePaths.storeSettingsTable)}
         />
       </div>
     </SettingsSection>
   );
 };
 
-export default StoreOperationSection;
+export default CustomerOrderSection;
