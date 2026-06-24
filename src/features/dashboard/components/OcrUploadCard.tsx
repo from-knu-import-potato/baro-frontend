@@ -37,9 +37,9 @@ const OcrUploadCard = () => {
           onClick={() => fileInputRef.current?.click()}
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
-          className="border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-3 py-5 bg-blue-50/10 cursor-pointer hover:bg-baro-blue/10 transition-colors group"
+          className="border-2 border-dashed rounded-xl flex flex-col items-center justify-center gap-3 py-5 bg-muted/20 cursor-pointer hover:bg-baro-blue/5 transition-colors group"
         >
-          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+          <div className="w-8 h-8 rounded-full bg-baro-blue/15 flex items-center justify-center group-hover:bg-baro-blue/25 transition-colors">
             <Upload className="w-4 h-4 text-baro-blue" />
           </div>
           <div className="text-center">

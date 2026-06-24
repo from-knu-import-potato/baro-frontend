@@ -65,7 +65,7 @@ const MenuOcrUploadStep = ({ onFileSelect, onBack }: MenuOcrUploadStepProps) => 
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-border hover:border-baro-blue/50 rounded-xl bg-muted/20 hover:bg-blue-50/30 transition-all cursor-pointer flex flex-col items-center justify-center gap-3 py-12"
+          className="border-2 border-dashed border-border hover:border-baro-blue/50 rounded-xl bg-muted/20 hover:bg-baro-blue/5 transition-all cursor-pointer flex flex-col items-center justify-center gap-3 py-12"
         >
           <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center">
             <FileImage className="w-6 h-6 text-muted-foreground" />

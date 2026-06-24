@@ -85,7 +85,7 @@ const OcrUploadStep = ({ onFileSelect }: OcrUploadStepProps) => {
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
             onClick={() => fileInputRef.current?.click()}
-            className="flex-1 border-2 border-dashed border-border hover:border-baro-blue/50 rounded-xl bg-muted/20 hover:bg-blue-50/30 transition-all cursor-pointer flex flex-col items-center justify-center gap-3 py-10 md:flex-none md:py-14"
+            className="flex-1 border-2 border-dashed border-border hover:border-baro-blue/50 rounded-xl bg-muted/20 hover:bg-baro-blue/5 transition-all cursor-pointer flex flex-col items-center justify-center gap-3 py-10 md:flex-none md:py-14"
           >
             <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center">
               <FileImage className="w-6 h-6 text-muted-foreground" />
