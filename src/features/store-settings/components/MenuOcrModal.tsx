@@ -9,6 +9,7 @@ import MenuOcrReviewStep, {
 } from '@/features/store-settings/components/MenuOcrReviewStep';
 import MenuOcrUploadStep from '@/features/store-settings/components/MenuOcrUploadStep';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 
 type OcrStep = 'upload' | 'analyzing' | 'review';
 
@@ -65,8 +66,8 @@ const MenuOcrModal = ({
         })),
       );
       setStep('review');
-    } catch {
-      setErrorMsg('메뉴 인식에 실패했습니다. 다시 시도해주세요.');
+    } catch (err) {
+      setErrorMsg(getApiErrorMessage(err, '메뉴 인식에 실패했습니다. 다시 시도해 주세요.'));
       setStep('upload');
     }
   };
@@ -108,7 +109,7 @@ const MenuOcrModal = ({
         {step === 'upload' && (
           <>
             {errorMsg && (
-              <div className="text-xs text-destructive bg-red-50 rounded-md px-3 py-2">
+              <div className="text-xs text-destructive bg-destructive/10 rounded-md px-3 py-2">
                 {errorMsg}
               </div>
             )}

@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { useQueryClient } from '@tanstack/react-query';
-import axios from 'axios';
 import { ArrowLeft, ScanLine } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -25,6 +24,7 @@ import type { OcrInboundItem } from '@/features/ocr-inbound/types/ocrInbound.typ
 import { confirmInbound } from '@/features/store-settings/api/ingredients.api';
 import { updateStoreSettings } from '@/features/store-settings/api/storeSettings.api';
 import { useStoreSettings } from '@/features/store-settings/hooks/useStoreSettings';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 
 type Step = 'upload' | 'analyzing' | 'review';
 
@@ -176,11 +176,9 @@ const OcrInboundPage = () => {
         setStep('review');
         saveDraft({ imageBase64: base64, metadata: result.metadata, items: processedItems });
       } catch (err) {
-        const message =
-          axios.isAxiosError(err) && err.response?.data?.error?.message
-            ? err.response.data.error.message
-            : 'OCR 처리에 실패했습니다. 잠시 후 다시 시도해주세요.';
-        toast.error(message);
+        toast.error(
+          getApiErrorMessage(err, 'OCR 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+        );
         URL.revokeObjectURL(blobUrl);
         setStep('upload');
         setImageUrl(null);

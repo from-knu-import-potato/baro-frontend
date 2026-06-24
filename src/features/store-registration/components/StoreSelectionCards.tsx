@@ -66,7 +66,7 @@ const StoreSelectionCards = () => {
             {/* Text */}
             <div className="flex-1 space-y-2">
               <p className="text-xs font-bold uppercase tracking-widest text-baro-blue">사장님</p>
-              <h2 className="text-xl font-black text-baro-black">새 가게 등록하기</h2>
+              <h2 className="text-xl">새 가게 등록하기</h2>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 직접 가게를 개설하고 재고를 관리하세요.
                 <br />
@@ -136,7 +136,7 @@ const StoreSelectionCards = () => {
             {/* Text */}
             <div className="flex-1 space-y-2">
               <p className="text-xs font-bold uppercase tracking-widest text-baro-green">직원</p>
-              <h2 className="text-xl font-black text-baro-black">초대코드로 합류하기</h2>
+              <h2 className="text-xl">초대코드로 합류하기</h2>
               <p className="text-sm leading-relaxed text-muted-foreground">
                 사장님께 받은 초대코드를 입력하면
                 <br />
