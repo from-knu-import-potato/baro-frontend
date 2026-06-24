@@ -83,7 +83,7 @@ const MenuOcrReviewStep = ({
   const duplicateCount = items.filter((item) => item.name.trim() && isDuplicate(item.name)).length;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col flex-1 min-h-0">
       {/* 스크롤 영역: 헤더 + 항목 목록 + 추가 버튼 */}
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4 pb-2 pr-1">
         <div className="flex items-center justify-between">
