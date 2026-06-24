@@ -40,11 +40,11 @@ const StepBasicInfo = ({ data, userName, onChange, errors }: StepBasicInfoProps)
         </Label>
         <Input
           id="storeName"
-          placeholder="예: 바로 카페 홍대점"
+          placeholder="예: 바로 카페 강원대점"
           value={data.storeName}
           onChange={(e) => onChange({ ...data, storeName: e.target.value })}
           aria-invalid={!!errors.storeName}
-          className="h-10"
+          className="h-10 focus:bg-background"
         />
         {errors.storeName && <p className="text-xs text-destructive">{errors.storeName}</p>}
       </div>

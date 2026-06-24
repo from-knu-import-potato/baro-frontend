@@ -9,6 +9,7 @@ import MenuOcrReviewStep, {
 } from '@/features/store-settings/components/MenuOcrReviewStep';
 import MenuOcrUploadStep from '@/features/store-settings/components/MenuOcrUploadStep';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shadcn/ui/dialog';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 
 type OcrStep = 'upload' | 'analyzing' | 'review';
 
@@ -65,8 +66,8 @@ const MenuOcrModal = ({
         })),
       );
       setStep('review');
-    } catch {
-      setErrorMsg('메뉴 인식에 실패했습니다. 다시 시도해주세요.');
+    } catch (err) {
+      setErrorMsg(getApiErrorMessage(err, '메뉴 인식에 실패했습니다. 다시 시도해 주세요.'));
       setStep('upload');
     }
   };
@@ -97,7 +98,7 @@ const MenuOcrModal = ({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && handleClose()}>
-      <DialogContent className="sm:max-w-3xl max-h-[90vh] flex flex-col">
+      <DialogContent className="sm:max-w-3xl max-h-[90svh] flex flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <ScanLine className="size-4 text-muted-foreground" />
@@ -108,7 +109,7 @@ const MenuOcrModal = ({
         {step === 'upload' && (
           <>
             {errorMsg && (
-              <div className="text-xs text-destructive bg-red-50 rounded-md px-3 py-2">
+              <div className="text-xs text-destructive bg-destructive/10 rounded-md px-3 py-2">
                 {errorMsg}
               </div>
             )}
@@ -117,7 +118,7 @@ const MenuOcrModal = ({
         )}
 
         {step === 'analyzing' && (
-          <div className="flex flex-col items-center justify-center gap-4 py-16">
+          <div className="flex flex-col items-center justify-center gap-4 py-16 min-h-80">
             <Loader2 className="w-10 h-10 animate-spin text-baro-blue" />
             <div className="text-center">
               <p className="text-sm font-semibold">메뉴를 인식하는 중입니다</p>
@@ -127,7 +128,7 @@ const MenuOcrModal = ({
         )}
 
         {step === 'review' && (
-          <div className="flex-1 min-h-0">
+          <div className="flex-1 min-h-0 flex flex-col">
             <MenuOcrReviewStep
               items={reviewItems}
               existingNames={existingNames}

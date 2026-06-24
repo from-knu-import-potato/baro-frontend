@@ -19,16 +19,12 @@ import {
 } from '@/shadcn/ui/dialog';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 
 interface InviteCodeModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const ERROR_MESSAGES: Record<string, string> = {
-  INVALID_INVITE_CODE: '유효하지 않은 초대코드입니다. 다시 확인해 주세요.',
-  ALREADY_MEMBER: '이미 참여한 가게입니다.',
-};
 
 const InviteCodeModal = ({ open, onOpenChange }: InviteCodeModalProps) => {
   const navigate = useNavigate();
@@ -49,11 +45,9 @@ const InviteCodeModal = ({ open, onOpenChange }: InviteCodeModalProps) => {
         navigate(routePaths.storeHome, { replace: true });
       },
       onError: (err: unknown) => {
-        const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response
-          ?.data?.error?.code;
-        const message =
-          (code && ERROR_MESSAGES[code]) ?? '가게 참여에 실패했습니다. 잠시 후 다시 시도해 주세요.';
-        toast.error(message);
+        toast.error(
+          getApiErrorMessage(err, '가게 참여에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+        );
       },
     });
   };

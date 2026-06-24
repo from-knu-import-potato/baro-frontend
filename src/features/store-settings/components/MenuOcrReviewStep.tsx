@@ -83,7 +83,7 @@ const MenuOcrReviewStep = ({
   const duplicateCount = items.filter((item) => item.name.trim() && isDuplicate(item.name)).length;
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col flex-1 min-h-0">
       {/* 스크롤 영역: 헤더 + 항목 목록 + 추가 버튼 */}
       <div className="flex-1 min-h-0 overflow-y-auto flex flex-col gap-4 pb-2 pr-1">
         <div className="flex items-center justify-between">
@@ -99,7 +99,7 @@ const MenuOcrReviewStep = ({
 
         {/* 중복 안내 */}
         {duplicateCount > 0 && (
-          <p className="text-xs text-orange-600 bg-orange-50 border border-orange-200 rounded-lg px-3 py-2">
+          <p className="text-xs text-baro-yellow-text bg-baro-yellow/10 border border-baro-yellow/40 rounded-lg px-3 py-2">
             이미 등록된 메뉴 <strong>{duplicateCount}개</strong>는 등록하지 않습니다. 이름을
             수정하거나 해당 항목을 삭제해주세요.
           </p>
@@ -123,13 +123,13 @@ const MenuOcrReviewStep = ({
               <button
                 type="button"
                 onClick={() => handleImageClick(item.id)}
-                className="w-9 h-9 rounded-lg border overflow-hidden flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors shrink-0"
+                className="w-9 h-9 rounded-lg border overflow-hidden flex items-center justify-center bg-muted hover:bg-muted/60 transition-colors shrink-0"
                 title="사진 추가"
               >
                 {item.imageUrl ? (
                   <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
                 ) : (
-                  <ImagePlus className="w-3.5 h-3.5 text-gray-300" />
+                  <ImagePlus className="w-3.5 h-3.5 text-muted-foreground/40" />
                 )}
               </button>
             );
@@ -142,11 +142,12 @@ const MenuOcrReviewStep = ({
                   placeholder="메뉴명"
                   className={cn(
                     'h-8 text-sm',
-                    dup && 'border-orange-400 bg-orange-50 focus-visible:ring-orange-300 pr-14',
+                    dup &&
+                      'border-baro-yellow bg-baro-yellow/10 focus-visible:ring-baro-yellow/50 pr-14',
                   )}
                 />
                 {dup && (
-                  <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-orange-600 bg-orange-100 border border-orange-300 px-1.5 py-0.5 rounded-full whitespace-nowrap">
+                  <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px] font-semibold text-baro-yellow-text bg-baro-yellow/25 border border-baro-yellow/60 px-1.5 py-0.5 rounded-full whitespace-nowrap">
                     이미 등록됨
                   </span>
                 )}
@@ -190,7 +191,7 @@ const MenuOcrReviewStep = ({
                     'w-4 h-4',
                     item.isFeatured
                       ? 'fill-baro-yellow text-baro-yellow'
-                      : 'text-gray-300 hover:text-baro-yellow/50',
+                      : 'text-muted-foreground/40 hover:text-baro-yellow/50',
                   )}
                 />
               </button>
@@ -200,7 +201,7 @@ const MenuOcrReviewStep = ({
               <button
                 type="button"
                 onClick={() => handleDelete(item.id)}
-                className="flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground hover:text-baro-red hover:bg-red-50 transition-colors"
+                className="flex items-center justify-center w-8 h-8 rounded-md text-muted-foreground hover:text-baro-red hover:bg-red-500/10 transition-colors"
                 aria-label="항목 삭제"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -210,7 +211,7 @@ const MenuOcrReviewStep = ({
             return (
               <div
                 key={item.id}
-                className={cn('rounded-lg transition-colors', dup && 'bg-orange-50/60')}
+                className={cn('rounded-lg transition-colors', dup && 'bg-baro-yellow/5')}
               >
                 {/* 데스크탑 행 */}
                 <div className="hidden md:grid grid-cols-[36px_2fr_100px_2fr_36px_36px] gap-2 items-center px-1 py-0.5">

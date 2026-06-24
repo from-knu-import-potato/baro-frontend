@@ -32,7 +32,7 @@ const MenuOcrUploadStep = ({ onFileSelect, onBack }: MenuOcrUploadStepProps) => 
   };
 
   return (
-    <div className="flex flex-col gap-6 pr-2">
+    <div className="flex flex-col gap-6 flex-1 min-h-0 overflow-y-auto">
       <div className="flex flex-col gap-4">
         <div className="text-center">
           <p className="text-sm font-semibold">메뉴판을 등록해주세요</p>
@@ -65,7 +65,7 @@ const MenuOcrUploadStep = ({ onFileSelect, onBack }: MenuOcrUploadStepProps) => 
           onDrop={handleDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => fileInputRef.current?.click()}
-          className="border-2 border-dashed border-border hover:border-baro-blue/50 rounded-xl bg-muted/20 hover:bg-blue-50/30 transition-all cursor-pointer flex flex-col items-center justify-center gap-3 py-12"
+          className="border-2 border-dashed border-border hover:border-baro-blue/50 rounded-xl bg-muted/20 hover:bg-baro-blue/5 transition-all cursor-pointer flex flex-col items-center justify-center gap-3 py-12"
         >
           <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center">
             <FileImage className="w-6 h-6 text-muted-foreground" />
@@ -88,7 +88,7 @@ const MenuOcrUploadStep = ({ onFileSelect, onBack }: MenuOcrUploadStepProps) => 
         <div className="flex flex-col gap-3 md:flex-row">
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full md:flex-1"
             onClick={() => fileInputRef.current?.click()}
           >
             <FileImage className="w-4 h-4" />
@@ -96,7 +96,7 @@ const MenuOcrUploadStep = ({ onFileSelect, onBack }: MenuOcrUploadStepProps) => 
           </Button>
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full md:flex-1"
             onClick={() => cameraInputRef.current?.click()}
           >
             <Camera className="w-4 h-4" />

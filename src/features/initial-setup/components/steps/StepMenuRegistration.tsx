@@ -11,6 +11,7 @@ import MenuOcrReviewStep, {
 } from '@/features/store-settings/components/MenuOcrReviewStep';
 import MenuOcrUploadStep from '@/features/store-settings/components/MenuOcrUploadStep';
 import { Button } from '@/shadcn/ui/button';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 
 type OcrStep = 'upload' | 'analyzing' | 'review';
 
@@ -67,8 +68,8 @@ const StepMenuRegistration = ({ data, onChange }: StepMenuRegistrationProps) => 
         })),
       );
       setOcrStep('review');
-    } catch {
-      setOcrError('메뉴 인식에 실패했습니다. 다시 시도해주세요.');
+    } catch (err) {
+      setOcrError(getApiErrorMessage(err, '메뉴 인식에 실패했습니다. 다시 시도해 주세요.'));
       setOcrStep('upload');
     }
   };
@@ -95,13 +96,13 @@ const StepMenuRegistration = ({ data, onChange }: StepMenuRegistrationProps) => 
   /* OCR 플로우 활성 중 */
   if (ocrStep !== null) {
     return (
-      <div className="flex flex-1 min-h-0 flex-col overflow-hidden py-2">
+      <div className="flex flex-1 min-h-0 flex-col overflow-hidden">
         {ocrStep === 'upload' && (
           <>
             {ocrError && (
-              <p className="text-xs text-destructive bg-red-50 rounded-lg px-3 py-2 mb-4">
+              <div className="text-xs text-destructive bg-destructive/10 rounded-lg px-3 py-2 mb-3">
                 {ocrError}
-              </p>
+              </div>
             )}
             <MenuOcrUploadStep
               onFileSelect={handleOcrFileSelect}
@@ -140,9 +141,9 @@ const StepMenuRegistration = ({ data, onChange }: StepMenuRegistrationProps) => 
     <div className="flex flex-1 min-h-0 flex-col">
       {data.length === 0 ? (
         /* 빈 상태 — 방법 선택 */
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-gray-200 text-center">
-          <div className="flex size-12 items-center justify-center rounded-full bg-gray-100">
-            <Plus className="size-6 text-gray-400" />
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-xl border-2 border-dashed border-border text-center">
+          <div className="flex size-12 items-center justify-center rounded-full bg-muted">
+            <Plus className="size-6 text-muted-foreground" />
           </div>
           <div>
             <p className="text-sm font-medium text-muted-foreground">등록된 메뉴가 없습니다</p>
@@ -182,7 +183,7 @@ const StepMenuRegistration = ({ data, onChange }: StepMenuRegistrationProps) => 
                   key={menu.id}
                   className="group overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-md"
                 >
-                  <div className="relative h-28 bg-gray-100 dark:bg-gray-800">
+                  <div className="relative h-28 bg-muted">
                     {menu.imageUrl ? (
                       <img
                         src={menu.imageUrl}
@@ -191,7 +192,7 @@ const StepMenuRegistration = ({ data, onChange }: StepMenuRegistrationProps) => 
                       />
                     ) : (
                       <div className="flex h-full items-center justify-center">
-                        <ImageOff className="size-8 text-gray-300" />
+                        <ImageOff className="size-8 text-muted-foreground/40" />
                       </div>
                     )}
 
@@ -206,14 +207,14 @@ const StepMenuRegistration = ({ data, onChange }: StepMenuRegistrationProps) => 
                       <button
                         type="button"
                         onClick={() => handleOpenEdit(menu)}
-                        className="flex size-6 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-sm transition-colors hover:text-baro-blue"
+                        className="flex size-6 items-center justify-center rounded-full bg-background/90 text-foreground/70 shadow-sm transition-colors hover:text-baro-blue"
                       >
                         <Pencil className="size-3" />
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDelete(menu.id)}
-                        className="flex size-6 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-sm transition-colors hover:text-red-500"
+                        className="flex size-6 items-center justify-center rounded-full bg-background/90 text-foreground/70 shadow-sm transition-colors hover:text-baro-red"
                       >
                         <Trash2 className="size-3" />
                       </button>

@@ -27,7 +27,7 @@ export function useUpdateStoreSettings() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: Partial<Omit<StoreSettings, 'operatingHours'>>) =>
+    mutationFn: (data: Partial<Omit<StoreSettings, 'operatingHours'>> & { ownerId?: string }) =>
       updateStoreSettings(storeId!, data),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['storeSettings', storeId] });
