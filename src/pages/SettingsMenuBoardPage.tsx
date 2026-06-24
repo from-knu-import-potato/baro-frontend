@@ -192,7 +192,7 @@ const SettingsMenuBoardPage = () => {
               {/* 레이아웃 */}
               <div className="px-4 py-3">
                 <p className="mb-3 text-xs font-medium text-muted-foreground">레이아웃</p>
-                <div className="inline-flex gap-0.5 rounded-lg bg-gray-100 p-1">
+                <div className="inline-flex gap-0.5 rounded-lg bg-muted p-1">
                   {(
                     [
                       { key: 'list', label: '리스트', icon: AlignJustify },
@@ -206,8 +206,8 @@ const SettingsMenuBoardPage = () => {
                       className={cn(
                         'flex items-center gap-2 rounded-md px-5 py-2 text-sm transition-all',
                         form.layout === key
-                          ? 'bg-white font-medium text-gray-900 shadow-sm'
-                          : 'text-gray-400 hover:text-gray-600',
+                          ? 'bg-background font-medium text-foreground shadow-sm'
+                          : 'text-muted-foreground hover:text-foreground',
                       )}
                     >
                       <Icon className="size-4" />
@@ -295,9 +295,9 @@ const SettingsMenuBoardPage = () => {
                   <button
                     type="button"
                     onClick={() => bannerInputRef.current?.click()}
-                    className="flex h-20 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-gray-200 bg-gray-50/60 transition-colors hover:border-baro-blue/40 hover:bg-baro-blue/5"
+                    className="flex h-20 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/40 transition-colors hover:border-baro-blue/40 hover:bg-baro-blue/5 dark:bg-transparent"
                   >
-                    <ImagePlus className="size-5 text-gray-300" />
+                    <ImagePlus className="size-5 text-muted-foreground/40" />
                     <span className="text-xs text-muted-foreground">배너 이미지 추가</span>
                   </button>
                 )}
