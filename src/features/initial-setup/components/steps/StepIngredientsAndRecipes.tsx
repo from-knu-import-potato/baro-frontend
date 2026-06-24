@@ -330,9 +330,9 @@ const StepIngredientsAndRecipes = ({
   };
 
   return (
-    <div className="flex flex-1 min-h-0 flex-col gap-4 md:flex-row">
+    <div className="flex flex-col gap-4 md:flex-1 md:min-h-0 md:flex-row">
       {/* ── 왼쪽 패널: 식자재 등록 ── */}
-      <div className="flex flex-1 min-h-0 flex-col overflow-hidden rounded-xl border">
+      <div className="flex flex-col overflow-hidden rounded-xl border md:flex-1 md:min-h-0">
         {/* 패널 헤더 */}
         <div className="shrink-0 border-b px-4 py-3">
           <h3 className="text-sm font-semibold">식자재 등록</h3>
@@ -395,9 +395,9 @@ const StepIngredientsAndRecipes = ({
         </div>
 
         {/* 식자재 태그 목록 — 스크롤 영역 */}
-        <div className="flex-1 min-h-0 overflow-y-auto p-3">
+        <div className="overflow-y-auto p-3 md:flex-1 md:min-h-0">
           {ingredients.length === 0 ? (
-            <div className="flex h-full items-center justify-center rounded-xl border-2 border-dashed border-gray-200 text-center">
+            <div className="flex min-h-25 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 text-center md:h-full md:min-h-0">
               <p className="text-xs text-muted-foreground">
                 식자재를 입력하면 여기에 태그로 표시됩니다
               </p>
@@ -417,7 +417,7 @@ const StepIngredientsAndRecipes = ({
       </div>
 
       {/* ── 오른쪽 패널: 레시피 등록 ── */}
-      <div className="flex flex-1 min-h-0 flex-col overflow-hidden rounded-xl border">
+      <div className="flex flex-col overflow-hidden rounded-xl border md:flex-1 md:min-h-0">
         {/* 패널 헤더 */}
         <div className="shrink-0 border-b px-4 py-3">
           <h3 className="text-sm font-semibold">메뉴별 레시피</h3>
@@ -427,9 +427,9 @@ const StepIngredientsAndRecipes = ({
         </div>
 
         {/* 레시피 패널 목록 — 스크롤 영역 */}
-        <div className="flex-1 min-h-0 overflow-y-auto p-3">
+        <div className="overflow-y-auto p-3 md:flex-1 md:min-h-0">
           {menuItems.length === 0 ? (
-            <div className="flex h-full items-center justify-center rounded-xl border-2 border-dashed border-gray-200 text-center">
+            <div className="flex min-h-25 items-center justify-center rounded-xl border-2 border-dashed border-gray-200 text-center md:h-full md:min-h-0">
               <div>
                 <p className="text-sm text-muted-foreground">등록된 메뉴가 없습니다</p>
                 <p className="mt-0.5 text-xs text-muted-foreground">
