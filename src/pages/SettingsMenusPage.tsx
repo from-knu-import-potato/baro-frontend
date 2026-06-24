@@ -140,15 +140,15 @@ const MenuModal = ({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent showCloseButton={false} className="max-h-[calc(100svh-4rem)] overflow-hidden">
-        <DialogHeader>
+      <DialogContent showCloseButton={false} className="max-h-[calc(100svh-4rem)] flex flex-col">
+        <DialogHeader className="shrink-0">
           <DialogTitle className="flex items-center gap-2">
             <UtensilsCrossed className="size-4 text-muted-foreground" />
             {editing ? '메뉴 수정' : '메뉴 등록'}
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4 overflow-y-auto min-h-0">
+        <div className="flex flex-1 flex-col gap-4 overflow-y-auto min-h-0">
           {/* 사진 업로드 */}
           <div className="space-y-1.5">
             <Label>메뉴 사진</Label>
@@ -268,15 +268,15 @@ const MenuModal = ({
           </div>
         </div>
 
-        <DialogFooter>
-          <Button type="button" variant="outline" onClick={onClose}>
+        <DialogFooter className="shrink-0">
+          <Button type="button" variant="outline" onClick={onClose} className="shrink-0">
             취소
           </Button>
           <Button
             type="button"
             onClick={handleSave}
             disabled={isSaving || isUploading}
-            className="bg-baro-blue hover:bg-baro-blue/80"
+            className="shrink-0 bg-baro-blue hover:bg-baro-blue/80"
           >
             {editing ? '수정 완료' : '등록하기'}
           </Button>
