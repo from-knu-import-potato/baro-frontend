@@ -13,6 +13,7 @@ import useAuthStore from '@/features/auth/store/authStore';
 import { Button } from '@/shadcn/ui/button';
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 
 const schema = z.object({
   username: z
@@ -44,14 +45,7 @@ const RegisterForm = () => {
       setTokens(accessToken, refreshToken);
       navigate(routePaths.myStores, { replace: true });
     } catch (err: unknown) {
-      const status = (err as { response?: { status?: number } })?.response?.status;
-      if (status === 403) {
-        toast.error('초대 코드가 올바르지 않습니다.');
-      } else if (status === 409) {
-        toast.error('이미 사용 중인 아이디입니다.');
-      } else {
-        toast.error('회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.');
-      }
+      toast.error(getApiErrorMessage(err, '회원가입에 실패했습니다. 잠시 후 다시 시도해 주세요.'));
     }
   };
 
