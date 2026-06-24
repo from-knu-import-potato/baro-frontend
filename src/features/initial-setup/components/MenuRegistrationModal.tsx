@@ -104,7 +104,7 @@ const MenuRegistrationModal = ({
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent showCloseButton={false}>
+      <DialogContent showCloseButton={false} className="max-h-[calc(100svh-4rem)] overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <UtensilsCrossed className="size-4 text-muted-foreground" />
@@ -112,7 +112,7 @@ const MenuRegistrationModal = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 overflow-y-auto min-h-0">
           {/* 사진 업로드 */}
           <div className="space-y-1.5">
             <Label>메뉴 사진</Label>
