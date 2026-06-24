@@ -1,7 +1,8 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 
 import {
   Check,
+  ChevronDown,
   ChevronRight,
   Globe,
   Info,
@@ -77,8 +78,20 @@ function getInitials(name?: string | null) {
   return name?.trim().slice(0, 2) ?? '?';
 }
 
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+  return isMobile;
+};
+
 const MyStoresList = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { data: userInfo, isLoading: isUserLoading } = useUserInfo();
   const { data: stores, isLoading: isStoresLoading } = useMyStores();
   const { mutate: updateName, isPending: isUpdatingName } = useUpdateUserName();
@@ -307,10 +320,18 @@ const MyStoresList = () => {
                     <Info className="h-4 w-4 text-muted-foreground" />
                     <span>서비스 정보</span>
                   </div>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  {isMobile ? (
+                    <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  )}
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="right" align="start" className="w-48">
+              <DropdownMenuContent
+                side={isMobile ? 'bottom' : 'right'}
+                align="start"
+                className="w-48"
+              >
                 <DropdownMenuItem disabled className="text-xs text-muted-foreground">
                   버전 {APP_VERSION}
                 </DropdownMenuItem>
@@ -373,7 +394,7 @@ const MyStoresList = () => {
           </div>
 
           {/* Stores grid — scrolls internally */}
-          <div className="flex-1 overflow-y-auto p-1 pt-3 md:overflow-y-auto">
+          <div className="flex-1 overflow-y-auto px-2 pt-3 pb-2 md:overflow-y-auto">
             {isStoresLoading ? (
               <div className="grid grid-cols-2 gap-3 md:grid-cols-2 md:gap-4 lg:grid-cols-3">
                 {Array.from({ length: 3 }).map((_, i) => (

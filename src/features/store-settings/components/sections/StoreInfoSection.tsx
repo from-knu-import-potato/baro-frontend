@@ -5,6 +5,7 @@ import { Store } from 'lucide-react';
 import {
   useStoreSettings,
   useUpdateStoreSettings,
+  useStoreMembers,
 } from '@/features/store-settings/hooks/useStoreSettings';
 import type { StoreSettings } from '@/features/store-settings/types/store-settings.types';
 import { Button } from '@/shadcn/ui/button';
@@ -44,21 +45,31 @@ const labelOf = (options: { value: string; label: string }[], val: string) =>
 const StoreInfoSection = () => {
   const { data, isLoading } = useStoreSettings();
   const { mutate: updateStore, isPending } = useUpdateStoreSettings();
+  const { data: members = [] } = useStoreMembers();
   const [isEditing, setIsEditing] = useState(false);
   const [form, setForm] = useState<StoreSettings | null>(null);
+  const [pendingOwnerId, setPendingOwnerId] = useState<string | null>(null);
 
   const handleEdit = () => {
     if (data) setForm(data);
+    setPendingOwnerId(null);
     setIsEditing(true);
   };
 
   const handleSave = () => {
     if (!form) return;
-    updateStore(form, { onSuccess: () => setIsEditing(false) });
+    const updateData = pendingOwnerId ? { ...form, ownerId: pendingOwnerId } : form;
+    updateStore(updateData, {
+      onSuccess: () => {
+        setPendingOwnerId(null);
+        setIsEditing(false);
+      },
+    });
   };
 
   const handleCancel = () => {
     if (data) setForm(data);
+    setPendingOwnerId(null);
     setIsEditing(false);
   };
 
@@ -106,10 +117,44 @@ const StoreInfoSection = () => {
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs text-muted-foreground">대표자명</Label>
-            <Input value={form.owner.name} disabled />
-            <p className="text-[11px] text-muted-foreground">
-              직원 추가 기능 오픈 후 변경 가능합니다.
-            </p>
+            {members.length <= 1 ? (
+              <>
+                <Input value={form.owner.name} disabled />
+                <p className="text-[11px] text-muted-foreground">
+                  팀 멤버가 없어 대표자를 변경할 수 없습니다.
+                </p>
+              </>
+            ) : (
+              <>
+                <Select
+                  value={pendingOwnerId ?? data?.owner.id ?? ''}
+                  onValueChange={(val) => setPendingOwnerId(val === data?.owner.id ? null : val)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue>
+                      {pendingOwnerId
+                        ? members.find((m) => m.userId === pendingOwnerId)?.name
+                        : data?.owner.name}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    {members.map((member) => (
+                      <SelectItem key={member.userId} value={member.userId}>
+                        {member.name}
+                        {member.role === 'owner' && (
+                          <span className="ml-1.5 text-xs text-muted-foreground">(현재 대표)</span>
+                        )}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {pendingOwnerId && (
+                  <p className="text-[11px] text-amber-600">
+                    저장 시 해당 멤버에게 대표자 권한이 이전됩니다.
+                  </p>
+                )}
+              </>
+            )}
           </div>
           <div className="space-y-1.5">
             <Label className="text-xs text-muted-foreground">사업 유형</Label>

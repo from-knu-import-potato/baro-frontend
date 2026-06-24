@@ -29,7 +29,7 @@ export async function fetchStoreSettings(storeId: string): Promise<StoreSettings
 
 export async function updateStoreSettings(
   storeId: string,
-  data: Partial<Omit<StoreSettings, 'operatingHours'>>,
+  data: Partial<Omit<StoreSettings, 'operatingHours'>> & { ownerId?: string },
 ): Promise<void> {
   await axiosInstance.patch(`/stores/${storeId}`, data);
 }
