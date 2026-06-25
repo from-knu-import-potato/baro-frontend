@@ -3,6 +3,8 @@ import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import useAuthStore from '@/features/auth/store/authStore';
+import type { SseNewOrderPayload } from '@/features/customer-order/types/customerOrder.api.types';
+import useOrderWarningsStore from '@/features/dashboard/store/orderWarningsStore';
 
 // EventSource는 커스텀 헤더를 지원하지 않으므로 fetch + ReadableStream으로 SSE 연결
 export const useOrderSSE = (storeId: string | null) => {
@@ -43,7 +45,17 @@ export const useOrderSSE = (storeId: string | null) => {
             if (line.startsWith('event: ')) {
               eventType = line.slice(7).trim();
             } else if (line.startsWith('data: ')) {
-              if (eventType === 'new-order' || eventType === 'order-status-changed') {
+              if (eventType === 'new-order') {
+                try {
+                  const payload = JSON.parse(line.slice(6)) as SseNewOrderPayload;
+                  if (payload.stockWarnings?.length) {
+                    useOrderWarningsStore.getState().setWarnings(payload.id, payload.stockWarnings);
+                  }
+                } catch {
+                  // 파싱 실패 시 무시
+                }
+                queryClient.invalidateQueries({ queryKey: ['orders', storeId] });
+              } else if (eventType === 'order-status-changed') {
                 queryClient.invalidateQueries({ queryKey: ['orders', storeId] });
               }
               eventType = '';

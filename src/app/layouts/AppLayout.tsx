@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
@@ -8,7 +8,17 @@ import useAuthStore from '@/features/auth/store/authStore';
 import { useClosingHistory } from '@/features/closing/hooks/useClosingHistory';
 import useClosingStore from '@/features/closing/store/closingStore';
 import { useDashboardStats } from '@/features/dashboard/hooks/useDashboardStats';
+import { useOrders } from '@/features/dashboard/hooks/useOrders';
 import { useStoreSettings } from '@/features/store-settings/hooks/useStoreSettings';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/shadcn/ui/alert-dialog';
+import { Button } from '@/shadcn/ui/button';
 import { SidebarInset, SidebarProvider } from '@/shadcn/ui/sidebar';
 import AppHeader from '@/widgets/AppHeader';
 import AppSidebar from '@/widgets/AppSidebar';
@@ -49,11 +59,34 @@ const AppLayout = () => {
     }
   }, [isOpen, pathname, navigate]);
 
+  const [showActiveOrdersWarning, setShowActiveOrdersWarning] = useState(false);
+
   const storeId = useAuthStore((s) => s.storeId);
   const { data: storeData, isLoading: isStoreLoading } = useStoreSettings();
   const { data: userData, isLoading: isUserLoading } = useUserInfo();
   const { data: dashboardStats } = useDashboardStats(isOpen ? storeId : null);
   const { data: closingHistory } = useClosingHistory(isOpen ? storeId : null);
+  const { data: orders = [] } = useOrders(isOpen ? storeId : null);
+  const businessDate = useClosingStore((s) => s.businessSession.businessDate);
+
+  const toKSTDate = (isoString: string) =>
+    new Date(new Date(isoString).getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
+
+  const todayOrders = businessDate
+    ? orders.filter((o) => toKSTDate(o.createdAt) === businessDate)
+    : orders;
+
+  const activeOrders = todayOrders.filter(
+    (o) => o.status === 'pending' || o.status === 'preparing',
+  );
+
+  const handleClosingClick = () => {
+    if (activeOrders.length > 0) {
+      setShowActiveOrdersWarning(true);
+    } else {
+      navigate('/closing');
+    }
+  };
 
   // 가게 설정 페이지에 있는 동안 스크롤 위치를 동기적으로 추적
   useEffect(() => {
@@ -110,7 +143,7 @@ const AppLayout = () => {
           userName={userData?.name ?? ''}
           userRole={ROLE_LABEL[storeData?.myRole ?? ''] ?? ''}
           isLoading={isUserLoading || isStoreLoading}
-          onClosingClick={() => navigate('/closing')}
+          onClosingClick={handleClosingClick}
           missedClosing={
             (dashboardStats?.missedClosing ?? false) && (closingHistory?.closings.length ?? 0) > 0
           }
@@ -121,6 +154,43 @@ const AppLayout = () => {
           </div>
         </div>
       </SidebarInset>
+      <AlertDialog open={showActiveOrdersWarning} onOpenChange={setShowActiveOrdersWarning}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>아직 완료되지 않은 주문이 있어요</AlertDialogTitle>
+            <AlertDialogDescription>
+              {activeOrders.filter((o) => o.status === 'pending').length > 0 && (
+                <>
+                  신규 주문{' '}
+                  <strong>{activeOrders.filter((o) => o.status === 'pending').length}건</strong>
+                  {activeOrders.filter((o) => o.status === 'preparing').length > 0 && ', '}
+                </>
+              )}
+              {activeOrders.filter((o) => o.status === 'preparing').length > 0 && (
+                <>
+                  준비 중{' '}
+                  <strong>{activeOrders.filter((o) => o.status === 'preparing').length}건</strong>
+                </>
+              )}
+              이 남아있어요. 마감 전에 주문을 모두 처리해 주세요.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button variant="outline" onClick={() => setShowActiveOrdersWarning(false)}>
+              돌아가기
+            </Button>
+            <Button
+              className="bg-baro-blue text-white hover:bg-baro-blue/80"
+              onClick={() => {
+                setShowActiveOrdersWarning(false);
+                navigate('/closing');
+              }}
+            >
+              그래도 마감하기
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </SidebarProvider>
   );
 };

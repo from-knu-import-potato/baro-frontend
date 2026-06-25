@@ -16,10 +16,12 @@ export const useUpdateOrderStatus = (storeId: string | null) => {
     mutationFn: ({
       orderId,
       status,
+      restoreStock,
     }: {
       orderId: string;
       status: UpdateOrderStatusRequest['status'];
-    }) => updateOrderStatus(storeId!, orderId, status),
+      restoreStock?: boolean;
+    }) => updateOrderStatus(storeId!, orderId, status, restoreStock),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['orders', storeId] }),
   });
 };

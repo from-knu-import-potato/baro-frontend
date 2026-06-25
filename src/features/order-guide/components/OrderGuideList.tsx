@@ -40,9 +40,8 @@ const URGENCY_CONFIG: Record<
   },
   warning: {
     label: '주의',
-    badgeClass:
-      'bg-orange-100 text-orange-600 border border-orange-200 dark:bg-orange-950/40 dark:text-orange-400',
-    rowClass: 'border-l-4 border-l-orange-400',
+    badgeClass: 'bg-baro-red/10 text-baro-red border border-baro-red/20',
+    rowClass: 'border-l-4 border-l-baro-red',
     icon: <AlertTriangle className="w-3.5 h-3.5" />,
   },
   recommended: {
