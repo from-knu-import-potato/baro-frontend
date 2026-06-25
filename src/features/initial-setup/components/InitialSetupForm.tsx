@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { routePaths } from '@/app/routes/routePaths';
 import useAuthStore from '@/features/auth/store/authStore';
@@ -23,6 +24,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/shadcn/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/ui/card';
 import BackButton from '@/shared/components/BackButton';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 
 type BasicInfoErrors = Partial<Record<keyof StoreBasicInfo, string>>;
 
@@ -102,8 +104,10 @@ const InitialSetupForm = () => {
       });
 
       navigate(routePaths.dashboard);
-    } catch {
-      alert('초기 설정 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } catch (err) {
+      toast.error(
+        getApiErrorMessage(err, '초기 설정 저장에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+      );
     }
   };
 

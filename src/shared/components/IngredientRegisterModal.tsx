@@ -24,6 +24,7 @@ import {
 import { Input } from '@/shadcn/ui/input';
 import { Label } from '@/shadcn/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shadcn/ui/select';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 
 type IngredientUnit = 'g' | 'ml' | '개';
 
@@ -125,7 +126,8 @@ const IngredientRegisterModal = ({
   const handleDeleteConversion = (conv: UnitConversionDto) => {
     deleteConversion(conv.id, {
       onSuccess: () => toast.success(`${conv.purchaseUnit} 변환 계수가 삭제되었습니다.`),
-      onError: () => toast.error('삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+      onError: (err) =>
+        toast.error(getApiErrorMessage(err, '삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.')),
     });
   };
 
@@ -153,7 +155,8 @@ const IngredientRegisterModal = ({
           setIsAddingConversion(false);
           setNewConversion({ purchaseUnit: '', factor: '' });
         },
-        onError: () => toast.error('추가에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+        onError: (err) =>
+          toast.error(getApiErrorMessage(err, '추가에 실패했습니다. 잠시 후 다시 시도해 주세요.')),
       },
     );
   };
