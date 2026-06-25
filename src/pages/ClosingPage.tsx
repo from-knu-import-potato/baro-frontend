@@ -7,9 +7,6 @@ import { toast } from 'sonner';
 
 import useAuthStore from '@/features/auth/store/authStore';
 import AfterClosingModal from '@/features/closing/components/AfterClosingModal';
-import ClosingExtraDeductionDialog, {
-  type ExtraDeductionRow,
-} from '@/features/closing/components/ClosingExtraDeductionDialog';
 import ClosingInventoryDeductionSection, {
   type DeductionRow,
 } from '@/features/closing/components/ClosingInventoryDeductionSection';
@@ -54,8 +51,6 @@ const ClosingPage = () => {
   const { data: preview, isLoading, isError } = useClosingPreview(storeId, dateParam);
 
   const [deductionRows, setDeductionRows] = useState<DeductionRow[]>([]);
-  const [extraDeductions, setExtraDeductions] = useState<ExtraDeductionRow[]>([]);
-  const [extraDialogOpen, setExtraDialogOpen] = useState(false);
   const [afterModalOpen, setAfterModalOpen] = useState(false);
   const [alreadyClosedModalOpen, setAlreadyClosedModalOpen] = useState(false);
   const [finalRevenue, setFinalRevenue] = useState(0);
@@ -69,39 +64,16 @@ const ClosingPage = () => {
     setDeductionRows(
       preview.inventoryDeductions.map((d) => ({
         ...d,
-        actualUsage: d.theoreticalUsage,
+        remainingStock: d.currentStock,
       })),
     );
     setIsInitialized(true);
   }
 
-  const handleDeductionChange = (ingredientId: string, actualUsage: number) => {
+  const handleDeductionChange = (ingredientId: string, remainingStock: number) => {
     setDeductionRows((prev) =>
-      prev.map((row) => (row.ingredientId === ingredientId ? { ...row, actualUsage } : row)),
+      prev.map((row) => (row.ingredientId === ingredientId ? { ...row, remainingStock } : row)),
     );
-  };
-
-  const handleAddExtra = (row: ExtraDeductionRow) => {
-    setExtraDeductions((prev) => {
-      const exists = prev.find((r) => r.ingredientId === row.ingredientId);
-      if (exists) {
-        return prev.map((r) =>
-          r.ingredientId === row.ingredientId ? { ...r, amount: r.amount + row.amount } : r,
-        );
-      }
-      return [...prev, row];
-    });
-    setExtraDialogOpen(false);
-  };
-
-  const handleExtraAmountChange = (ingredientId: string, amount: number) => {
-    setExtraDeductions((prev) =>
-      prev.map((r) => (r.ingredientId === ingredientId ? { ...r, amount } : r)),
-    );
-  };
-
-  const handleExtraRemove = (ingredientId: string) => {
-    setExtraDeductions((prev) => prev.filter((r) => r.ingredientId !== ingredientId));
   };
 
   const handleComplete = () => {
@@ -112,20 +84,12 @@ const ClosingPage = () => {
       return;
     }
 
-    const merged = new Map<string, number>();
-    deductionRows.forEach(({ ingredientId, actualUsage }) => {
-      merged.set(ingredientId, (merged.get(ingredientId) ?? 0) + actualUsage);
-    });
-    extraDeductions.forEach(({ ingredientId, amount }) => {
-      merged.set(ingredientId, (merged.get(ingredientId) ?? 0) + amount);
-    });
-
     submitClosing(
       {
         date: preview.date,
-        inventoryDeductions: Array.from(merged.entries()).map(([ingredientId, actualUsage]) => ({
+        inventoryDeductions: deductionRows.map(({ ingredientId, remainingStock }) => ({
           ingredientId,
-          actualUsage,
+          remainingStock,
         })),
       },
       {
@@ -225,14 +189,7 @@ const ClosingPage = () => {
           <ClosingSoldMenusSection menus={preview.soldMenus} />
 
           {/* 재고 차감 섹션 */}
-          <ClosingInventoryDeductionSection
-            rows={deductionRows}
-            onChange={handleDeductionChange}
-            extraRows={extraDeductions}
-            onAddExtra={() => setExtraDialogOpen(true)}
-            onExtraAmountChange={handleExtraAmountChange}
-            onExtraRemove={handleExtraRemove}
-          />
+          <ClosingInventoryDeductionSection rows={deductionRows} onChange={handleDeductionChange} />
         </div>
 
         {/* 하단 버튼 — sticky */}
@@ -257,12 +214,6 @@ const ClosingPage = () => {
           )}
         </div>
       </div>
-
-      <ClosingExtraDeductionDialog
-        open={extraDialogOpen}
-        onClose={() => setExtraDialogOpen(false)}
-        onAdd={handleAddExtra}
-      />
 
       {storeId && (
         <AfterClosingModal

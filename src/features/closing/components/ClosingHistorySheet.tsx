@@ -141,12 +141,14 @@ const DetailView = ({ storeId, item, onBack }: DetailViewProps) => {
                 <p className="text-sm text-muted-foreground pl-6">차감된 재고가 없습니다.</p>
               ) : (
                 <div className="rounded-lg border overflow-hidden overflow-x-auto">
-                  <table className="w-full min-w-[280px] text-sm">
+                  <table className="w-full min-w-[400px] text-sm">
                     <thead>
                       <tr className="bg-muted/50 text-muted-foreground">
                         <th className="text-left px-3 py-2 font-medium">식자재</th>
-                        <th className="text-right px-3 py-2 font-medium">사용량</th>
-                        <th className="text-right px-3 py-2 font-medium">차감 후 재고</th>
+                        <th className="text-right px-3 py-2 font-medium">주문 차감</th>
+                        <th className="text-right px-3 py-2 font-medium">실제 사용량</th>
+                        <th className="text-right px-3 py-2 font-medium">보정값</th>
+                        <th className="text-right px-3 py-2 font-medium">마감 후 재고</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -154,7 +156,16 @@ const DetailView = ({ storeId, item, onBack }: DetailViewProps) => {
                         <tr key={deduction.ingredientId} className="border-t">
                           <td className="px-3 py-2.5 font-medium">{deduction.ingredientName}</td>
                           <td className="px-3 py-2.5 text-right text-muted-foreground">
-                            {deduction.usedAmount.toLocaleString('ko-KR')}
+                            {deduction.orderDeductedAmount.toLocaleString('ko-KR')}
+                            {deduction.unit}
+                          </td>
+                          <td className="px-3 py-2.5 text-right">
+                            {deduction.actualUsage.toLocaleString('ko-KR')}
+                            {deduction.unit}
+                          </td>
+                          <td className="px-3 py-2.5 text-right text-muted-foreground">
+                            {deduction.adjustmentAmount > 0 ? '+' : ''}
+                            {deduction.adjustmentAmount.toLocaleString('ko-KR')}
                             {deduction.unit}
                           </td>
                           <td className="px-3 py-2.5 text-right">

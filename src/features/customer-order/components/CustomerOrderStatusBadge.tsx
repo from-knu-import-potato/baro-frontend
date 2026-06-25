@@ -1,8 +1,14 @@
 import type { OrderStatus } from '@/features/customer-order/types/customerOrder.types';
 
 const STATUS_CONFIG: Record<OrderStatus, { label: string; className: string }> = {
-  pending: { label: '신규 주문', className: 'bg-baro-yellow/10 text-baro-yellow-text' },
-  preparing: { label: '준비중', className: 'bg-sky-50 text-sky-500' },
+  pending: {
+    label: '신규 주문',
+    className: 'bg-baro-green/10 text-baro-green border border-baro-green/50',
+  },
+  preparing: {
+    label: '준비중',
+    className: 'bg-baro-green/10 text-baro-green border border-baro-green/50',
+  },
   completed: { label: '완료', className: 'bg-slate-100 text-slate-400' },
   cancelled: { label: '취소', className: 'bg-zinc-100 text-zinc-400' },
 };

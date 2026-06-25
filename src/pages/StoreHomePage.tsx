@@ -93,6 +93,7 @@ const StoreHomePage = () => {
   const { data: history, isLoading } = useClosingHistory(storeId);
   const businessDateClosed =
     history?.closings.some((c) => c.date.startsWith(businessDate)) ?? false;
+  const hasEverClosed = (history?.closings.length ?? 0) > 0;
 
   // 개점 시간 이후(휴무일 제외)에만 전날 마감 누락 여부 조회
   const { data: dashboardStats } = useDashboardStats(
@@ -108,7 +109,8 @@ const StoreHomePage = () => {
     if (businessSession.isOpen && businessSession.businessDate === businessDate)
       return 'already-open';
     if (isHoliday) return businessDateClosed ? 'holiday-closed' : 'holiday';
-    if (isBeforeOpen) return businessDateClosed ? 'before-open-closed' : 'before-open-not-closed';
+    if (isBeforeOpen)
+      return businessDateClosed || !hasEverClosed ? 'before-open-closed' : 'before-open-not-closed';
     return businessDateClosed ? 'today-closed' : 'normal';
   };
 
