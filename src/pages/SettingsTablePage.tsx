@@ -16,6 +16,7 @@ import {
 import { Button } from '@/shadcn/ui/button';
 import { Input } from '@/shadcn/ui/input';
 import { Skeleton } from '@/shadcn/ui/skeleton';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 
 const BASE_URL = window.location.origin;
 
@@ -92,8 +93,8 @@ const SettingsTablePage = () => {
           toast.success('테이블 수가 저장되었습니다.');
           setIsEditing(false);
         },
-        onError: () => {
-          toast.error('저장에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+        onError: (err) => {
+          toast.error(getApiErrorMessage(err, '저장에 실패했습니다. 잠시 후 다시 시도해 주세요.'));
         },
       },
     );

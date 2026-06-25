@@ -67,6 +67,7 @@ import { Input } from '@/shadcn/ui/input';
 import { Separator } from '@/shadcn/ui/separator';
 import { Skeleton } from '@/shadcn/ui/skeleton';
 import baroLogo from '@/shared/assets/images/baro-logo.png';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 
 const ROLE_LABEL: Record<MyStore['role'], string> = { owner: '사장님', staff: '직원' };
 const ROLE_STYLE: Record<MyStore['role'], string> = {
@@ -140,8 +141,8 @@ const MyStoresList = () => {
       await withdrawUser();
       clearAuth();
       navigate(routePaths.login, { replace: true });
-    } catch {
-      toast.error('회원 탈퇴에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, '회원 탈퇴에 실패했습니다. 잠시 후 다시 시도해 주세요.'));
       setIsWithdrawing(false);
       setWithdrawOpen(false);
     }
@@ -158,7 +159,10 @@ const MyStoresList = () => {
     if (!trimmed) return;
     updateName(trimmed, {
       onSuccess: () => setIsEditingName(false),
-      onError: () => toast.error('이름 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+      onError: (err) =>
+        toast.error(
+          getApiErrorMessage(err, '이름 변경에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+        ),
     });
   };
 
@@ -176,8 +180,10 @@ const MyStoresList = () => {
         setDeleteTargetId(null);
         setIsEditMode(false);
       },
-      onError: () => {
-        toast.error('가게 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      onError: (err) => {
+        toast.error(
+          getApiErrorMessage(err, '가게 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+        );
       },
     });
   };
@@ -191,8 +197,10 @@ const MyStoresList = () => {
         setLeaveTargetId(null);
         setIsEditMode(false);
       },
-      onError: () => {
-        toast.error('가게 나가기에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      onError: (err) => {
+        toast.error(
+          getApiErrorMessage(err, '가게 나가기에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+        );
       },
     });
   };

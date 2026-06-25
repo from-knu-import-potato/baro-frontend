@@ -25,6 +25,7 @@ import {
   DialogTitle,
 } from '@/shadcn/ui/dialog';
 import { Skeleton } from '@/shadcn/ui/skeleton';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 
 interface ClosingCancelModalProps {
   open: boolean;
@@ -74,8 +75,10 @@ const ClosingCancelModal = ({ open, onClose, storeId }: ClosingCancelModalProps)
         setConfirmingItem(null);
         onClose();
       },
-      onError: () => {
-        toast.error('마감 취소에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      onError: (err) => {
+        toast.error(
+          getApiErrorMessage(err, '마감 취소에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+        );
         setConfirmingItem(null);
       },
     });

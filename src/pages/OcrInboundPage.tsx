@@ -278,8 +278,8 @@ const OcrInboundPage = () => {
       qc.invalidateQueries({ queryKey: ['storeSettings', storeId] });
       toast.success('재고 등록이 완료되었습니다.');
       navigate(routePaths.inventory);
-    } catch {
-      toast.error('입고 확정에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, '입고 확정에 실패했습니다. 잠시 후 다시 시도해 주세요.'));
     } finally {
       setIsConfirming(false);
     }

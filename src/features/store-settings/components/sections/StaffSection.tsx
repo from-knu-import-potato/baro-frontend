@@ -24,6 +24,7 @@ import {
 import { Skeleton } from '@/shadcn/ui/skeleton';
 import SettingRow from '@/shared/components/SettingRow';
 import SettingsSection from '@/shared/components/SettingsSection';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 
 const MemberAvatar = ({ member }: { member: StoreMember }) => {
   if (member.profileImage) {
@@ -64,8 +65,10 @@ const StaffSection = () => {
       await regenerateInviteCode(storeId);
       await queryClient.invalidateQueries({ queryKey: ['storeSettings', storeId] });
       toast.success('초대코드가 발급되었습니다.');
-    } catch {
-      toast.error('초대코드 발급에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } catch (err) {
+      toast.error(
+        getApiErrorMessage(err, '초대코드 발급에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+      );
     } finally {
       setIsIssuing(false);
       setConfirmReissueOpen(false);
@@ -87,8 +90,10 @@ const StaffSection = () => {
         toast.success(`${targetMember.name}님을 내보냈습니다.`);
         setTargetMember(null);
       },
-      onError: () => {
-        toast.error('멤버 내보내기에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      onError: (err) => {
+        toast.error(
+          getApiErrorMessage(err, '멤버 내보내기에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+        );
         setTargetMember(null);
       },
     });
