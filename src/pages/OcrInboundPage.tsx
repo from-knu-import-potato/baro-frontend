@@ -70,11 +70,12 @@ function applyStoredConversions(items: OcrInboundItem[], map: UnitConversionMap)
       return item;
     const conv = map.get(makeConversionKey(item.matchedInventoryId, item.purchaseUnit));
     if (!conv) return item;
+    const factor = Number(conv.factor);
     return {
       ...item,
       unit: conv.baseUnit,
-      quantity: (item.purchaseQuantity ?? 0) * conv.factor,
-      conversionFactor: conv.factor,
+      quantity: (item.purchaseQuantity ?? 0) * factor,
+      conversionFactor: factor,
     };
   });
 }
@@ -251,7 +252,7 @@ const OcrInboundPage = () => {
         ingredientId: (item.matchedInventoryId ?? item.newIngredientId)!,
         purchaseUnit: item.purchaseUnit!,
         baseUnit: item.unit,
-        factor: item.conversionFactor!,
+        factor: Number(item.conversionFactor!),
       }));
 
     setIsConfirming(true);
