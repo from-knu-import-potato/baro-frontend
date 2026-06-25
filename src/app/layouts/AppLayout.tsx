@@ -18,9 +18,26 @@ const ROLE_LABEL: Record<string, string> = {
   staff: '직원',
 };
 
+const STORE_SETTINGS_PATH = routePaths.storeSettings;
+const STORE_SETTINGS_SUB_PATHS = [
+  routePaths.storeSettingsMenus,
+  routePaths.storeSettingsMenuBoard,
+  routePaths.storeSettingsTable,
+  routePaths.storeSettingsRecipes,
+  routePaths.storeSettingsIngredients,
+];
+const SCROLL_STORAGE_KEY = 'baro-store-settings-scroll';
+
+const isStoreSettingsSubPath = (path: string) =>
+  STORE_SETTINGS_SUB_PATHS.some((p) => path.startsWith(p));
+
+// 모듈 레벨: React 생명주기와 무관하게 스크롤 위치를 동기적으로 보존
+let settingsScrollTop = 0;
+
 const AppLayout = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const { pathname } = useLocation();
+  const prevPathnameRef = useRef<string>(pathname);
   const navigate = useNavigate();
 
   const { isOpen } = useClosingStore((s) => s.businessSession);
@@ -38,8 +55,46 @@ const AppLayout = () => {
   const { data: dashboardStats } = useDashboardStats(isOpen ? storeId : null);
   const { data: closingHistory } = useClosingHistory(isOpen ? storeId : null);
 
+  // 가게 설정 페이지에 있는 동안 스크롤 위치를 동기적으로 추적
   useEffect(() => {
-    scrollRef.current?.scrollTo(0, 0);
+    if (pathname !== STORE_SETTINGS_PATH) return;
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      settingsScrollTop = el.scrollTop;
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [pathname]);
+
+  useEffect(() => {
+    const prev = prevPathnameRef.current;
+    prevPathnameRef.current = pathname;
+
+    const comingBackToSettings = pathname === STORE_SETTINGS_PATH && isStoreSettingsSubPath(prev);
+    const goingToSubPage = prev === STORE_SETTINGS_PATH && isStoreSettingsSubPath(pathname);
+    const movingBetweenSubPages = isStoreSettingsSubPath(prev) && isStoreSettingsSubPath(pathname);
+
+    if (goingToSubPage) {
+      // 가게 설정 → 하위 페이지: 리스너로 수집한 위치 저장 후 최상단 이동
+      sessionStorage.setItem(SCROLL_STORAGE_KEY, String(settingsScrollTop));
+      scrollRef.current?.scrollTo(0, 0);
+    } else if (comingBackToSettings) {
+      // 하위 페이지 → 가게 설정: 복원할 위치를 미리 동기적으로 반영 후 레이아웃 완료 시 스크롤
+      const saved = Number(sessionStorage.getItem(SCROLL_STORAGE_KEY) ?? 0);
+      settingsScrollTop = saved;
+      requestAnimationFrame(() => {
+        scrollRef.current?.scrollTo({ top: saved, behavior: 'instant' });
+      });
+    } else if (movingBetweenSubPages) {
+      // 하위 페이지 간 이동: 저장된 위치는 유지하고 최상단으로만 이동
+      scrollRef.current?.scrollTo(0, 0);
+    } else {
+      // 설정 영역을 완전히 벗어남: 저장 위치 제거 후 최상단 이동
+      sessionStorage.removeItem(SCROLL_STORAGE_KEY);
+      settingsScrollTop = 0;
+      scrollRef.current?.scrollTo(0, 0);
+    }
   }, [pathname]);
 
   return (

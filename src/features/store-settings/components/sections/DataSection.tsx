@@ -24,6 +24,7 @@ import {
 import { Button } from '@/shadcn/ui/button';
 import SettingRow from '@/shared/components/SettingRow';
 import SettingsSection from '@/shared/components/SettingsSection';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 
 const DataSection = () => {
   const navigate = useNavigate();
@@ -43,8 +44,10 @@ const DataSection = () => {
         toast.success('가게 데이터가 초기화되었습니다.');
         setOpen(false);
       },
-      onError: () => {
-        toast.error('데이터 초기화에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      onError: (err) => {
+        toast.error(
+          getApiErrorMessage(err, '데이터 초기화에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+        );
         setOpen(false);
       },
     });
@@ -58,8 +61,10 @@ const DataSection = () => {
         useAuthStore.setState({ storeId: null });
         navigate(routePaths.myStores, { replace: true });
       },
-      onError: () => {
-        toast.error('가게 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      onError: (err) => {
+        toast.error(
+          getApiErrorMessage(err, '가게 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+        );
         setDeleteOpen(false);
       },
     });
@@ -73,8 +78,10 @@ const DataSection = () => {
         useAuthStore.setState({ storeId: null });
         navigate(routePaths.myStores, { replace: true });
       },
-      onError: () => {
-        toast.error('가게 나가기에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      onError: (err) => {
+        toast.error(
+          getApiErrorMessage(err, '가게 나가기에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
+        );
         setLeaveOpen(false);
       },
     });

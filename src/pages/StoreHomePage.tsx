@@ -36,6 +36,7 @@ import {
 } from '@/shadcn/ui/dialog';
 import { Skeleton } from '@/shadcn/ui/skeleton';
 import baroLogo from '@/shared/assets/images/baro-logo.png';
+import { getApiErrorMessage } from '@/shared/utils/apiError';
 import {
   getBusinessDate,
   getTodayOpenTime,
@@ -120,8 +121,8 @@ const StoreHomePage = () => {
       await openBusiness(storeId, { businessDate: targetDate });
       setBusinessSession({ isOpen: true, businessDate: targetDate });
       navigate('/dashboard');
-    } catch {
-      toast.error('영업 시작에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } catch (err) {
+      toast.error(getApiErrorMessage(err, '영업 시작에 실패했습니다. 잠시 후 다시 시도해 주세요.'));
     } finally {
       setIsStarting(false);
     }
