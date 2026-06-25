@@ -67,4 +67,22 @@ export interface CreateOrderRequest {
 
 export interface UpdateOrderStatusRequest {
   status: 'preparing' | 'completed' | 'cancelled';
+  restoreStock?: boolean;
+}
+
+export interface StockWarning {
+  ingredientName: string;
+  required: number;
+  currentStock: number;
+  unit: 'g' | 'ml' | '개';
+}
+
+export interface SseNewOrderPayload {
+  id: string;
+  storeId: string;
+  tableNumber: number;
+  status: ApiOrderStatus;
+  totalPrice: number;
+  items?: ApiOrderItem[];
+  stockWarnings: StockWarning[];
 }

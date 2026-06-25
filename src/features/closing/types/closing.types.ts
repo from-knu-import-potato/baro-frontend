@@ -10,8 +10,10 @@ export interface ClosingInventoryDeduction {
   ingredientId: string;
   ingredientName: string;
   unit: 'g' | 'ml' | '개';
-  theoreticalUsage: number;
+  openingStock: number;
+  orderDeductedAmount: number;
   currentStock: number;
+  isNegative: boolean;
 }
 
 export interface ClosingPreview {
@@ -25,7 +27,7 @@ export interface ClosingPreview {
 
 export interface ClosingDeductionItem {
   ingredientId: string;
-  actualUsage: number;
+  remainingStock: number;
 }
 
 export interface ClosingRequest {
@@ -37,7 +39,9 @@ export interface ClosingDeductionResult {
   ingredientId: string;
   ingredientName: string;
   unit: string;
-  usedAmount: number;
+  orderDeductedAmount: number;
+  actualUsage: number;
+  adjustmentAmount: number;
   remainingStock: number;
 }
 
@@ -92,7 +96,9 @@ export interface ClosingDetailInventoryDeduction {
   ingredientId: string;
   ingredientName: string;
   unit: 'g' | 'ml' | '개';
-  usedAmount: number;
+  orderDeductedAmount: number;
+  actualUsage: number;
+  adjustmentAmount: number;
   remainingStock: number;
 }
 

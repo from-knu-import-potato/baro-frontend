@@ -35,8 +35,8 @@ const TodayStatusSection = ({ stats, onClosingClick }: TodayStatusSectionProps) 
         <StatItem
           label="전체 재고 개수"
           value={`${stats.totalInventory.toLocaleString()} 개`}
-          iconBg="bg-orange-100"
-          icon={<Package className="w-6 h-6 text-orange-400" />}
+          iconBg="bg-baro-red/10"
+          icon={<Package className="w-6 h-6 text-baro-red" />}
           subtitle={`마지막 업데이트  ${stats.lastUpdated}`}
         />
         <StatItem

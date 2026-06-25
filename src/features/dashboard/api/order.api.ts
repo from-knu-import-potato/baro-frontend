@@ -13,10 +13,14 @@ export const updateOrderStatus = (
   storeId: string,
   orderId: string,
   status: UpdateOrderStatusRequest['status'],
+  restoreStock?: boolean,
 ): Promise<ApiOrder> =>
   axiosInstance
     .patch<{
       success: boolean;
       data: ApiOrder;
-    }>(`/stores/${storeId}/orders/${orderId}/status`, { status })
+    }>(`/stores/${storeId}/orders/${orderId}/status`, {
+      status,
+      ...(restoreStock !== undefined && { restoreStock }),
+    })
     .then((res) => res.data.data);

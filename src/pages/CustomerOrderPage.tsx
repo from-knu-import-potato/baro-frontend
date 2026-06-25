@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react';
 
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { AlertCircle, CheckCircle, Loader2, Minus, Plus, ShoppingCart } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock, Loader2, Minus, Plus, ShoppingCart } from 'lucide-react';
 import { useParams } from 'react-router-dom';
 
 import {
+  fetchPublicStoreOpenStatus,
   fetchStoreMenuCategories,
   fetchStoreMenus,
   fetchStoreTheme,
@@ -58,7 +59,7 @@ const MenuItemListCard = ({ item, quantity, themeHex, onUpdate }: MenuItemCardPr
         className="size-16 rounded-lg object-cover shrink-0"
       />
     ) : (
-      <div className="size-16 rounded-lg bg-orange-50 flex items-center justify-center shrink-0 text-2xl select-none">
+      <div className="size-16 rounded-lg bg-baro-red/5 flex items-center justify-center shrink-0 text-2xl select-none">
         ☕
       </div>
     )}
@@ -89,7 +90,7 @@ const MenuItemGridCard = ({ item, quantity, themeHex, onUpdate }: MenuItemCardPr
     )}
     style={quantity > 0 ? ({ '--tw-ring-color': `${themeHex}60` } as React.CSSProperties) : {}}
   >
-    <div className="relative h-32 bg-orange-50">
+    <div className="relative h-32 bg-baro-red/5">
       {item.imageUrl ? (
         <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
       ) : (
@@ -244,6 +245,22 @@ const OrderSuccess = ({
   );
 };
 
+/* ── 미개점 안내 화면 ── */
+const StoreClosed = ({ themeHex }: { themeHex: string }) => (
+  <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-6 gap-5">
+    <div
+      className="size-16 rounded-full flex items-center justify-center"
+      style={{ backgroundColor: `${themeHex}20` }}
+    >
+      <Clock className="size-8" style={{ color: themeHex }} />
+    </div>
+    <div className="text-center">
+      <h1 className="text-lg font-bold text-gray-900">현재 영업 중이 아닙니다</h1>
+      <p className="text-sm text-gray-400 mt-2">영업 시간을 확인하시거나 직원에게 문의해 주세요.</p>
+    </div>
+  </div>
+);
+
 /* ── 메인 페이지 ── */
 const CustomerOrderPage = () => {
   const { storeId, tableNumber } = useParams<{ storeId: string; tableNumber: string }>();
@@ -280,6 +297,12 @@ const CustomerOrderPage = () => {
     }
   });
 
+  const { data: openStatus } = useQuery({
+    queryKey: ['public-store-open-status', storeId],
+    queryFn: () => fetchPublicStoreOpenStatus(storeId!),
+    enabled: !!storeId,
+  });
+
   const {
     data: menus = [],
     isLoading: isMenuLoading,
@@ -304,8 +327,15 @@ const CustomerOrderPage = () => {
 
   const themeHex = THEME_HEX[theme.themeColor];
 
+  const [isStoreClosed, setIsStoreClosed] = useState(false);
+
   const orderMutation = useMutation({
     mutationFn: (data: Parameters<typeof createOrder>[1]) => createOrder(storeId!, data),
+    onError: (err: unknown) => {
+      const code = (err as { response?: { data?: { error?: { code?: string } } } })?.response?.data
+        ?.error?.code;
+      if (code === 'STORE_CLOSED') setIsStoreClosed(true);
+    },
     onSuccess: (order) => {
       const cartItems: CartItem[] = menus
         .filter((item) => (cart[item.id] ?? 0) > 0)
@@ -367,6 +397,10 @@ const CustomerOrderPage = () => {
       customerNote: customerNote || undefined,
     });
   };
+
+  if (openStatus?.isOpen === false || isStoreClosed) {
+    return <StoreClosed themeHex={themeHex} />;
+  }
 
   if (successInfo) {
     return (
