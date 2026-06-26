@@ -12,6 +12,7 @@ interface IngredientLinkModalProps {
   open: boolean;
   ocrName: string;
   ingredients: ExistingIngredient[];
+  currentIngredientId?: string;
   onClose: () => void;
   onConfirm: (ingredient: ExistingIngredient) => void;
 }
@@ -20,6 +21,7 @@ const IngredientLinkModal = ({
   open,
   ocrName,
   ingredients,
+  currentIngredientId,
   onClose,
   onConfirm,
 }: IngredientLinkModalProps) => {
@@ -72,30 +74,33 @@ const IngredientLinkModal = ({
               <p className="text-xs text-muted-foreground text-center py-6">검색 결과가 없습니다</p>
             ) : (
               <div className="flex flex-wrap gap-1.5">
-                {filtered.map((ingredient) => (
-                  <button
-                    key={ingredient.id}
-                    onClick={() => setSelected(ingredient)}
-                    className={cn(
-                      'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all select-none cursor-pointer',
-                      selected?.id === ingredient.id
-                        ? 'border-baro-blue bg-baro-blue/10 text-baro-blue'
-                        : 'text-foreground hover:border-baro-blue/60 hover:bg-baro-blue/5',
-                    )}
-                  >
-                    {ingredient.name}
-                    <span
+                {filtered.map((ingredient) => {
+                  const isActive =
+                    selected?.id === ingredient.id ||
+                    (!selected && ingredient.id === currentIngredientId);
+                  return (
+                    <button
+                      key={ingredient.id}
+                      onClick={() => setSelected(ingredient)}
                       className={cn(
-                        'text-[10px]',
-                        selected?.id === ingredient.id
-                          ? 'text-baro-blue/70'
-                          : 'text-muted-foreground',
+                        'inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-all select-none cursor-pointer',
+                        isActive
+                          ? 'border-baro-blue bg-baro-blue/10 text-baro-blue'
+                          : 'text-foreground hover:border-baro-blue/60 hover:bg-baro-blue/5',
                       )}
                     >
-                      ({ingredient.unit})
-                    </span>
-                  </button>
-                ))}
+                      {ingredient.name}
+                      <span
+                        className={cn(
+                          'text-[10px]',
+                          isActive ? 'text-baro-blue/70' : 'text-muted-foreground',
+                        )}
+                      >
+                        ({ingredient.unit})
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>

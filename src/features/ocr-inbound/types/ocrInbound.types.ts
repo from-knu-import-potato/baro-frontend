@@ -3,6 +3,7 @@ export type OcrUnit = 'g' | 'ml' | '개';
 export interface OcrInboundItem {
   id: string;
   name: string;
+  originalName: string;
   quantity: number;
   unit: OcrUnit;
   unitPrice: number | null;

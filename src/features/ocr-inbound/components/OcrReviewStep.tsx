@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { useQueryClient } from '@tanstack/react-query';
 import {
   AlertCircle,
   Building2,
   CalendarIcon,
-  CheckCircle2,
   FileText,
   Hash,
   Link,
@@ -12,10 +12,13 @@ import {
   RotateCcw,
   Trash2,
   TriangleAlert,
+  X,
   ZoomIn,
   ZoomOut,
 } from 'lucide-react';
+import { toast } from 'sonner';
 
+import useAuthStore from '@/features/auth/store/authStore';
 import IngredientLinkModal from '@/features/ocr-inbound/components/IngredientLinkModal';
 import type { OcrMetadata } from '@/features/ocr-inbound/types/ocrInbound.api.types';
 import type {
@@ -23,6 +26,7 @@ import type {
   OcrInboundItem,
   OcrUnit,
 } from '@/features/ocr-inbound/types/ocrInbound.types';
+import { deleteIngredient } from '@/features/store-settings/api/ingredients.api';
 import { useIngredients } from '@/features/store-settings/hooks/useIngredients';
 import { cn } from '@/lib/utils';
 import { Button } from '@/shadcn/ui/button';
@@ -54,6 +58,8 @@ const OcrReviewStep = ({
   onReset,
   isConfirming = false,
 }: OcrReviewStepProps) => {
+  const storeId = useAuthStore((s) => s.storeId);
+  const qc = useQueryClient();
   const { data: ingredientList = [] } = useIngredients();
   const existingIngredients: ExistingIngredient[] = ingredientList.map((ing) => ({
     id: ing.id,
@@ -72,6 +78,7 @@ const OcrReviewStep = ({
     open: boolean;
     itemId: string;
     name: string;
+    currentIngredientId?: string;
   } | null>(null);
   const [dragging, setDragging] = useState(false);
   const dragRef = useRef({ startX: 0, startY: 0, posX: 0, posY: 0 });
@@ -136,12 +143,43 @@ const OcrReviewStep = ({
     onItemsChange(items.filter((item) => item.id !== id));
   };
 
+  const handleUnlink = (id: string) => {
+    onItemsChange(
+      items.map((item) =>
+        item.id === id
+          ? {
+              ...item,
+              name: item.originalName || item.name,
+              isMatched: false,
+              matchedInventoryId: undefined,
+            }
+          : item,
+      ),
+    );
+  };
+
+  const handleCancelRegistration = async (id: string, ingredientId: string) => {
+    if (!storeId) return;
+    try {
+      await deleteIngredient(storeId, ingredientId);
+      qc.invalidateQueries({ queryKey: ['ingredients', storeId] });
+      onItemsChange(
+        items.map((item) =>
+          item.id === id ? { ...item, isMatched: false, newIngredientId: undefined } : item,
+        ),
+      );
+    } catch {
+      toast.error('등록 취소에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    }
+  };
+
   const handleAdd = () => {
     onItemsChange([
       ...items,
       {
         id: `new-${Date.now()}`,
         name: '',
+        originalName: '',
         quantity: 0,
         unit: 'g',
         unitPrice: null,
@@ -491,12 +529,6 @@ const OcrReviewStep = ({
                 </Popover>
               );
 
-              const matchedBadge = (
-                <span className="inline-flex items-center gap-1 text-xs text-baro-blue bg-blue-50 px-2 py-0.5 rounded-full border border-blue-200/60 whitespace-nowrap dark:bg-blue-950/40 dark:border-blue-800/40">
-                  <CheckCircle2 className="w-3 h-3" />
-                  기존
-                </span>
-              );
               const registerBtn = (
                 <button
                   onClick={() =>
@@ -522,22 +554,70 @@ const OcrReviewStep = ({
                   연결
                 </button>
               );
-              const statusField = item.isMatched ? (
-                matchedBadge
+              const relinkBtn = (
+                <button
+                  onClick={() =>
+                    setLinkModal({
+                      open: true,
+                      itemId: item.id,
+                      name: item.name,
+                      currentIngredientId: item.matchedInventoryId,
+                    })
+                  }
+                  className="inline-flex items-center gap-0.5 text-xs text-baro-blue bg-blue-50 hover:bg-blue-100 px-1.5 py-0.5 rounded-full border border-blue-200/60 whitespace-nowrap transition-colors cursor-pointer dark:bg-blue-950/40 dark:border-blue-800/40 dark:hover:bg-blue-950/60"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  재연결
+                </button>
+              );
+              const unlinkBtn = (
+                <button
+                  onClick={() => handleUnlink(item.id)}
+                  className="inline-flex items-center gap-0.5 text-xs text-muted-foreground bg-muted hover:bg-muted/70 px-1.5 py-0.5 rounded-full border whitespace-nowrap transition-colors cursor-pointer"
+                >
+                  <X className="w-3 h-3" />
+                  연결 해제
+                </button>
+              );
+              const cancelRegistrationBtn = (
+                <button
+                  onClick={() =>
+                    item.newIngredientId && handleCancelRegistration(item.id, item.newIngredientId)
+                  }
+                  className="inline-flex items-center gap-0.5 text-xs text-baro-red bg-red-50 hover:bg-red-100 px-1.5 py-0.5 rounded-full border border-red-200/60 whitespace-nowrap transition-colors cursor-pointer dark:bg-red-950/40 dark:border-red-800/40 dark:hover:bg-red-950/60"
+                >
+                  <X className="w-3 h-3" />
+                  등록 취소
+                </button>
+              );
+              const statusField = item.matchedInventoryId ? (
+                <div className="flex flex-col gap-1">
+                  {relinkBtn}
+                  {unlinkBtn}
+                </div>
+              ) : item.newIngredientId ? (
+                cancelRegistrationBtn
               ) : (
                 <div className="flex flex-col gap-1">
                   {registerBtn}
                   {linkBtn}
                 </div>
               );
-              const mobileStatusField = item.isMatched ? (
-                matchedBadge
-              ) : (
-                <div className="flex flex-col gap-1">
-                  {registerBtn}
-                  {linkBtn}
-                </div>
-              );
+              const mobileStatusField = statusField;
+
+              const nameField =
+                item.matchedInventoryId || item.newIngredientId ? (
+                  <span className="h-8 flex items-center px-3 rounded-md border bg-muted text-sm text-muted-foreground truncate">
+                    {item.name}
+                  </span>
+                ) : (
+                  <Input
+                    value={item.name}
+                    onChange={(e) => handleChange(item.id, 'name', e.target.value)}
+                    className="h-8 text-sm"
+                    placeholder="식자재명"
+                  />
+                );
 
               const deleteBtn = (
                 <button
@@ -559,12 +639,7 @@ const OcrReviewStep = ({
                     )}
                   >
                     <div className="flex items-center justify-center">{warningIcon}</div>
-                    <Input
-                      value={item.name}
-                      onChange={(e) => handleChange(item.id, 'name', e.target.value)}
-                      className="h-8 text-sm"
-                      placeholder="식자재명"
-                    />
+                    {nameField}
                     {quantityField}
                     {unitField}
                     {priceField}
@@ -586,12 +661,7 @@ const OcrReviewStep = ({
                     {/* 이름 + 상태 + 삭제 */}
                     <div className="flex items-center gap-2">
                       <div className="w-5 shrink-0 flex justify-center">{warningIcon}</div>
-                      <Input
-                        value={item.name}
-                        onChange={(e) => handleChange(item.id, 'name', e.target.value)}
-                        className="flex-1 h-8 text-sm min-w-0"
-                        placeholder="식자재명"
-                      />
+                      <div className="flex-1 min-w-0">{nameField}</div>
                       <div className="shrink-0">{mobileStatusField}</div>
                       {deleteBtn}
                     </div>
@@ -721,6 +791,7 @@ const OcrReviewStep = ({
           open={linkModal.open}
           ocrName={linkModal.name}
           ingredients={existingIngredients}
+          currentIngredientId={linkModal.currentIngredientId}
           onClose={() => setLinkModal(null)}
           onConfirm={(ingredient: ExistingIngredient) => {
             onItemsChange(
@@ -728,6 +799,10 @@ const OcrReviewStep = ({
                 item.id === linkModal.itemId
                   ? {
                       ...item,
+                      // 첫 연결 시에만 originalName 저장 (재연결 시 덮어쓰지 않음)
+                      ...(!item.matchedInventoryId && {
+                        originalName: item.originalName || item.name,
+                      }),
                       name: ingredient.name,
                       unit: ingredient.unit,
                       isMatched: true,
