@@ -23,6 +23,7 @@ import type { OcrMetadata } from '@/features/ocr-inbound/types/ocrInbound.api.ty
 import type { OcrInboundItem } from '@/features/ocr-inbound/types/ocrInbound.types';
 import { confirmInbound } from '@/features/store-settings/api/ingredients.api';
 import { updateStoreSettings } from '@/features/store-settings/api/storeSettings.api';
+import { useIngredients } from '@/features/store-settings/hooks/useIngredients';
 import { useStoreSettings } from '@/features/store-settings/hooks/useStoreSettings';
 import { getApiErrorMessage } from '@/shared/utils/apiError';
 
@@ -88,6 +89,7 @@ const OcrInboundPage = () => {
   const { data: storeSettings } = useStoreSettings();
   const { data: conversionData } = useUnitConversions();
   const conversionMap = conversionData?.map;
+  const { data: ingredientList = [] } = useIngredients();
   const safetyStockPct = storeSettings?.safetyStockPct ?? 0;
 
   const locationState = location.state as { file?: File } | null;
@@ -127,6 +129,7 @@ const OcrInboundPage = () => {
   const [isConfirming, setIsConfirming] = useState(false);
   const handledInitialFile = useRef(false);
   const conversionApplied = useRef(false);
+  const unitSynced = useRef(false);
 
   // 검수 중 아이템·메타데이터 변경 시 sessionStorage 동기화
   useEffect(() => {
@@ -140,6 +143,23 @@ const OcrInboundPage = () => {
     conversionApplied.current = true;
     setItems((prev) => applyStoredConversions(prev, conversionMap));
   }, [conversionMap, step]);
+
+  // 매칭된 비표준 단위 항목의 unit을 재고 목록 기준으로 동기화 (1회만 실행)
+  useEffect(() => {
+    if (unitSynced.current || !ingredientList.length || step !== 'review') return;
+    unitSynced.current = true;
+    setItems((prev) => {
+      let changed = false;
+      const updated = prev.map((item) => {
+        if (!item.purchaseUnit || !item.matchedInventoryId) return item;
+        const ingredient = ingredientList.find((ing) => ing.id === item.matchedInventoryId);
+        if (!ingredient || item.unit === ingredient.unit) return item;
+        changed = true;
+        return { ...item, unit: ingredient.unit };
+      });
+      return changed ? updated : prev;
+    });
+  }, [ingredientList, step]);
 
   // onItemsChange: items 변경 시 연결된 항목에 저장된 변환 계수 자동 채움
   const handleItemsChange = useCallback(
