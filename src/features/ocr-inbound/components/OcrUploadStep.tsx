@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 
 import { Camera, FileImage } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/shadcn/ui/button';
 
@@ -18,16 +19,28 @@ const OcrUploadStep = ({ onFileSelect }: OcrUploadStepProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
+  const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'application/pdf']);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) onFileSelect(file);
     e.target.value = '';
+    if (!file) return;
+    if (!ALLOWED_TYPES.has(file.type)) {
+      toast.error('JPG, PNG, PDF 파일만 업로드할 수 있습니다.');
+      return;
+    }
+    onFileSelect(file);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    if (file?.type.startsWith('image/')) onFileSelect(file);
+    if (!file) return;
+    if (!ALLOWED_TYPES.has(file.type)) {
+      toast.error('JPG, PNG, PDF 파일만 업로드할 수 있습니다.');
+      return;
+    }
+    onFileSelect(file);
   };
 
   return (
@@ -95,7 +108,7 @@ const OcrUploadStep = ({ onFileSelect }: OcrUploadStepProps) => {
               <p className="text-xs text-muted-foreground mt-0.5">클릭하여 파일을 선택해주세요</p>
             </div>
             <span className="text-xs text-muted-foreground/60 bg-muted px-2.5 py-1 rounded-full">
-              JPG, PNG · 최대 10MB
+              JPG, PNG, PDF · 최대 10MB
             </span>
           </div>
 
@@ -129,7 +142,7 @@ const OcrUploadStep = ({ onFileSelect }: OcrUploadStepProps) => {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept=".jpg,.jpeg,.png,.pdf"
         className="hidden"
         onChange={handleFileChange}
       />
