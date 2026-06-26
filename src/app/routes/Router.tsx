@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { Routes, Route, useLocation } from 'react-router-dom';
 
 import AppLayout from '@/app/layouts/AppLayout';
@@ -34,6 +36,11 @@ import TermsOfServicePage from '@/pages/TermsOfServicePage';
 
 const StandalonePageWrapper = ({ element }: { element: React.ReactElement }) => {
   const { key } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [key]);
+
   return (
     <div key={key} className="animate-page-fade-in">
       {element}
