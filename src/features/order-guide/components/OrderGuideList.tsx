@@ -35,20 +35,20 @@ const URGENCY_CONFIG: Record<
     label: '긴급',
     badgeClass:
       'bg-red-100 text-baro-red border border-red-200 dark:bg-red-950/40 dark:text-red-400',
-    rowClass: 'border-l-4 border-l-baro-red',
+    rowClass: 'border-l-4 border-l-baro-red/50',
     icon: <Siren className="w-3.5 h-3.5" />,
   },
   warning: {
     label: '주의',
-    badgeClass: 'bg-baro-red/10 text-baro-red border border-baro-red/20',
-    rowClass: 'border-l-4 border-l-baro-red',
+    badgeClass: 'bg-baro-yellow/10 text-baro-yellow-dark border border-baro-yellow',
+    rowClass: 'border-l-4 border-l-baro-yellow/50',
     icon: <AlertTriangle className="w-3.5 h-3.5" />,
   },
   recommended: {
     label: '권장',
     badgeClass:
       'bg-blue-100 text-baro-blue-dark border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400',
-    rowClass: 'border-l-4 border-l-baro-blue',
+    rowClass: 'border-l-4 border-l-baro-blue/50',
     icon: <ShoppingCart className="w-3.5 h-3.5" />,
   },
 };
