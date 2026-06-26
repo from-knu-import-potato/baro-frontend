@@ -11,6 +11,7 @@ export const routePaths = {
   dashboard: '/dashboard',
   inventory: '/inventory',
   ocrInbound: '/ocr-inbound',
+  inboundHistory: '/inbound-history',
   orderGuide: '/order-guide',
   closing: '/closing',
   closingOrderGuideDetail: '/closing/order-guide-detail',

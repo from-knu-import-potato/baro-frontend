@@ -28,6 +28,36 @@ export interface OcrApiResponse {
   metadata: OcrMetadata;
   items: OcrApiItem[];
   rawText: string;
+  imageUrl: string | null;
+}
+
+export interface InboundRecord {
+  id: string;
+  transactionDate: string | null;
+  supplierName: string | null;
+  invoiceNumber: string | null;
+  totalSupplyAmount: string | null;
+  totalTax: string | null;
+  totalAmount: string | null;
+  invoiceImageUrl: string | null;
+  createdAt: string;
+  itemCount: number;
+}
+
+export interface InboundRecordItem {
+  id: string;
+  ingredientId: string;
+  ingredientName: string;
+  unit: 'g' | 'ml' | '개';
+  amount: string;
+  unitPrice: string | null;
+  supplyPrice: string | null;
+  expiryDate: string | null;
+  memo: string | null;
+}
+
+export interface InboundRecordDetail extends Omit<InboundRecord, 'itemCount'> {
+  items: InboundRecordItem[];
 }
 
 export interface UnitConversionDto {
