@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 
 import { Camera, FileImage } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/shadcn/ui/button';
 
@@ -19,16 +20,28 @@ const MenuOcrUploadStep = ({ onFileSelect, onBack }: MenuOcrUploadStepProps) => 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
+  const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png']);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) onFileSelect(file);
     e.target.value = '';
+    if (!file) return;
+    if (!ALLOWED_TYPES.has(file.type)) {
+      toast.error('JPG, PNG 이미지 파일만 업로드할 수 있습니다.');
+      return;
+    }
+    onFileSelect(file);
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    if (file?.type.startsWith('image/')) onFileSelect(file);
+    if (!file) return;
+    if (!ALLOWED_TYPES.has(file.type)) {
+      toast.error('JPG, PNG 이미지 파일만 업로드할 수 있습니다.');
+      return;
+    }
+    onFileSelect(file);
   };
 
   return (
@@ -118,7 +131,7 @@ const MenuOcrUploadStep = ({ onFileSelect, onBack }: MenuOcrUploadStepProps) => 
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept=".jpg,.jpeg,.png"
         className="hidden"
         onChange={handleFileChange}
       />

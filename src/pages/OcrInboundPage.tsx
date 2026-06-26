@@ -25,7 +25,7 @@ import { confirmInbound } from '@/features/store-settings/api/ingredients.api';
 import { updateStoreSettings } from '@/features/store-settings/api/storeSettings.api';
 import { useIngredients } from '@/features/store-settings/hooks/useIngredients';
 import { useStoreSettings } from '@/features/store-settings/hooks/useStoreSettings';
-import { getApiErrorMessage } from '@/shared/utils/apiError';
+import { getApiErrorCode, getApiErrorMessage } from '@/shared/utils/apiError';
 
 type Step = 'upload' | 'analyzing' | 'review';
 
@@ -201,11 +201,15 @@ const OcrInboundPage = () => {
           getApiErrorMessage(err, 'OCR 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
         );
         URL.revokeObjectURL(blobUrl);
-        setStep('upload');
-        setImageUrl(null);
+        if (getApiErrorCode(err) === 'NOT_INVOICE' && locationState?.file) {
+          navigate(routePaths.dashboard);
+        } else {
+          setStep('upload');
+          setImageUrl(null);
+        }
       }
     },
-    [storeId, conversionMap],
+    [storeId, conversionMap, locationState, navigate],
   );
 
   useEffect(() => {
