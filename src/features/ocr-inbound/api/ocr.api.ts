@@ -22,6 +22,7 @@ const parseSpec = (spec: string | null): { factor: number; unit: OcrUnit } | und
 export interface OcrUploadResult {
   metadata: OcrMetadata;
   items: OcrInboundItem[];
+  invoiceImageUrl: string | null;
 }
 
 export async function uploadOcrImage(storeId: string, file: File): Promise<OcrUploadResult> {
@@ -34,10 +35,11 @@ export async function uploadOcrImage(storeId: string, file: File): Promise<OcrUp
     { headers: { 'Content-Type': 'multipart/form-data' } },
   );
 
-  const { metadata, items } = res.data.data;
+  const { metadata, items, imageUrl } = res.data.data;
 
   return {
     metadata,
+    invoiceImageUrl: imageUrl ?? null,
     items: items.map((item, i) => {
       const isNonStandard = item.amount === null;
       const parsedSpec = isNonStandard ? parseSpec(item.spec) : undefined;
@@ -65,4 +67,10 @@ export async function uploadOcrImage(storeId: string, file: File): Promise<OcrUp
       };
     }),
   };
+}
+
+export async function deleteInvoiceImage(storeId: string, imageUrl: string): Promise<void> {
+  await axiosInstance.delete(`/stores/${storeId}/ocr/invoice-image`, {
+    params: { imageUrl },
+  });
 }

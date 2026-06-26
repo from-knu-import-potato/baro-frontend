@@ -79,7 +79,6 @@ const IngredientRegisterModal = ({
       initial[c.id] = c.factor;
     });
     // open될 때 서버 데이터로 로컬 편집 상태 초기화 — 외부 상태와 동기화 목적으로 허용
-
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setLocalFactors(initial);
   }, [open, conversions.length]);
