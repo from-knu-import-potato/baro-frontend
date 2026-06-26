@@ -44,6 +44,7 @@ export async function uploadOcrImage(storeId: string, file: File): Promise<OcrUp
       return {
         id: `ocr-${Date.now()}-${i}`,
         name: item.name,
+        originalName: item.name,
         quantity: parsedSpec ? item.purchaseAmount * parsedSpec.factor : (item.amount ?? 0),
         unit: parsedSpec?.unit ?? item.unit ?? 'g',
         unitPrice: item.unitPrice ?? null,
