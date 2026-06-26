@@ -15,6 +15,7 @@ export interface OcrApiItem {
   purchaseAmount: number; // 명세서 원본 수량
   amount: number | null; // 변환된 수량 (null = 비표준 단위, 변환 계수 필요)
   unit: OcrUnit | null; // 변환된 기본 단위 (null = 비표준 단위)
+  spec: string | null; // 1구매단위당 내용물 정보 (예: "20개", "1000ml")
   unitPrice: number | null;
   supplyPrice: number | null;
   memo: string | null;
