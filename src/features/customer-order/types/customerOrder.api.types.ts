@@ -57,6 +57,7 @@ export interface ApiOrder {
   createdAt: string;
   updatedAt: string;
   items?: ApiOrderItem[];
+  stockWarnings?: StockWarning[];
 }
 
 export interface CreateOrderRequest {

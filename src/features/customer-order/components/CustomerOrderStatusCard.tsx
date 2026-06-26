@@ -119,7 +119,7 @@ const OrderCard = ({ order, storeId, onCancelCompleted }: OrderCardProps) => {
               {stockWarnings
                 .map(
                   (w) =>
-                    `${w.ingredientName} (필요 ${w.required}${w.unit}, 현재 ${w.currentStock}${w.unit})`,
+                    `${w.ingredientName} (필요 ${w.required}${w.unit}, 가용 재고 ${w.currentStock}${w.unit})`,
                 )
                 .join(', ')}
               이 부족해요.
