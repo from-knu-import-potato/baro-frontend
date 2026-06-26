@@ -73,6 +73,26 @@ const DonutChart = ({ salesRatio, hasData }: DonutChartProps) => {
   );
 };
 
+/* ── 금액 포맷 ── */
+const formatWon = (value: number): string => {
+  const abs = Math.abs(value);
+  const sign = value < 0 ? '-' : '';
+
+  if (abs >= 100_000_000) {
+    const rounded = Math.round((abs / 100_000_000) * 10) / 10;
+    if (rounded % 1 === 0) return `${sign}${rounded.toLocaleString()}억원`;
+    const [int, dec] = rounded.toFixed(1).split('.');
+    return `${sign}${Number(int).toLocaleString()}.${dec}억원`;
+  }
+  if (abs >= 1_000_000) {
+    const rounded = Math.round((abs / 10_000) * 10) / 10;
+    if (rounded % 1 === 0) return `${sign}${Math.round(rounded).toLocaleString()}만원`;
+    const [int, dec] = rounded.toFixed(1).split('.');
+    return `${sign}${Number(int).toLocaleString()}.${dec}만원`;
+  }
+  return `${sign}${abs.toLocaleString()}원`;
+};
+
 /* ── 메인 카드 ── */
 const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
   const latest = data[data.length - 1];
@@ -92,7 +112,7 @@ const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
   const consumptionRatio = total > 0 ? latest.consumption / total : 0;
 
   return (
-    <Card size="sm" className="md:h-full">
+    <Card size="sm" className="xl:h-full">
       <CardHeader className="border-b px-4">
         <CardTitle className="text-sm flex items-center gap-2">
           <PieChart className="w-4 h-4 text-muted-foreground" />
@@ -121,7 +141,7 @@ const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
               <span className="text-xs text-muted-foreground">
                 {(total > 0 ? (1 - consumptionRatio) * 100 : 0).toFixed(1)}%
               </span>
-              <span className="text-sm font-bold">{(latest.sales / 10000).toFixed(0)}만원</span>
+              <span className="text-sm font-bold">{formatWon(latest.sales)}</span>
             </div>
           </div>
 
@@ -135,9 +155,7 @@ const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
               <span className="text-xs text-muted-foreground">
                 {(consumptionRatio * 100).toFixed(1)}%
               </span>
-              <span className="text-sm font-bold">
-                {(latest.consumption / 10000).toFixed(0)}만원
-              </span>
+              <span className="text-sm font-bold">{formatWon(latest.consumption)}</span>
             </div>
           </div>
 
@@ -151,7 +169,7 @@ const SalesConsumptionCard = ({ data }: SalesConsumptionCardProps) => {
                 </span>
               )}
               <span className={`text-sm font-bold ${isDeficit ? 'text-baro-red' : ''}`}>
-                {(rawProfit / 10000).toFixed(0)}만원
+                {formatWon(rawProfit)}
               </span>
             </div>
           </div>
