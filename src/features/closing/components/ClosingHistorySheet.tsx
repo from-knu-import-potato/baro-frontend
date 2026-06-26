@@ -141,20 +141,20 @@ const DetailView = ({ storeId, item, onBack }: DetailViewProps) => {
                 <p className="text-sm text-muted-foreground pl-6">차감된 재고가 없습니다.</p>
               ) : (
                 <div className="rounded-lg border overflow-hidden overflow-x-auto">
-                  <table className="w-full min-w-[400px] text-sm">
+                  <table className="w-full min-w-[480px] text-sm table-fixed">
                     <thead>
                       <tr className="bg-muted/50 text-muted-foreground">
-                        <th className="text-left px-3 py-2 font-medium">식자재</th>
-                        <th className="text-right px-3 py-2 font-medium">주문 차감</th>
-                        <th className="text-right px-3 py-2 font-medium">실제 사용량</th>
-                        <th className="text-right px-3 py-2 font-medium">보정값</th>
-                        <th className="text-right px-3 py-2 font-medium">마감 후 재고</th>
+                        <th className="text-left px-3 py-2 font-medium w-[30%] whitespace-nowrap">식자재</th>
+                        <th className="text-right px-3 py-2 font-medium w-[17%] whitespace-nowrap">주문 차감</th>
+                        <th className="text-right px-3 py-2 font-medium w-[18%] whitespace-nowrap">실제 사용량</th>
+                        <th className="text-right px-3 py-2 font-medium w-[15%] whitespace-nowrap">보정값</th>
+                        <th className="text-right px-3 py-2 font-medium w-[20%] whitespace-nowrap">마감 후 재고</th>
                       </tr>
                     </thead>
                     <tbody>
                       {detail.inventoryDeductions.map((deduction) => (
                         <tr key={deduction.ingredientId} className="border-t">
-                          <td className="px-3 py-2.5 font-medium">{deduction.ingredientName}</td>
+                          <td className="px-3 py-2.5 font-medium truncate max-w-0">{deduction.ingredientName}</td>
                           <td className="px-3 py-2.5 text-right text-muted-foreground">
                             {deduction.orderDeductedAmount.toLocaleString('ko-KR')}
                             {deduction.unit}
