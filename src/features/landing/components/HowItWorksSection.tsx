@@ -17,7 +17,7 @@ const timeline = [
     icon: <QrCode size={20} />,
     title: '점심 주문이 쏟아져요',
     description:
-      '손님이 QR을 스캔하면 주문이 실시간으로 들어옵니다. 사장님은 응대 대신 운영에만 집중하세요.',
+      '손님이 QR을 스캔하면 주문이 실시간으로 들어오고, 수락하는 순간 재고가 즉시 차감됩니다. 재고가 부족하면 바로 알림이 와요.',
     color: 'bg-baro-blue',
   },
   {
@@ -32,7 +32,8 @@ const timeline = [
     time: '오후 10:00',
     icon: <ClipboardCheck size={20} />,
     title: '마감, 1분이면 끝',
-    description: '당일 판매 메뉴 기반으로 재고가 자동 차감됩니다. 30분짜리 손계산은 이제 없어요.',
+    description:
+      '예상 잔량을 보고 실제 남은 재고를 입력하면 끝. 마감 때 재고 계산에 30분 쓰는 일은 없어요.',
     color: 'bg-baro-black dark:bg-neutral-600',
   },
 ];

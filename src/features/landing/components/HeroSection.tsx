@@ -17,8 +17,13 @@ const HeroSection = () => {
 
   const handleStartClick = () => {
     if (isLoggedIn) {
-      if (canGoBack) navigate(-1);
-      else navigate(routePaths.myStores);
+      const returnPath = sessionStorage.getItem('landingReturnPath');
+      if (returnPath) {
+        sessionStorage.removeItem('landingReturnPath');
+        navigate(returnPath);
+      } else {
+        navigate(canGoBack ? routePaths.dashboard : routePaths.myStores);
+      }
     } else {
       navigate(routePaths.login);
     }
@@ -153,7 +158,9 @@ const HeroSection = () => {
                     <p className="text-[10px] font-black text-baro-black-muted tracking-tighter uppercase mb-0.5">
                       Closing
                     </p>
-                    <p className="text-sm font-bold leading-none">오늘 마감 완료, 재고 자동 차감</p>
+                    <p className="text-sm font-bold leading-none">
+                      마감 완료, 실제 잔량 확인 후 재고 확정
+                    </p>
                   </div>
                 </div>
               </div>

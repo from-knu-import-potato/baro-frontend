@@ -28,9 +28,9 @@ export const features: Feature[] = [
   },
   {
     icon: <Zap size={32} />,
-    title: '마감 자동화',
+    title: '실시간 재고 관리',
     description:
-      '당일 판매 메뉴와 레시피를 기반으로 이론 사용량을 계산하고, 검토 후 재고를 자동 차감합니다.',
+      '주문 수락 시 레시피 기반으로 재고가 즉시 차감됩니다. 마감엔 실제 잔량을 확인하고 차이만 보정하면 끝.',
     color: 'text-baro-black',
     bgColor: 'bg-baro-black-muted/5',
   },
