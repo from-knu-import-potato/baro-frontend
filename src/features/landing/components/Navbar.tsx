@@ -9,6 +9,17 @@ import ThemeToggle from '@/features/theme/components/ThemeToggle';
 import { useTheme } from '@/features/theme/hooks/useTheme';
 import { Button } from '@/shadcn/ui/button';
 
+const LANDING_RETURN_KEY = 'landingReturnPath';
+
+const PUBLIC_PATHS = new Set<string>([
+  routePaths.landing,
+  routePaths.notices,
+  routePaths.terms,
+  routePaths.privacy,
+  routePaths.support,
+  routePaths.login,
+]);
+
 const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -18,14 +29,22 @@ const Navbar = () => {
   const canGoBack = location.key !== 'default';
 
   const handleLogoClick = () => {
+    if (isLoggedIn && !PUBLIC_PATHS.has(location.pathname)) {
+      sessionStorage.setItem(LANDING_RETURN_KEY, location.pathname);
+    }
     navigate(routePaths.landing);
     setIsMenuOpen(false);
   };
 
   const handleCtaClick = () => {
     if (isLoggedIn) {
-      if (canGoBack) navigate(-1);
-      else navigate(routePaths.myStores);
+      const returnPath = sessionStorage.getItem(LANDING_RETURN_KEY);
+      if (returnPath) {
+        sessionStorage.removeItem(LANDING_RETURN_KEY);
+        navigate(returnPath);
+      } else {
+        navigate(canGoBack ? routePaths.dashboard : routePaths.myStores);
+      }
     } else {
       navigate(routePaths.login);
     }

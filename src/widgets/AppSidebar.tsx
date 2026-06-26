@@ -1,5 +1,5 @@
 import { LayoutDashboard, Package, Truck, Store, Settings, Home, Globe, User } from 'lucide-react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 
 import { routePaths } from '@/app/routes/routePaths';
 import useAuthStore from '@/features/auth/store/authStore';
@@ -21,11 +21,12 @@ import {
 import { Skeleton } from '@/shadcn/ui/skeleton';
 import BaroLogo from '@/shared/assets/images/baro-logo.png';
 
+const LANDING_RETURN_KEY = 'landingReturnPath';
+
 const BOTTOM_NAV_ITEMS = [
   { label: '회원 설정', icon: Settings, to: routePaths.settings },
   { label: '계정 홈', icon: User, to: routePaths.myStores },
   { label: '가게 홈', icon: Home, to: routePaths.storeHome },
-  { label: '서비스 소개', icon: Globe, to: routePaths.landing },
 ];
 
 const BUSINESS_TYPE_LABEL: Record<string, string> = {
@@ -47,6 +48,7 @@ const AppSidebar = ({
   businessType,
   isLoading = false,
 }: AppSidebarProps) => {
+  const navigate = useNavigate();
   const location = useLocation();
   const storeId = useAuthStore((s) => s.storeId);
   const { isCompleted } = useClosingStatus(storeId);
@@ -149,6 +151,19 @@ const AppSidebar = ({
               </SidebarMenuButton>
             </SidebarMenuItem>
           ))}
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              isActive={location.pathname === routePaths.landing}
+              tooltip="서비스 소개"
+              onClick={() => {
+                sessionStorage.setItem(LANDING_RETURN_KEY, location.pathname);
+                navigate(routePaths.landing);
+              }}
+            >
+              <Globe />
+              <span>서비스 소개</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
         </SidebarMenu>
 
         <SidebarSeparator className="mx-0" />
