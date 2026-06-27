@@ -15,14 +15,14 @@ const DashboardPage = () => {
   const { data: salesData, isLoading: salesLoading } = useDashboardSales(storeId);
 
   return (
-    <main className="flex-1 min-h-0 overflow-y-auto md:overflow-hidden p-3 flex flex-col gap-4 md:flex-row">
+    <main className="flex-1 min-h-0 overflow-y-auto xl:overflow-hidden p-3 flex flex-col gap-4 xl:flex-row">
       {/* 주문 현황 */}
-      <div className="flex-1 min-w-0 md:min-h-0 md:overflow-hidden p-1">
+      <div className="flex-1 min-w-0 md:max-h-80 xl:max-h-none xl:min-h-0 xl:overflow-hidden p-1">
         <OrderStatusCard storeId={storeId} />
       </div>
 
       {/* 가게 현황 */}
-      <div className="flex-1 min-w-0 flex flex-col gap-4 md:min-h-0 p-1">
+      <div className="flex-1 min-w-0 flex flex-col gap-4 xl:min-h-0 p-1">
         {/* 오늘의 가게 현황 요약 */}
         {statsLoading || !stats ? (
           <Skeleton className="h-23 w-full rounded-xl" />
@@ -31,12 +31,12 @@ const DashboardPage = () => {
         )}
 
         {/* 이번달 현황 + OCR / 메모 */}
-        <div className="flex flex-col gap-4 flex-1 min-h-0 md:flex-row md:gap-5">
+        <div className="flex flex-col gap-4 md:flex-row md:gap-5 xl:flex-1 xl:min-h-0">
           {/* 이번달 현황 + OCR 빠른 입고 처리 */}
-          <div className="flex-1 min-w-0 flex flex-col gap-4 md:min-h-0">
-            <div className="md:flex-1 md:min-h-0">
+          <div className="flex-1 min-w-0 flex flex-col gap-4">
+            <div className="xl:flex-1 xl:min-h-0">
               {salesLoading || !salesData || salesData.length === 0 ? (
-                <Skeleton className="h-40 w-full rounded-xl md:h-full" />
+                <Skeleton className="h-40 w-full rounded-xl xl:h-full" />
               ) : (
                 <SalesConsumptionCard data={salesData} />
               )}

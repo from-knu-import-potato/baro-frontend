@@ -21,7 +21,7 @@ const TimePicker = ({ value, onChange }: TimeSelectProps) => {
   const [h, m] = value ? value.split(':') : ['', ''];
 
   return (
-    <div className="flex flex-1 items-center gap-1">
+    <div className="flex flex-1 items-center gap-0.5">
       <Select value={h || undefined} onValueChange={(v) => onChange(`${v}:${m || '00'}`)}>
         <SelectTrigger size="sm" className="h-6 flex-1 text-xs">
           <SelectValue placeholder="시" />

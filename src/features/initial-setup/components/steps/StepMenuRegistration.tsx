@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { ImageOff, Loader2, Pencil, Plus, ScanLine, Star, Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import useAuthStore from '@/features/auth/store/authStore';
 import MenuRegistrationModal from '@/features/initial-setup/components/MenuRegistrationModal';
@@ -11,7 +12,7 @@ import MenuOcrReviewStep, {
 } from '@/features/store-settings/components/MenuOcrReviewStep';
 import MenuOcrUploadStep from '@/features/store-settings/components/MenuOcrUploadStep';
 import { Button } from '@/shadcn/ui/button';
-import { getApiErrorMessage } from '@/shared/utils/apiError';
+import { getApiErrorCode, getApiErrorMessage } from '@/shared/utils/apiError';
 
 type OcrStep = 'upload' | 'analyzing' | 'review';
 
@@ -69,7 +70,12 @@ const StepMenuRegistration = ({ data, onChange }: StepMenuRegistrationProps) => 
       );
       setOcrStep('review');
     } catch (err) {
-      setOcrError(getApiErrorMessage(err, '메뉴 인식에 실패했습니다. 다시 시도해 주세요.'));
+      const msg = getApiErrorMessage(err, '메뉴 인식에 실패했습니다. 다시 시도해 주세요.');
+      if (getApiErrorCode(err) === 'NOT_MENU') {
+        toast.error(msg);
+      } else {
+        setOcrError(msg);
+      }
       setOcrStep('upload');
     }
   };

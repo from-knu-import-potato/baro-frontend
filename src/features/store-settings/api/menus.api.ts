@@ -7,6 +7,7 @@ export interface MenuDto {
   description: string | null;
   imageUrl: string | null;
   isAvailable: boolean;
+  isFeatured: boolean;
   categoryId: string | null;
 }
 

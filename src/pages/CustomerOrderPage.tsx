@@ -1,7 +1,18 @@
 import { useMemo, useState } from 'react';
 
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { AlertCircle, CheckCircle, Clock, Loader2, Minus, Plus, ShoppingCart } from 'lucide-react';
+import {
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  ImageOff,
+  Loader2,
+  Minus,
+  Plus,
+  ShoppingCart,
+  Star,
+  UtensilsCrossed,
+} from 'lucide-react';
 import { useParams } from 'react-router-dom';
 
 import {
@@ -59,12 +70,15 @@ const MenuItemListCard = ({ item, quantity, themeHex, onUpdate }: MenuItemCardPr
         className="size-16 rounded-lg object-cover shrink-0"
       />
     ) : (
-      <div className="size-16 rounded-lg bg-baro-red/5 flex items-center justify-center shrink-0 text-2xl select-none">
-        ☕
+      <div className="size-16 rounded-lg bg-gray-100 flex items-center justify-center shrink-0">
+        <ImageOff className="size-6 text-gray-300" />
       </div>
     )}
     <div className="flex-1 min-w-0">
       <div className="flex items-center gap-1.5">
+        {item.isFeatured && (
+          <Star className="size-3.5 shrink-0 fill-baro-yellow text-baro-yellow" />
+        )}
         <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
         {!item.isAvailable && (
           <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded shrink-0">
@@ -90,11 +104,21 @@ const MenuItemGridCard = ({ item, quantity, themeHex, onUpdate }: MenuItemCardPr
     )}
     style={quantity > 0 ? ({ '--tw-ring-color': `${themeHex}60` } as React.CSSProperties) : {}}
   >
-    <div className="relative h-32 bg-baro-red/5">
+    <div className="relative aspect-square bg-gray-100">
       {item.imageUrl ? (
         <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />
       ) : (
-        <div className="flex h-full items-center justify-center text-3xl select-none">☕</div>
+        <div className="flex h-full items-center justify-center">
+          <ImageOff className="size-8 text-gray-300" />
+        </div>
+      )}
+      {item.isFeatured && (
+        <div className="absolute left-1.5 top-1.5">
+          <span className="flex items-center gap-0.5 rounded-full bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-baro-yellow-text shadow-sm">
+            <Star className="size-2.5 fill-baro-yellow text-baro-yellow" />
+            대표
+          </span>
+        </div>
       )}
       {!item.isAvailable && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
@@ -104,13 +128,13 @@ const MenuItemGridCard = ({ item, quantity, themeHex, onUpdate }: MenuItemCardPr
         </div>
       )}
     </div>
-    <div className="p-3">
-      <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
+    <div className="p-2">
+      <p className="text-xs font-semibold text-gray-900 truncate">{item.name}</p>
       {item.description && (
-        <p className="mt-0.5 text-xs text-gray-400 line-clamp-1">{item.description}</p>
+        <p className="mt-0.5 text-[10px] text-gray-400 line-clamp-1">{item.description}</p>
       )}
-      <div className="mt-2 flex items-center justify-between">
-        <p className="text-sm font-bold text-gray-900">{item.price.toLocaleString()}원</p>
+      <div className="mt-1.5 flex items-center justify-between gap-1">
+        <p className="text-xs font-bold text-gray-900 truncate">{item.price.toLocaleString()}원</p>
         <MenuQuantityControl
           item={item}
           quantity={quantity}
@@ -126,31 +150,31 @@ const MenuItemGridCard = ({ item, quantity, themeHex, onUpdate }: MenuItemCardPr
 const MenuQuantityControl = ({ item, quantity, themeHex, onUpdate }: MenuItemCardProps) => {
   if (!item.isAvailable) return null;
   return (
-    <div className="flex items-center gap-2 shrink-0">
+    <div className="flex items-center gap-1 shrink-0">
       {quantity > 0 ? (
         <>
           <button
             onClick={() => onUpdate(item.id, -1)}
-            className="size-8 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 active:scale-90 transition-transform"
+            className="size-7 flex items-center justify-center rounded-full border border-gray-200 text-gray-500 active:scale-90 transition-transform"
           >
-            <Minus className="size-3.5" />
+            <Minus className="size-3" />
           </button>
-          <span className="w-4 text-center text-sm font-bold text-gray-900">{quantity}</span>
+          <span className="w-4 text-center text-xs font-bold text-gray-900">{quantity}</span>
           <button
             onClick={() => onUpdate(item.id, 1)}
-            className="size-8 flex items-center justify-center rounded-full text-white active:scale-90 transition-transform"
+            className="size-7 flex items-center justify-center rounded-full text-white active:scale-90 transition-transform"
             style={{ backgroundColor: themeHex }}
           >
-            <Plus className="size-3.5" />
+            <Plus className="size-3" />
           </button>
         </>
       ) : (
         <button
           onClick={() => onUpdate(item.id, 1)}
-          className="size-8 flex items-center justify-center rounded-full text-white active:scale-90 transition-transform"
+          className="size-7 flex items-center justify-center rounded-full text-white active:scale-90 transition-transform"
           style={{ backgroundColor: themeHex }}
         >
-          <Plus className="size-3.5" />
+          <Plus className="size-3" />
         </button>
       )}
     </div>
@@ -428,8 +452,8 @@ const CustomerOrderPage = () => {
         style={{ backgroundColor: themeHex }}
       >
         <div className="flex items-center gap-3">
-          <div className="size-9 rounded-lg bg-white/20 flex items-center justify-center text-lg select-none shrink-0">
-            🍽️
+          <div className="size-9 rounded-lg bg-white/20 flex items-center justify-center shrink-0">
+            <UtensilsCrossed className="size-5 text-white" />
           </div>
           <div>
             <p className="text-sm font-bold text-white leading-none">주문하기</p>
@@ -483,14 +507,14 @@ const CustomerOrderPage = () => {
         <div
           className={
             theme.layout === 'grid'
-              ? 'px-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3'
+              ? 'px-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2.5'
               : 'px-4 space-y-2'
           }
         >
           {isLoading ? (
             theme.layout === 'grid' ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <Skeleton key={i} className="h-52 w-full rounded-xl" />
+              Array.from({ length: 6 }).map((_, i) => (
+                <Skeleton key={i} className="aspect-square w-full rounded-xl" />
               ))
             ) : (
               Array.from({ length: 4 }).map((_, i) => (

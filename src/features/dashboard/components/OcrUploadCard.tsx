@@ -2,6 +2,7 @@ import { useRef } from 'react';
 
 import { ScanLine, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 import { routePaths } from '@/app/routes/routePaths';
 
@@ -9,17 +10,27 @@ const OcrUploadCard = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const ALLOWED_TYPES = new Set(['image/jpeg', 'image/png', 'application/pdf']);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
-    navigate(routePaths.ocrInbound, { state: { file } });
     e.target.value = '';
+    if (!file) return;
+    if (!ALLOWED_TYPES.has(file.type)) {
+      toast.error('JPG, PNG, PDF 파일만 업로드할 수 있습니다.');
+      return;
+    }
+    navigate(routePaths.ocrInbound, { state: { file } });
   };
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    if (!file?.type.startsWith('image/')) return;
+    if (!file) return;
+    if (!ALLOWED_TYPES.has(file.type)) {
+      toast.error('JPG, PNG, PDF 파일만 업로드할 수 있습니다.');
+      return;
+    }
     navigate(routePaths.ocrInbound, { state: { file } });
   };
 
@@ -44,7 +55,9 @@ const OcrUploadCard = () => {
           </div>
           <div className="text-center">
             <p className="text-sm font-semibold">거래명세서를 여기에 올려주세요</p>
-            <p className="text-xs text-muted-foreground mt-1">이미지 파일 (JPG, PNG) · 최대 10MB</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              이미지 (JPG, PNG) 또는 PDF · 최대 10MB
+            </p>
           </div>
         </div>
       </div>
@@ -52,7 +65,7 @@ const OcrUploadCard = () => {
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept=".jpg,.jpeg,.png,.pdf"
         className="hidden"
         onChange={handleFileChange}
       />

@@ -113,17 +113,27 @@ const AppLayout = () => {
       sessionStorage.setItem(SCROLL_STORAGE_KEY, String(settingsScrollTop));
       scrollRef.current?.scrollTo(0, 0);
     } else if (comingBackToSettings) {
-      // 하위 페이지 → 가게 설정: 복원할 위치를 미리 동기적으로 반영 후 레이아웃 완료 시 스크롤
+      // 하위 페이지 → 가게 설정: 컨텐츠 높이가 충분해질 때까지 rAF retry loop로 복원
       const saved = Number(sessionStorage.getItem(SCROLL_STORAGE_KEY) ?? 0);
       settingsScrollTop = saved;
-      requestAnimationFrame(() => {
-        scrollRef.current?.scrollTo({ top: saved, behavior: 'instant' });
-      });
+      if (saved === 0) return;
+      const el = scrollRef.current;
+      if (!el) return;
+      const deadline = performance.now() + 1000;
+      const tryRestore = () => {
+        el.scrollTo({ top: saved, behavior: 'instant' });
+        if (el.scrollTop < saved - 1 && performance.now() < deadline) {
+          requestAnimationFrame(tryRestore);
+        }
+      };
+      requestAnimationFrame(tryRestore);
     } else if (movingBetweenSubPages) {
       // 하위 페이지 간 이동: 저장된 위치는 유지하고 최상단으로만 이동
       scrollRef.current?.scrollTo(0, 0);
-    } else {
+    } else if (prev !== pathname) {
       // 설정 영역을 완전히 벗어남: 저장 위치 제거 후 최상단 이동
+      // prev === pathname인 경우(초기 마운트 or StrictMode 이중 실행)는 무시해서
+      // StrictMode 2번째 실행이 sessionStorage를 지우는 버그 방지
       sessionStorage.removeItem(SCROLL_STORAGE_KEY);
       settingsScrollTop = 0;
       scrollRef.current?.scrollTo(0, 0);

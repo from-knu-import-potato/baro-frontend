@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 
 import useAuthStore from '@/features/auth/store/authStore';
 import {
@@ -21,6 +22,9 @@ export function useUpdateStoreTheme() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (data: StoreThemeDto) => updateStoreTheme(storeId!, data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['store-theme', storeId] }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ['store-theme', storeId] });
+      toast.success('저장이 완료되었습니다.');
+    },
   });
 }

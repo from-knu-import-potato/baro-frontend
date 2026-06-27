@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 
 import { routePaths } from '@/app/routes/routePaths';
 import useAuthStore from '@/features/auth/store/authStore';
-import { uploadOcrImage } from '@/features/ocr-inbound/api/ocr.api';
+import { deleteInvoiceImage, uploadOcrImage } from '@/features/ocr-inbound/api/ocr.api';
 import {
   saveUnitConversions,
   type UnitConversionSaveDto,
@@ -23,8 +23,18 @@ import type { OcrMetadata } from '@/features/ocr-inbound/types/ocrInbound.api.ty
 import type { OcrInboundItem } from '@/features/ocr-inbound/types/ocrInbound.types';
 import { confirmInbound } from '@/features/store-settings/api/ingredients.api';
 import { updateStoreSettings } from '@/features/store-settings/api/storeSettings.api';
+import { useIngredients } from '@/features/store-settings/hooks/useIngredients';
 import { useStoreSettings } from '@/features/store-settings/hooks/useStoreSettings';
-import { getApiErrorMessage } from '@/shared/utils/apiError';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/shadcn/ui/alert-dialog';
+import { Button } from '@/shadcn/ui/button';
+import { getApiErrorCode, getApiErrorMessage } from '@/shared/utils/apiError';
 
 type Step = 'upload' | 'analyzing' | 'review';
 
@@ -88,6 +98,7 @@ const OcrInboundPage = () => {
   const { data: storeSettings } = useStoreSettings();
   const { data: conversionData } = useUnitConversions();
   const conversionMap = conversionData?.map;
+  const { data: ingredientList = [] } = useIngredients();
   const safetyStockPct = storeSettings?.safetyStockPct ?? 0;
 
   const locationState = location.state as { file?: File } | null;
@@ -124,9 +135,13 @@ const OcrInboundPage = () => {
   const [step, setStep] = useState<Step>(initialStep);
   const [items, setItems] = useState<OcrInboundItem[]>(initialItems);
   const [metadata, setMetadata] = useState<OcrMetadata | null>(initialMetadata);
+  const [invoiceImageUrl, setInvoiceImageUrl] = useState<string | null>(null);
   const [isConfirming, setIsConfirming] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const handledInitialFile = useRef(false);
   const conversionApplied = useRef(false);
+  const unitSynced = useRef(false);
 
   // 검수 중 아이템·메타데이터 변경 시 sessionStorage 동기화
   useEffect(() => {
@@ -140,6 +155,23 @@ const OcrInboundPage = () => {
     conversionApplied.current = true;
     setItems((prev) => applyStoredConversions(prev, conversionMap));
   }, [conversionMap, step]);
+
+  // 매칭된 비표준 단위 항목의 unit을 재고 목록 기준으로 동기화 (1회만 실행)
+  useEffect(() => {
+    if (unitSynced.current || !ingredientList.length || step !== 'review') return;
+    unitSynced.current = true;
+    setItems((prev) => {
+      let changed = false;
+      const updated = prev.map((item) => {
+        if (!item.purchaseUnit || !item.matchedInventoryId) return item;
+        const ingredient = ingredientList.find((ing) => ing.id === item.matchedInventoryId);
+        if (!ingredient || item.unit === ingredient.unit) return item;
+        changed = true;
+        return { ...item, unit: ingredient.unit };
+      });
+      return changed ? updated : prev;
+    });
+  }, [ingredientList, step]);
 
   // onItemsChange: items 변경 시 연결된 항목에 저장된 변환 계수 자동 채움
   const handleItemsChange = useCallback(
@@ -174,6 +206,7 @@ const OcrInboundPage = () => {
         setImageBase64(base64);
         setMetadata(result.metadata);
         setItems(processedItems);
+        setInvoiceImageUrl(result.invoiceImageUrl);
         setStep('review');
         saveDraft({ imageBase64: base64, metadata: result.metadata, items: processedItems });
       } catch (err) {
@@ -181,11 +214,15 @@ const OcrInboundPage = () => {
           getApiErrorMessage(err, 'OCR 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.'),
         );
         URL.revokeObjectURL(blobUrl);
-        setStep('upload');
-        setImageUrl(null);
+        if (getApiErrorCode(err) === 'NOT_INVOICE' && locationState?.file) {
+          navigate(routePaths.dashboard);
+        } else {
+          setStep('upload');
+          setImageUrl(null);
+        }
       }
     },
-    [storeId, conversionMap],
+    [storeId, conversionMap, locationState, navigate],
   );
 
   useEffect(() => {
@@ -199,11 +236,36 @@ const OcrInboundPage = () => {
     if (imageUrl?.startsWith('blob:')) URL.revokeObjectURL(imageUrl);
     clearDraft();
     conversionApplied.current = false;
+    unitSynced.current = false;
     setStep('upload');
     setImageUrl(null);
     setImageBase64(null);
     setItems([]);
     setMetadata(null);
+    setInvoiceImageUrl(null);
+  };
+
+  const requestCancel = () => {
+    if (invoiceImageUrl) {
+      setShowCancelDialog(true);
+    } else {
+      handleReset();
+    }
+  };
+
+  const handleDeleteAndReset = async () => {
+    if (invoiceImageUrl && storeId) {
+      setIsDeleting(true);
+      try {
+        await deleteInvoiceImage(storeId, invoiceImageUrl);
+      } catch {
+        toast.error('명세서 이미지 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+    setShowCancelDialog(false);
+    handleReset();
   };
 
   const handleConfirm = async () => {
@@ -262,7 +324,7 @@ const OcrInboundPage = () => {
         qc.invalidateQueries({ queryKey: ['unitConversions', storeId] });
       }
 
-      await confirmInbound(storeId, inboundItems, metadata ?? undefined);
+      await confirmInbound(storeId, inboundItems, metadata ?? undefined, invoiceImageUrl);
 
       if (safetyStockPct > 0) {
         try {
@@ -289,7 +351,7 @@ const OcrInboundPage = () => {
     if (step === 'upload') {
       navigate(-1);
     } else {
-      handleReset();
+      requestCancel();
     }
   };
 
@@ -336,11 +398,38 @@ const OcrInboundPage = () => {
             metadata={metadata}
             onItemsChange={handleItemsChange}
             onConfirm={handleConfirm}
-            onReset={handleReset}
+            onReset={requestCancel}
             isConfirming={isConfirming}
           />
         )}
       </div>
+
+      <AlertDialog open={showCancelDialog} onOpenChange={(o) => !o && setShowCancelDialog(false)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>입고를 취소할까요?</AlertDialogTitle>
+            <AlertDialogDescription>
+              취소하면 인식된 내용과 저장된 명세서 이미지가 삭제됩니다.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowCancelDialog(false)}
+              disabled={isDeleting}
+            >
+              계속 검수
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => void handleDeleteAndReset()}
+              disabled={isDeleting}
+            >
+              {isDeleting ? '삭제 중...' : '삭제 후 나가기'}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

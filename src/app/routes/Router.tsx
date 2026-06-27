@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { Routes, Route, useLocation } from 'react-router-dom';
 
 import AppLayout from '@/app/layouts/AppLayout';
@@ -11,6 +13,7 @@ import CredentialLoginPage from '@/pages/CredentialLoginPage';
 import CustomerOrderPage from '@/pages/CustomerOrderPage';
 import DashboardPage from '@/pages/DashboardPage';
 import DayClosedPage from '@/pages/DayClosedPage';
+import InboundHistoryPage from '@/pages/InboundHistoryPage';
 import InitialSetupPage from '@/pages/InitialSetupPage';
 import InventoryPage from '@/pages/InventoryPage';
 import LandingPage from '@/pages/LandingPage';
@@ -34,6 +37,11 @@ import TermsOfServicePage from '@/pages/TermsOfServicePage';
 
 const StandalonePageWrapper = ({ element }: { element: React.ReactElement }) => {
   const { key } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [key]);
+
   return (
     <div key={key} className="animate-page-fade-in">
       {element}
@@ -118,6 +126,7 @@ export default function Router() {
         <Route element={<AppLayout />}>
           <Route path={routePaths.dashboard} element={<DashboardPage />} />
           <Route path={routePaths.inventory} element={<InventoryPage />} />
+          <Route path={routePaths.inboundHistory} element={<InboundHistoryPage />} />
           <Route path={routePaths.orderGuide} element={<OrderGuidePage />} />
           <Route path={routePaths.closing} element={<ClosingPage />} />
           {/* 가게 설정 */}

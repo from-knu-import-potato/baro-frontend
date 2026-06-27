@@ -48,9 +48,11 @@ export async function confirmInbound(
     memo?: string | null;
   }[],
   metadata?: OcrMetadata,
+  imageUrl?: string | null,
 ): Promise<void> {
   await axiosInstance.post(`/stores/${storeId}/ingredients/inbound`, {
     ...(metadata ? { metadata } : {}),
+    ...(imageUrl ? { imageUrl } : {}),
     items,
   });
 }
