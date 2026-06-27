@@ -10,6 +10,7 @@ import {
   Minus,
   Plus,
   ShoppingCart,
+  Star,
   UtensilsCrossed,
 } from 'lucide-react';
 import { useParams } from 'react-router-dom';
@@ -75,6 +76,9 @@ const MenuItemListCard = ({ item, quantity, themeHex, onUpdate }: MenuItemCardPr
     )}
     <div className="flex-1 min-w-0">
       <div className="flex items-center gap-1.5">
+        {item.isFeatured && (
+          <Star className="size-3.5 shrink-0 fill-baro-yellow text-baro-yellow" />
+        )}
         <p className="text-sm font-semibold text-gray-900 truncate">{item.name}</p>
         {!item.isAvailable && (
           <span className="text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded shrink-0">
@@ -106,6 +110,14 @@ const MenuItemGridCard = ({ item, quantity, themeHex, onUpdate }: MenuItemCardPr
       ) : (
         <div className="flex h-full items-center justify-center">
           <ImageOff className="size-8 text-gray-300" />
+        </div>
+      )}
+      {item.isFeatured && (
+        <div className="absolute left-1.5 top-1.5">
+          <span className="flex items-center gap-0.5 rounded-full bg-white/90 px-1.5 py-0.5 text-[10px] font-medium text-baro-yellow-text shadow-sm">
+            <Star className="size-2.5 fill-baro-yellow text-baro-yellow" />
+            대표
+          </span>
         </div>
       )}
       {!item.isAvailable && (

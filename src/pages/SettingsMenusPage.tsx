@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react';
 
 import {
   ArrowLeft,
+  Ban,
   ChevronDown,
   ChevronUp,
   ImageOff,
@@ -11,6 +12,7 @@ import {
   Plus,
   ScanLine,
   Search,
+  Star,
   Trash2,
   UtensilsCrossed,
   X,
@@ -52,6 +54,7 @@ type MenuForm = {
   price: string;
   imageUrl: string | null;
   categoryId: string;
+  isFeatured: boolean;
 };
 
 const EMPTY_FORM: MenuForm = {
@@ -60,6 +63,7 @@ const EMPTY_FORM: MenuForm = {
   price: '',
   imageUrl: null,
   categoryId: '',
+  isFeatured: false,
 };
 
 /* ── 메뉴 등록/수정 모달 ── */
@@ -89,6 +93,7 @@ const MenuModal = ({
           price: String(editing.price),
           imageUrl: editing.imageUrl,
           categoryId: editing.categoryId ?? '',
+          isFeatured: editing.isFeatured,
         }
       : EMPTY_FORM,
   );
@@ -135,6 +140,7 @@ const MenuModal = ({
       price: Number(form.price),
       imageUrl: form.imageUrl,
       categoryId: form.categoryId || null,
+      isFeatured: form.isFeatured,
     });
   };
 
@@ -244,27 +250,45 @@ const MenuModal = ({
             />
           </div>
 
-          {/* 가격 */}
-          <div className="space-y-1.5">
-            <Label htmlFor="menu-price">
-              가격 <span className="text-red-500">*</span>
-            </Label>
-            <div className="relative">
-              <Input
-                id="menu-price"
-                type="number"
-                placeholder="0"
-                min={0}
-                value={form.price}
-                onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))}
-                aria-invalid={!!errors.price}
-                className="h-10 pr-8"
-              />
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                원
-              </span>
+          {/* 가격 + 대표 메뉴 */}
+          <div className="flex items-end gap-3">
+            <div className="flex-1 space-y-1.5">
+              <Label htmlFor="menu-price">
+                가격 <span className="text-red-500">*</span>
+              </Label>
+              <div className="relative">
+                <Input
+                  id="menu-price"
+                  type="number"
+                  placeholder="0"
+                  min={0}
+                  value={form.price}
+                  onChange={(e) => setForm((p) => ({ ...p, price: e.target.value }))}
+                  aria-invalid={!!errors.price}
+                  className="h-10 pr-8"
+                />
+                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+                  원
+                </span>
+              </div>
+              {errors.price && <p className="text-xs text-destructive">{errors.price}</p>}
             </div>
-            {errors.price && <p className="text-xs text-destructive">{errors.price}</p>}
+
+            {/* 대표 메뉴 토글 */}
+            <button
+              type="button"
+              onClick={() => setForm((p) => ({ ...p, isFeatured: !p.isFeatured }))}
+              className="mb-0.5 flex h-10 items-center gap-1.5 rounded-lg border px-3 transition-colors hover:bg-baro-yellow/10"
+            >
+              <Star
+                className={
+                  form.isFeatured
+                    ? 'size-4 fill-baro-yellow text-baro-yellow'
+                    : 'size-4 text-gray-300'
+                }
+              />
+              <span className="text-xs font-medium text-muted-foreground">대표 메뉴</span>
+            </button>
           </div>
         </div>
 
@@ -291,12 +315,18 @@ const MenuCard = ({
   menu,
   onEdit,
   onDelete,
+  onToggleFeatured,
+  onToggleAvailable,
 }: {
   menu: MenuDto;
   onEdit: () => void;
   onDelete: () => void;
+  onToggleFeatured: () => void;
+  onToggleAvailable: () => void;
 }) => (
-  <div className="group overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-md">
+  <div
+    className={`group overflow-hidden rounded-xl border bg-card transition-shadow hover:shadow-md${!menu.isAvailable ? ' opacity-60' : ''}`}
+  >
     <div className="relative h-28 bg-gray-100 dark:bg-gray-800">
       {menu.imageUrl ? (
         <img src={menu.imageUrl} alt={menu.name} className="h-full w-full object-cover" />
@@ -305,10 +335,39 @@ const MenuCard = ({
           <ImageOff className="size-8 text-gray-300" />
         </div>
       )}
-      <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+      {!menu.isAvailable && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="rounded-full bg-black/60 px-2.5 py-0.5 text-xs font-medium text-white">
+            품절
+          </span>
+        </div>
+      )}
+      {/* 모바일: 항상 표시 / 데스크탑: hover 시 표시 */}
+      <div className="absolute right-2 top-2 flex gap-1 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
+        <button
+          type="button"
+          onClick={onToggleFeatured}
+          title={menu.isFeatured ? '대표 메뉴 해제' : '대표 메뉴 설정'}
+          className="flex size-6 items-center justify-center rounded-full bg-white/90 shadow-sm transition-colors hover:bg-baro-yellow/10"
+        >
+          <Star
+            className={
+              menu.isFeatured ? 'size-3 fill-baro-yellow text-baro-yellow' : 'size-3 text-gray-400'
+            }
+          />
+        </button>
+        <button
+          type="button"
+          onClick={onToggleAvailable}
+          title={menu.isAvailable ? '품절 처리' : '품절 해제'}
+          className="flex size-6 items-center justify-center rounded-full bg-white/90 shadow-sm transition-colors hover:bg-red-50"
+        >
+          <Ban className={menu.isAvailable ? 'size-3 text-gray-400' : 'size-3 text-baro-red'} />
+        </button>
         <button
           type="button"
           onClick={onEdit}
+          title="메뉴 수정"
           className="flex size-6 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-sm transition-colors hover:text-baro-blue"
         >
           <Pencil className="size-3" />
@@ -316,6 +375,7 @@ const MenuCard = ({
         <button
           type="button"
           onClick={onDelete}
+          title="메뉴 삭제"
           className="flex size-6 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-sm transition-colors hover:text-red-500"
         >
           <Trash2 className="size-3" />
@@ -323,7 +383,10 @@ const MenuCard = ({
       </div>
     </div>
     <div className="px-3 py-2.5">
-      <p className="truncate text-sm font-semibold">{menu.name}</p>
+      <p className="flex items-center gap-1 truncate text-sm font-semibold">
+        {menu.isFeatured && <Star className="size-3 shrink-0 fill-baro-yellow text-baro-yellow" />}
+        {menu.name}
+      </p>
       {menu.description && (
         <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">{menu.description}</p>
       )}
@@ -518,11 +581,15 @@ const MenuGrid = ({
   categories,
   onEdit,
   onDelete,
+  onToggleFeatured,
+  onToggleAvailable,
 }: {
   menus: MenuDto[];
   categories: MenuCategoryDto[];
   onEdit: (menu: MenuDto) => void;
   onDelete: (menuId: string) => void;
+  onToggleFeatured: (menu: MenuDto) => void;
+  onToggleAvailable: (menu: MenuDto) => void;
 }) => {
   const grouped = useMemo(() => {
     const result: { category: MenuCategoryDto | null; items: MenuDto[] }[] = [];
@@ -559,6 +626,8 @@ const MenuGrid = ({
                 menu={menu}
                 onEdit={() => onEdit(menu)}
                 onDelete={() => onDelete(menu.id)}
+                onToggleFeatured={() => onToggleFeatured(menu)}
+                onToggleAvailable={() => onToggleAvailable(menu)}
               />
             ))}
           </div>
@@ -580,17 +649,19 @@ const SettingsMenusPage = () => {
     isPending: isCreating,
   } = useCreateMenu();
   const { mutate: updateMenu, isPending: isUpdating } = useUpdateMenu();
-  const { mutate: deleteMenu } = useDeleteMenu();
+  const { mutate: deleteMenu, isPending: isDeleting } = useDeleteMenu();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<MenuDto | null>(null);
   const [modalKey, setModalKey] = useState(0);
   const [ocrOpen, setOcrOpen] = useState(false);
+  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   const filteredMenus = menus?.filter((m) =>
     m.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
+  const deleteTargetName = menus?.find((m) => m.id === deleteTargetId)?.name;
 
   const handleOpenNew = () => {
     setEditing(null);
@@ -615,6 +686,19 @@ const SettingsMenusPage = () => {
     }
   };
 
+  const handleToggleFeatured = (menu: MenuDto) => {
+    updateMenu({ menuId: menu.id, data: { isFeatured: !menu.isFeatured } });
+  };
+
+  const handleToggleAvailable = (menu: MenuDto) => {
+    updateMenu({ menuId: menu.id, data: { isAvailable: !menu.isAvailable } });
+  };
+
+  const handleDeleteConfirm = () => {
+    if (!deleteTargetId) return;
+    deleteMenu(deleteTargetId, { onSuccess: () => setDeleteTargetId(null) });
+  };
+
   const handleOcrConfirm = async (items: OcrMenuConfirmItem[]) => {
     for (const item of items) {
       let imageUrl: string | null = null;
@@ -631,6 +715,7 @@ const SettingsMenusPage = () => {
         description: item.description,
         imageUrl,
         categoryId: null,
+        isFeatured: item.isFeatured,
       });
     }
   };
@@ -715,7 +800,9 @@ const SettingsMenusPage = () => {
             menus={filteredMenus}
             categories={categories}
             onEdit={handleOpenEdit}
-            onDelete={(id) => deleteMenu(id)}
+            onDelete={setDeleteTargetId}
+            onToggleFeatured={handleToggleFeatured}
+            onToggleAvailable={handleToggleAvailable}
           />
         )}
       </div>
@@ -738,6 +825,42 @@ const SettingsMenusPage = () => {
         onConfirm={handleOcrConfirm}
         isConfirming={isCreating}
       />
+
+      {/* 삭제 확인 모달 */}
+      <Dialog open={!!deleteTargetId} onOpenChange={(v) => !v && setDeleteTargetId(null)}>
+        <DialogContent showCloseButton={false} className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Trash2 className="size-4 text-destructive" />
+              메뉴 삭제
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">{deleteTargetName}</span> 메뉴를
+            삭제하시겠습니까?
+            <br />
+            삭제 후에는 복구할 수 없습니다.
+          </p>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setDeleteTargetId(null)}
+              disabled={isDeleting}
+            >
+              취소
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? <Loader2 className="size-4 animate-spin" /> : '삭제'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
