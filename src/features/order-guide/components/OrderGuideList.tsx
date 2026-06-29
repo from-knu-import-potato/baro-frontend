@@ -24,7 +24,8 @@ const FILTER_TABS: { key: FilterTab; label: string }[] = [
   { key: 'all', label: '전체' },
   { key: 'critical', label: '긴급' },
   { key: 'warning', label: '주의' },
-  { key: 'recommended', label: '권장' },
+  { key: 'expiry', label: '만료' },
+  { key: 'recommend', label: '권장' },
 ];
 
 const URGENCY_CONFIG: Record<
@@ -44,7 +45,14 @@ const URGENCY_CONFIG: Record<
     rowClass: 'border-l-4 border-l-baro-yellow/50',
     icon: <AlertTriangle className="w-3.5 h-3.5" />,
   },
-  recommended: {
+  expiry: {
+    label: '만료',
+    badgeClass:
+      'bg-orange-100 text-orange-700 border border-orange-200 dark:bg-orange-950/40 dark:text-orange-400',
+    rowClass: 'border-l-4 border-l-orange-400/50',
+    icon: <CalendarDays className="w-3.5 h-3.5" />,
+  },
+  recommend: {
     label: '권장',
     badgeClass:
       'bg-blue-100 text-baro-blue-dark border border-blue-200 dark:bg-blue-950/40 dark:text-blue-400',
@@ -78,7 +86,7 @@ const OrderGuideList = ({ items, generatedAt }: OrderGuideListProps) => {
           </CardTitle>
         </div>
 
-        <div className="flex gap-1">
+        <div className="flex gap-1 overflow-x-auto">
           {FILTER_TABS.map((tab) => {
             const count =
               tab.key === 'all' ? items.length : countByUrgency(tab.key as UrgencyLevel);
@@ -89,7 +97,7 @@ const OrderGuideList = ({ items, generatedAt }: OrderGuideListProps) => {
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={`
-                  px-3 py-2 text-xs font-medium rounded-t-md border-b-2 transition-colors
+                  flex items-center whitespace-nowrap px-2.5 py-2 text-xs font-medium rounded-t-md border-b-2 transition-colors
                   ${
                     isActive
                       ? 'border-b-baro-blue text-baro-blue-dark bg-blue-50/50 dark:bg-blue-950/20'
@@ -99,13 +107,15 @@ const OrderGuideList = ({ items, generatedAt }: OrderGuideListProps) => {
               >
                 {tab.label}
                 <span
-                  className={`ml-1.5 inline-flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold
+                  className={`ml-1.5 inline-flex items-center justify-center min-w-4 h-4 px-1 rounded-full text-[10px] font-bold
                   ${
                     isActive
                       ? 'bg-baro-blue text-white'
                       : tab.key === 'critical' && count > 0
                         ? 'bg-red-100 text-baro-red'
-                        : 'bg-muted text-muted-foreground'
+                        : tab.key === 'expiry' && count > 0
+                          ? 'bg-orange-100 text-orange-700'
+                          : 'bg-muted text-muted-foreground'
                   }
                 `}
                 >
@@ -136,7 +146,7 @@ const OrderGuideList = ({ items, generatedAt }: OrderGuideListProps) => {
         ) : (
           <>
             {/* 고정 컬럼 헤더 (스크롤 내 sticky) */}
-            <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_3fr_80px] gap-4 px-5 py-2.5 bg-muted/40 border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide sticky top-0 z-10">
+            <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_3fr_80px] gap-4 px-5 py-2.5 bg-background border-b text-xs font-semibold text-muted-foreground uppercase tracking-wide sticky top-0 z-10">
               <span>재료명</span>
               <span>현재 재고</span>
               <span>안전 재고 기준</span>
@@ -188,15 +198,21 @@ const OrderGuideList = ({ items, generatedAt }: OrderGuideListProps) => {
                       <span className="md:hidden text-xs text-muted-foreground mb-0.5">
                         권장 발주량
                       </span>
-                      <span className="text-sm font-semibold text-baro-blue-dark">
-                        {formatStock(item.recommendedOrderQty, item.recommendedOrderUnit)}
-                      </span>
-                      {item.purchaseConversions.map((c) => (
-                        <span key={c.purchaseUnit} className="text-xs text-muted-foreground">
-                          약 {c.purchaseAmount} × {c.purchaseUnit} ({c.factor.toLocaleString()}
-                          {item.recommendedOrderUnit})
-                        </span>
-                      ))}
+                      {item.urgency === 'recommend' ? (
+                        <span className="text-sm text-muted-foreground">소진 후 재발주</span>
+                      ) : (
+                        <>
+                          <span className="text-sm font-semibold text-baro-blue-dark">
+                            {formatStock(item.recommendedOrderQty, item.recommendedOrderUnit)}
+                          </span>
+                          {item.purchaseConversions.map((c) => (
+                            <span key={c.purchaseUnit} className="text-xs text-muted-foreground">
+                              약 {c.purchaseAmount} × {c.purchaseUnit} ({c.factor.toLocaleString()}
+                              {item.recommendedOrderUnit})
+                            </span>
+                          ))}
+                        </>
+                      )}
                     </div>
 
                     <div className="flex flex-col justify-center gap-1">

@@ -11,7 +11,7 @@ interface BackendOrderGuideItem {
   unit: string;
   currentStock: number;
   safetyStock: number;
-  status: 'critical' | 'warning' | 'expiry';
+  status: 'critical' | 'warning' | 'expiry' | 'recommend';
   recommendedOrderAmount: number;
   reason: string;
   purchaseConversions: PurchaseConversion[];
@@ -29,10 +29,7 @@ export interface OrderGuideResponse {
   items: OrderGuideItem[];
 }
 
-const mapStatus = (status: BackendOrderGuideItem['status']): UrgencyLevel => {
-  if (status === 'expiry') return 'warning';
-  return status;
-};
+const mapStatus = (status: BackendOrderGuideItem['status']): UrgencyLevel => status;
 
 const mapItem = (item: BackendOrderGuideItem): OrderGuideItem => ({
   id: item.ingredientId,

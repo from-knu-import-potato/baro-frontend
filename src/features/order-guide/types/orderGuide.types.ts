@@ -1,4 +1,4 @@
-export type UrgencyLevel = 'critical' | 'warning' | 'recommended';
+export type UrgencyLevel = 'critical' | 'warning' | 'expiry' | 'recommend';
 
 export interface DemandFactor {
   icon: string;

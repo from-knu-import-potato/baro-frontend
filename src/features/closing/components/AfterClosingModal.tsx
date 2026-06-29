@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 
 import {
   AlertTriangle,
+  CalendarCheck,
+  CalendarDays,
   CheckCircle2,
   ChevronRight,
   ClipboardList,
   LogOut,
-  CalendarCheck,
   ShoppingCart,
   Siren,
 } from 'lucide-react';
@@ -47,7 +48,14 @@ const URGENCY_CONFIG: Record<
     borderClass: 'border-l-2 border-l-baro-red',
     icon: <AlertTriangle className="w-3 h-3" />,
   },
-  recommended: {
+  expiry: {
+    label: '만료',
+    badgeClass:
+      'bg-orange-100 text-orange-700 border border-orange-200 dark:bg-orange-950/40 dark:border-orange-800/40',
+    borderClass: 'border-l-2 border-l-orange-400',
+    icon: <CalendarDays className="w-3 h-3" />,
+  },
+  recommend: {
     label: '권장',
     badgeClass:
       'bg-blue-100 text-baro-blue border border-blue-200 dark:bg-blue-950/40 dark:border-blue-800/40',
@@ -255,8 +263,9 @@ const AfterClosingModal = ({
                     </div>
                     <div className="flex flex-col items-end gap-1 shrink-0">
                       <span className="text-sm font-bold tabular-nums">
-                        {item.recommendedOrderQty}
-                        {item.recommendedOrderUnit}
+                        {item.urgency === 'recommend'
+                          ? '소진 후 재발주'
+                          : `${item.recommendedOrderQty}${item.recommendedOrderUnit}`}
                       </span>
                       <span
                         className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[11px] font-semibold ${cfg.badgeClass}`}
