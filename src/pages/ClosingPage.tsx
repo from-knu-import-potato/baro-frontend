@@ -6,6 +6,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import useAuthStore from '@/features/auth/store/authStore';
+import { fetchBusinessOpenStatus } from '@/features/closing/api/closing.api';
 import AfterClosingModal from '@/features/closing/components/AfterClosingModal';
 import ClosingInventoryDeductionSection, {
   type DeductionRow,
@@ -44,6 +45,7 @@ const ClosingPage = () => {
   const queryClient = useQueryClient();
   const storeId = useAuthStore((s) => s.storeId);
   const clearBusinessSession = useClosingStore((s) => s.clearBusinessSession);
+  const setBusinessSession = useClosingStore((s) => s.setBusinessSession);
   const [searchParams] = useSearchParams();
   const dateParam = searchParams.get('date') ?? undefined;
   const isRetroactive = !!dateParam;
@@ -93,12 +95,21 @@ const ClosingPage = () => {
         })),
       },
       {
-        onSuccess: (res) => {
+        onSuccess: async (res) => {
           setFinalRevenue(res.totalRevenue);
           setClosingId(res.closingId);
           setClosingDate(res.date);
-          // 소급 마감은 오늘 영업 세션과 무관하므로 세션을 유지
-          if (!isRetroactive) clearBusinessSession();
+          if (!isRetroactive) {
+            clearBusinessSession();
+          } else {
+            // 소급 마감이 현재 businessDate를 닫은 경우를 포함해 서버 상태를 동기화
+            try {
+              const status = await fetchBusinessOpenStatus(storeId!);
+              setBusinessSession({ isOpen: status.isOpen, businessDate: status.businessDate });
+            } catch {
+              // 동기화 실패 시에도 마감 자체는 성공이므로 무시
+            }
+          }
           void queryClient.invalidateQueries({ queryKey: ['closing', 'preview'] });
           setAfterModalOpen(true);
         },

@@ -37,61 +37,139 @@
 ```
 src/
 ├─ app/         # 레이아웃, 라우팅, 전역 스타일, AppInitializer
-├─ features/    # 도메인별 기능 모듈 (auth, dashboard, order, inventory, ocr-inbound, order-guide, closing, settings, account-settings)
-│  └─ [domain]/ # components/, hooks/, api/, store/, types/
+├─ features/    # 도메인별 기능 모듈
+│  ├─ auth/              # 로그인, 회원가입, 인증 상태
+│  ├─ dashboard/         # 메인 대시보드
+│  ├─ customer-order/    # 손님 주문 메뉴판
+│  ├─ inventory/         # 재고 현황
+│  ├─ ocr-inbound/       # OCR 입고 처리
+│  ├─ order-guide/       # 발주 가이드
+│  ├─ closing/           # 마감하기
+│  ├─ store-settings/    # 가게 설정 (메뉴, 레시피, 식자재, 테이블 등)
+│  ├─ store-registration/ # 가게 등록, 계정 홈(내 가게 목록)
+│  ├─ account-settings/  # 회원 설정
+│  ├─ initial-setup/     # 가게 초기 세팅
+│  ├─ landing/           # 랜딩 페이지
+│  ├─ notification/      # 알림
+│  └─ theme/             # 다크/라이트 테마
+│  (각 도메인: components/, hooks/, api/, store/, types/)
 ├─ pages/       # 라우팅 페이지 — UI·로직 없이 features 조합만 담당
-├─ widgets/     # 2개 이상 페이지에서 쓰는 조합형 UI
+├─ widgets/     # 2개 이상 페이지에서 쓰는 조합형 UI (AppHeader, AppSidebar)
+├─ lib/         # shadcn 유틸 (cn 함수)
 ├─ shadcn/      # Shadcn 컴포넌트 (수정 금지)
 └─ shared/      # 도메인 무관 공용 리소스
    ├─ api/      # Axios 인스턴스, interceptor
+   ├─ assets/   # 이미지, 폰트 등 정적 파일
    ├─ components/, hooks/, constants/, utils/
-   ├─ design-token/  # colors.css, spacing.css, typography.css
-   ├─ lib/      # queryClient 등
-   ├─ store/    # 전역 상태 (사용자 정보, 인증 토큰)
    └─ types/    # 공용 타입
+   (디자인 토큰은 src/index.css @theme inline에 정의)
 ```
 
 ## 페이지 목록
 
-| 경로               | 페이지               | 접근 주체         |
-| ------------------ | -------------------- | ----------------- |
-| `/`                | 랜딩 페이지          | 전체              |
-| `/login`           | 로그인 (카카오 소셜) | 비회원            |
-| `/initial-setup`   | 가게 초기 세팅       | 사장님 (최초 1회) |
-| `/dashboard`       | 메인 대시보드        | 사장님            |
-| `/inventory`       | 전체 재고 현황       | 사장님            |
-| `/ocr-inbound`     | OCR 재고 입고 처리   | 사장님            |
-| `/order-guide`     | 발주 가이드          | 사장님            |
-| `/closing`         | 마감하기             | 사장님            |
-| `/settings`        | 가게 설정            | 사장님            |
-| `/my-account`      | 회원 설정            | 사장님            |
-| `/order?table={n}` | 손님 주문 메뉴판     | 손님 (비회원)     |
+| 경로                                    | 페이지                       | 접근 주체         |
+| --------------------------------------- | ---------------------------- | ----------------- |
+| `/`                                     | 랜딩 페이지                  | 전체              |
+| `/login`                                | 로그인 (카카오 소셜)         | 비회원            |
+| `/credential-login`                     | 로그인 (아이디/비밀번호)     | 비회원            |
+| `/register`                             | 회원가입 (서비스 초대코드 필요) | 비회원          |
+| `/auth/callback`                        | 카카오 OAuth 콜백 처리       | 자동 처리         |
+| `/my-stores`                            | 계정 홈 (가게 선택)          | 사장님            |
+| `/store-selection`                      | 새 가게 등록 또는 초대코드 합류 | 사장님          |
+| `/initial-setup`                        | 가게 초기 세팅               | 사장님            |
+| `/store-home`                           | 가게 홈 (영업 시작/마감 관리) | 사장님           |
+| `/dashboard`                            | 메인 대시보드                | 사장님            |
+| `/inventory`                            | 전체 재고 현황               | 사장님            |
+| `/inbound-history`                      | 입고 내역                    | 사장님            |
+| `/ocr-inbound`                          | OCR 재고 입고 처리           | 사장님            |
+| `/order-guide`                          | 발주 가이드                  | 사장님            |
+| `/closing`                              | 마감하기                     | 사장님            |
+| `/closing/order-guide-detail`           | 마감 후 발주 가이드 상세      | 사장님           |
+| `/day-closed`                           | 영업 종료 화면               | 사장님            |
+| `/store-settings`                       | 가게 설정 (메인)             | 사장님            |
+| `/store-settings/menus`                 | 메뉴 관리                    | 사장님            |
+| `/store-settings/menu-board`            | 메뉴판 설정                  | 사장님            |
+| `/store-settings/table`                 | 테이블 설정                  | 사장님            |
+| `/store-settings/recipes`               | 레시피 관리                  | 사장님            |
+| `/store-settings/ingredients`           | 식자재 관리                  | 사장님            |
+| `/settings`                             | 회원 설정 (계정 설정)        | 사장님            |
+| `/order/:storeId/table/:tableNumber`    | 손님 주문 메뉴판             | 손님 (비회원)     |
+| `/notices`                              | 공지사항                     | 전체              |
+| `/terms`                                | 이용약관                     | 전체              |
+| `/privacy`                              | 개인정보처리방침             | 전체              |
 
 ## API 연동
 
 - Base URL: `https://api.baro.com/v1` (임시)
-- 로그인: 카카오 OAuth 소셜 로그인 → JWT 발급 (이메일/일반 회원가입 없음)
+- 로그인 방식:
+  - 카카오 OAuth 소셜 로그인 (`/login` 페이지)
+  - 아이디/비밀번호 로그인 (`/credential-login` 페이지)
+  - 회원가입 (`/register` 페이지) — 서비스 초대코드 필요 (서버 환경변수로 관리하는 코드, 가게 멤버 초대코드와 별개)
+- 로그인 후 리다이렉트: 항상 `/my-stores` (계정 홈)으로 이동
+  - 카카오 OAuth: `/auth/callback`에서 토큰 파싱 후 `/my-stores`로 이동
+  - 가게가 없으면 계정 홈에서 "가게 추가하기" → `/store-selection`
 - 인증: JWT Bearer Token (Authorization 헤더)
 - 토큰 갱신: refresh token → `/auth/refresh`
 - 401 감지 시 Axios interceptor에서 자동 로그아웃
-- 실시간 주문 수신: WebSocket 또는 SSE (Server-Sent Events)
+- 실시간 주문 수신: SSE (Server-Sent Events)
 
 ## 상태 관리 전략
 
 - **서버 상태**: React Query — 모든 서버 데이터는 무조건 React Query
-- **클라이언트 전역 상태**: Zustand — 사용자 정보, 인증 토큰, 사이드바, 모달 등 순수 UI 상태만
+- **클라이언트 전역 상태**: Zustand
+  - `authStore` (persist): accessToken, refreshToken, storeId, operatingHours
+  - `closingStore` (persist): businessSession(isOpen/businessDate), todayClosing
+  - `orderWarningsStore`: 주문별 재고 경고 (품절 처리용)
+  - `customerOrderStore`: 손님 주문 목록 (현재 mock 데이터 사용)
+  - `inventoryStore`: 재고 목록 (현재 mock 데이터 사용)
 - **로컬 상태**: `useState`
 - **폼 상태**: React Hook Form
 
 ## 디자인 토큰
 
-| 토큰         | Primary | 용도                 |
-| ------------ | ------- | -------------------- |
-| `baro-blue`  | #449CD4 | 주요 액션 버튼, 링크 |
-| `baro-red`   | #BD5535 | 삭제, 경고           |
-| `baro-green` | #679436 | 입고 완료, 정상 상태 |
-| `baro-black` | #111111 | 텍스트               |
-| `baro-ivory` | #F2E9E1 | 배경 포인트          |
+| 토큰           | Primary | 용도                    |
+| -------------- | ------- | ----------------------- |
+| `baro-blue`    | #449CD4 | 주요 액션 버튼, 링크    |
+| `baro-red`     | #BD5535 | 삭제, 경고              |
+| `baro-green`   | #679436 | 입고 완료, 정상 상태    |
+| `baro-yellow`  | #FFD94D | 주의, 경고 (누락 알림)  |
+| `baro-black`   | #111111 | 텍스트                  |
+| `baro-ivory`   | #F2E9E1 | 배경 포인트             |
+
+각 색상에 `-dark` 변형 존재 (`baro-blue-dark`, `baro-red-dark` 등). 정의 위치: `src/index.css`
+
+## 네비게이션 구조
+
+### 사이드바 (AppSidebar) — AppLayout이 적용된 페이지에서만 표시
+
+메인 메뉴:
+- 대시보드 (`/dashboard`) — 영업 중이 아니거나 마감 완료 시 비활성화
+- 전체 재고 현황 (`/inventory`)
+- 발주 가이드 (`/order-guide`)
+- 가게 설정 (`/store-settings`)
+
+하단 메뉴:
+- 회원 설정 (`/settings`)
+- 계정 홈 (`/my-stores`)
+- 가게 홈 (`/store-home`)
+- 서비스 소개 (`/`)
+
+**OCR 입고(`/ocr-inbound`)는 사이드바에 없음** — 대시보드 카드 또는 직접 URL 접근
+
+### 헤더 (AppHeader) — AppLayout이 적용된 페이지에서만 표시
+
+- **마감하기** 버튼: 영업 중(`isOpen`)이고 오늘 마감 미완료일 때 활성화. 사이드바가 아닌 헤더에 위치.
+- 전날 마감 누락 경고 버튼: 조건부 표시
+
+### AppLayout 적용 페이지
+
+`/dashboard`, `/inventory`, `/inbound-history`, `/order-guide`, `/closing`, `/store-settings/*`, `/settings`
+→ 사이드바 + 헤더 있음
+
+### 사이드바 없는 독립 페이지
+
+`/ocr-inbound`, `/store-home`, `/my-stores`, `/store-selection`, `/initial-setup`, `/day-closed`, `/closing/order-guide-detail`, `/order/:storeId/table/:tableNumber`
+→ 사이드바 없음
 
 ## UI/UX 지침
 
@@ -135,7 +213,7 @@ src/
 - **전역 에러**: ErrorBoundary
 - **API 에러**: Axios interceptor 공통 처리 + 토스트 피드백
 - **폼 유효성**: Zod 스키마 → 서버 에러는 `setError`로 필드 바인딩
-- **로딩**: Suspense + Skeleton UI
+- **로딩**: React Query `isLoading` + Skeleton UI (Suspense 미사용)
 - **404/권한 없음**: 전용 에러 페이지 리다이렉트
 
 ## 금지 사항
@@ -154,7 +232,7 @@ src/
 - 식자재 단위: `g`, `ml`, `개` 세 가지만 사용
 - OCR 단위 환산: `kg→g` (×1000), `L→ml` (×1000) — 프론트엔드에서 처리 후 서버에 표준 단위로 전송
 - 재고 미등록 시 재고 관련 기능 비활성화(disabled) 처리 + 안내 문구 표시
-- 회원 탈퇴: 가게 데이터(재고·메뉴·레시피 등) 초기화 선행 필수
+- 회원 탈퇴: 프론트엔드에서 별도 초기화 단계 없이 `DELETE /users/me` 호출 → 백엔드에서 가게 데이터(재고·메뉴·레시피 등) 일괄 삭제 처리
 
 ## 이슈 & PR 규칙
 
