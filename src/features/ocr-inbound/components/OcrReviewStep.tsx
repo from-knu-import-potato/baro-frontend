@@ -419,14 +419,13 @@ const OcrReviewStep = ({
                   ? Math.round((item.purchaseUnitPrice / item.conversionFactor) * 10) / 10
                   : null;
 
-              const rowBg = cn(
-                item.isWarning && 'bg-red-50/40 dark:bg-red-950/20',
-                !item.isWarning && !item.isMatched && 'bg-green-50/20 dark:bg-green-950/10',
-                !item.isWarning &&
-                  item.purchaseUnit &&
-                  !item.conversionFactor &&
-                  'bg-baro-yellow/10',
-              );
+              const rowBg = item.isWarning
+                ? 'bg-red-50/60 dark:bg-red-950/20'
+                : item.purchaseUnit && !item.conversionFactor
+                  ? 'bg-baro-yellow/10'
+                  : !item.isMatched
+                    ? 'bg-baro-green/10 dark:bg-baro-green/5'
+                    : '';
 
               const warningIcon = item.isWarning ? (
                 <Tooltip>
